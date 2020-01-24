@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>Interventional Tree Explainer</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+<style>
+hover a {
+    color: "Olive";
+}
+
+.sidenav {
+  height: 100%;
+  width: 300px;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  padding-top: 20px;
+}
+
+.sidenav a {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+}
+
+.sidenav a:hover {
+  color: #f1f1f1;
+}
+
+body {font-family: "Lato", sans-serif}
+p {font-size: 20px}
+ul {font-size: 20px}
+caption {font-size: 18px}
+figcaption {font-size: 18px}
+
+.no-margin {
+	margin:0px;
+	font-family:courier;
+	font-size:16px;
+}
+
+</style>
+<body>
+
+
+<div class="sidenav">
+  <a href="#" class="w3-justify w3-button"><h3>Top</h3></a>
+  <a href="#overview" class="w3-justify w3-button"><h3>Overview</h3></a>
+  <a href="#background" class="w3-justify w3-button"><h3>1. Background</h3></a>
+	<a href="#shapley_values" class="w3-justify w3-button" style="margin-left:20px"><h5>1.1 Shapley values</h5></a>
+	<a href="#shap_values" class="w3-justify w3-button" style="margin-left:20px"><h5>1.2 SHAP values</h5></a>
+	<a href="#background_distribution" class="w3-justify w3-button" style="margin-left:20px"><h5>1.3 SHAP values with a <br>Background Distribution</h5></a>
+  <a href="#algorithm" class="w3-justify w3-button"><h3>2. Algorithm</h3></a>
+  	<a href="#brute_force" class="w3-justify w3-button" style="margin-left:20px"><h5>2.1 Brute force <br>implementation</h5></a>
+	<a href="#an_example" class="w3-justify w3-button" style="margin-left:20px"><h5>2.2 An example</h5></a>
+	<a href="#naive_implementation" class="w3-justify w3-button" style="margin-left:20px"><h5>2.3 Naive implementation</h5></a>
+	<a href="#dynamic_programming_implementation" class="w3-justify w3-button" style="margin-left:20px"><h5>2.4 Dynamic programming <br> implementation</h5></a>
+</div>
+
+<!-- Page content -->
+<div class="w3-content" style="max-width:2000px;margin-left:300px">
+<!-- margin-left: 250px; /* Same as the width of the sidebar */ -->
+  <!-- Automatic Slideshow Images -->
+  <div class="w3-display-container w3-center">
+    <img src="images/trees.jpg" style="width:100%">
+    <div class="w3-display-bottommiddle w3-container w3-text-white w3-hide-small">
+      <h2 class="w3-wide"><strong>An End to End Explanation of Interventional Tree Explainer</strong></h2>
+      <h2>Exact game-theoretic explanations of trees in linear time</h2>
+      <h2>Hugh Chen</h2>
+    </div>
+  </div>
+
+  <!-- Overview -->
+  <div class="w3-container w3-content w3-center w3-padding-16" style="max-width:800px" id="abstract">
+  	<h2 class="w3-justify" id="overview">Overview</h2>
+    <p class="w3-opacity w3-justify">
+    	In this article, I explain an algorithm I developed from our <a href="https://www.nature.com/articles/s42256-019-0138-9">paper</a> called Interventional Tree Explainer (ITE).  ITE is currently the default algorithm for explaining trees in the popular <a href="https://github.com/slundberg/shap">SHAP package</a>.  Although ITE is described in our paper, my goal here is to provide a clear and  easy to understand overview of the algorithm.  In this article, I aim to explain SHAP values, how ITE connects to other SHAP methods, and the technical aspects of ITE from the ground up.
+    </p>
+
+    <p class="w3-opacity w3-justify">
+    	As an overview, I will first define the problem we aim to solve with ITE by describing SHAP values (<a href="#background">Background Section</a>), a local feature attribution with desirable properties.  In general, computing SHAP values exactly is NP-hard.  If we focus on explaining tree-based models (e.g., XGBoost, decision trees, random forests, etc.), we can arrive at a naive polynomial time algorithm.  Leveraging dynamic programming, we can then modify the algorithm to run in linear time (<a href="algorithm">Algorithm Section</a>).  
+	</p>
+  </div>
+
+
+  <!-- The Background Section -->
+  <div class="w3-container w3-content w3-center w3-padding-16" style="max-width:800px">
+    <h2 class="w3-justify" id="background">1. Background</h2>
+    
+    <!-- <h3 class="w3-justify" id="trees_popular">1.1 Tree models are popular</h3>
+	<p class="w3-opacity w3-justify">
+    	Why do we even care about explaining trees?
+    </p> -->
+
+
+    <!-- What are Shapley Values? -->
+    <h3 class="w3-justify" id="shapley_values">1.1 Shapley values</h3>
+	<p class="w3-opacity w3-justify">
+    	Shapley values are a concept from cooperative game theory to spread credit among players \(N=\{1,\cdots,d\}\) in a coalitional game \(v(S):2^d\to\mathbb{R}^1\), where \(S\) is a subset of \(N\). 
+    </p>
+
+    <p class="w3-opacity w3-justify">
+    	As an example, let's imagine a company makes a profit \(v(S)\) dollars in 2020, determined by what combination of individuals \(S\) they employ in 2020.  Furthermore, let's assume we know \(v(S)\) for all possible combinations.  Then, the Shapley values assign credit to an individual \(i\) by taking a weighted average of how much the profit increases when \(i\) works together with all possible subsets (combinations) of the remaining individuals:
+    	$$
+    	\overbrace{\phi_i(v)}^{\text{Shapley value of player }i}=\sum_{S\subseteq \underbrace{N\setminus\{i\}}_{\text{Remaining individuals}}}\overbrace{\frac{|S|!(|N|-|S|-1)!}{|N|!}}^{\text{Weight }W(|S|,|N|)}(\overbrace{v(S\cup\{i\})-v(S)}^{\text{Profit individual }i\text{ adds}})
+    	$$
+    	The Shapley values consider how much an individual increases profit when they work together with all other possible teams.  Furthermore, they are a unique solution to spreading credit under several desirable axioms.  In this article I won't delve into why Shapley values are desirable, but if you are interested here are a few resources...
+    </p>
+
+
+    <!-- What are SHAP Values? -->
+    <h3 class="w3-justify" id="shap_values">1.2 SHAP values</h3>
+	<p class="w3-opacity w3-justify">
+    	SHAP values are a variant of Shapley values designed to explain ML models.  For SHAP values, the game \(v(S)\) is now related to a machine learning model \(f(x)\) and the set of players is now a feature vector \(x\in\mathbb{R}^d\).
+    </p>
+
+    <p class="w3-opacity w3-justify">
+    	Previously, for Shapley values the game's output \(v(S)\) was the value of the game with the players in \(S\) "present" and the remaining players "missing".  For \(v(S)\), "missing" is naturally defined: whether or not a player \(i\) is present in the set \(S\) (or, as in our example, whether an employee was working for the company in 2020).  
+    </p>
+
+    <p class="w3-opacity w3-justify">
+    	In comparison, ML models generally require a fixed length input which makes setting features to be "missing" or "present" less straightforward.  One natural way to do this is with a conditional expectation.  In words, the value of the game is the expected value of the model if we condition on a set of features that are "present".  If we define \(D\) to the background (underlying) distribution \(x\) is drawn from, then:
+    	$$
+		v(S)=\mathbb{E}_\mathcal{D}[f(x)|x_{S \cup \{i\}}]
+    	$$
+    	One caveat is that modelling the conditional expectation is very difficult.  Further, even if you do perfectly obtain the conditional expectation, the correlations you capture may cause you to attribute to features your model is not truly "using".  Although explaining relationships by modelling the conditional expectation may be desirable for some use cases, our goal is to explain the model itself; therefore, an arguably more natural approach is to use causal inference's <i>interventional conditional expectation</i>:
+    	$$
+    	v(S)=\mathbb{E}_\mathcal{D}[f(x)|\text{do}(x_{S \cup \{i\}})]
+    	$$
+    	The motivation for this interventional conditional expectation comes from \cite{janzing2019feature} which is also very close to Random Baseline Shapley in \cite{sundararajan2019many}).  Additionally, this is exactly the assumption made by Kernel Explainer and Sampling Explainer from the SHAP package.
+    </p>
+
+    <!-- Background distribution -->
+    <h3 class="w3-justify" id="background_distribution">1.3 SHAP values with a background distribution</h3>
+
+	<p class="w3-opacity w3-justify">
+		As we saw earlier, we need to evaluate the interventional conditional expectation to compute \(\phi_i(f,x)\). The interventional conditional expectation depends on a <i>background distribution</i> \(D\) that our foreground sample \(x\) is compared against to compute the SHAP value.  
+	</p>
+
+	<p class="w3-opacity w3-justify">
+		One natural definition of the background distribution is a uniform distribution over a population sample.  For instance, in machine learning, you could assign equal probability to every sample in your training set.  With this background distribution, we can re-write the SHAP value as an average of <i>single reference SHAP values</i>:
+		$$
+		\phi_i(f,x)=\frac{1}{|D|}\sum_{\hat{x}\in D}\phi_i(f,x,\hat{x})
+		$$
+	</p>  
+
+		<!-- Proof -->
+	<div style="background-color:aliceblue;">
+
+		<div style="padding-left:10px;padding-right:10px">
+
+			<p class="w3-justify"><a onclick="hideshow('proof_backgrounddist')"><strong>Proof (Click)</strong></a></p>
+
+			<div id="proof_backgrounddist", style="display:none">
+
+			    <p class="w3-opacity w3-justify">
+				    Define \(\mathcal{X}(x,\hat{x},S)\) to return a hybrid sample \(h\) where the features in \(S\) are from \(x\) and the remaining features are from \(\hat{x}\).  Define \(C\) to be all combinations of the set \(N \setminus \{i\}\) and \(P\) to be all permutations of \(N \setminus \{i\}\).  Starting with the definition of SHAP values: 
+					$$
+					\begin{aligned}
+					\phi_i(f,x)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(X)|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[f(X)|x_{S}])\\
+					&=\frac{1}{|P|}\sum_{S\subseteq P} \mathbb{E}_\mathcal{D}[f(x)|\text{do}(x_{S \cup \{i\}})] {-} \mathbb{E}_\mathcal{D}[\text{do}(f(x)|x_{S})]\\
+					&= \frac{1}{|P|}\sum_{S\subseteq P}\frac{1}{|D|}\sum_{\hat{x}\in D} f(\mathcal{X}(x,\hat{x},S\cup \{i\})) {-} f(\mathcal{X}(x,\hat{x},S))\\
+					&= \frac{1}{|D|}\sum_{\hat{x}\in D} \frac{1}{|P|}\sum_{S\subseteq P} f(\mathcal{X}(x,\hat{x},S\cup \{i\})) {-} f(\mathcal{X}(x,\hat{x},S)) \\
+					&= \frac{1}{|D|}\sum_{\hat{x}\in D} \underbrace{\sum_{S\subseteq C} W(|S|,|N|)f(\mathcal{X}(x,\hat{x},S\cup \{i\})) {-} f(\mathcal{X}(x,\hat{x},S))}_{\text{Single reference SHAP value}}\\
+					&=\frac{1}{|D|}\sum_{\hat{x}\in D}\phi_i(f,x,\hat{x})
+					\end{aligned}
+					$$
+
+					To go from line 2 to 3, we observe that when the background distribution is a single sample \(\hat{x}\), the interventional conditional expectation is simply:
+					$$
+					\mathbb{E}_\mathcal{D}[f(x)|\text{do}(x_{S \cup \{i\}})]=\mathcal{X}(x,\hat{x},S)
+					$$
+
+				</p>
+
+			</div>
+		</div>
+
+	</div>
+
+	<p class="w3-opacity w3-justify">
+		In words, we reduce the more complicated problem of obtaining \(\phi_i(f,x)\) to an average of much simpler problems \(\phi_i(f,x,\hat{x})\) where our foreground sample \(x\) is compared to a background distribution \(D\) with only one background sample \(\hat{x}\).
+	</p>
+
+  </div>
+
+
+    <div class="w3-container w3-content w3-center w3-padding-16" style="max-width:800px">
+    <h2 class="w3-justify" id="algorithm">2. Algorithm</h2>
+    
+    <p class="w3-opacity w3-justify">
+    Now our goal is to tackle the simpler problem of obtaining single reference SHAP values \(\phi_i(f,x,\hat{x})\). 
+	</p>
+
+    <!-- Brute force -->
+    <h3 class="w3-justify" id="brute_force">2.1 Brute force</h3>
+
+    <p class="w3-opacity w3-justify">
+    	The brute force approach would be to compute the following:
+
+    	$$
+    	\phi_i(f,x,\hat{x})=\sum_{S\subseteq N\setminus\{i\}} \underbrace{W(|S|,|N|)}_{W}\underbrace{f(\mathcal{X}(x,\hat{x},S\cup \{i\}))}_{\text{\textcolor{green}{Pos} term}} {-} \underbrace{f(\mathcal{X}(x,\hat{x},S)}_{\text{\textcolor{red}{Neg} term}})
+    	$$
+
+    	If the cost of computing the weight \(W\) is constant, then the computational complexity of the brute force method is the number of terms in the summation times the cost of making a prediction \(f(x)\) (likely on the order of the depth of the tree \(O(D)\)).  Since we consider two terms (\(\text{\textcolor{green}{Pos}}\) and \(\text{\textcolor{red}{Neg}}\)) for all possible combinations of the full set of features (without \(i\)), the computational complexity is \(O(D\times2^{d})\).
+
+    	Finally, the computational complexity to compute \(\phi_i(f,x,\hat{x})\) for all features is \(O(|N|\times D\times 2^{d})\).
+
+	</p>
+
+
+    <!-- Sampling based -->
+<!--     <h3 class="w3-justify" id="algo_expo">Sampling based approaches</h3>
+
+    <p class="w3-opacity w3-justify">
+	    There are a number of sampling based approaches to obtain SHAP values that use an interventional conditional expectation.  Two notable ones are Sampling Explainer and Kernel Explainer.  To approximate \(\phi_i(f,x)\) Sampling Explainer uses monte carlo sampling and Kernel Explainer uses a special weighted linear regression.  These methods are model-agnostic and all they require is the ability to evaluate \(f(x)\).  
+	</p> -->
+
+	<p class="w3-opacity w3-justify">
+	    However, if we constrain \(f(x)\) to be a tree-based model (e.g., XGBoost, decision trees, random forests, etc.), then we can come up with a simple polynomial time algorithm to compute \(\phi_i(f,x,\hat{x})\) exactly.  In the following section we discuss an example to provide intuition as to why.
+	</p>
+
+
+    <!-- Example -->
+    <h3 class="w3-justify" id="an_example">2.2 An Example</h3>
+
+	<div style="overflow-x:auto;">
+
+		<figure  style="float:left">
+			<figcaption class="w3-opacity">Figure 1: Binary tree example.</figcaption>
+			<img src="images/tree_example.jpg" alt="Tree Example" width="300">
+		</figure>
+
+		<table cellpadding="10" align="center">
+			<br>
+			<caption class="w3-opacity">Foreground sample \(x\).</caption>
+			<thead>
+				<tr>
+					<th title="Field #4">\(x_1\)</th>
+					<th title="Field #4">\(x_2\)</th>
+					<th title="Field #5">\(x_3\)</th>
+					<th title="Field #6">\(x_4\)</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr bgcolor="#F8F8F8">
+					<td align="right">\(-1\)</td>
+					<td align="right">\(2\)</td>
+					<td align="right">\(-3\)</td>
+					<td align="right">\(-4\)</td>
+				</tr>
+			</tbody>
+		</table>
+
+	<br>
+
+		<table cellpadding="10" align="center">
+			<caption class="w3-opacity">Background sample \(\hat{x}\).</caption>
+			<thead>
+				<tr>
+					<th title="Field #4">\(\hat{x}_1\)</th>
+					<th title="Field #4">\(\hat{x}_2\)</th>
+					<th title="Field #5">\(\hat{x}_3\)</th>
+					<th title="Field #6">\(\hat{x}_4\)</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr bgcolor="#F8F8F8">
+					<td align="right">\(1\)</td>
+					<td align="right">\(-2\)</td>
+					<td align="right">\(3\)</td>
+					<td align="right">\(4\)</td>
+				</tr>
+			</tbody>			
+		</table>
+	</div>
+
+    <p class="w3-opacity w3-justify">
+    	In this section, we will focus on the tree in Figure 1.  First of all, we can examine a brute force approach to explain feature \(1\) with \(x=[-1,2,-3,-4]\) and \(\hat{x}=[1,-2,3,4]\).  
+	</p>
+
+    <p class="w3-opacity w3-justify">
+    	In Table 1, each row corresponds to a combination \(S\) in the brute force summation.  In addition, we report the hybrid features \(h_i\) that are taken from either \(x\) and \(\hat{x}\).  The weight \(W\) is based on the size of \(S\) and the \(\text{\textcolor{green}{Pos}}\) and \(\text{\textcolor{red}{Neg}}\) terms correspond to \(f(\mathcal{X}(x,\hat{x},S\cup \{i\}))\) and \(f(\mathcal{X}(x,\hat{x},S))\) respectively.
+	</p>	
+
+    <p class="w3-opacity w3-justify">
+		We color \(h_1\) to be green if it came from \(x\) and red if it came from \(\hat{x}\), because if \(h_1\) is from \(x\) it corresponds to the \(\text{\textcolor{green}{Pos}}\) term and if \(h_1\) is from \(\hat{x}\) it corresponds to the \(\text{\textcolor{red}{Neg}}\) term.
+	</p>
+
+	<div style="overflow-x:auto;">
+		<table cellpadding="10" align="center">
+			<caption class="w3-opacity"><strong>Table 1: </strong>Brute force approach to compute \(\phi_1(f,x,\hat{x})\) has \(2^3\) rows and \(2^4\) \(\textcolor{green}{Pos}\)/\(\text{\textcolor{red}{Neg}}\) terms, where \(4\) is the total number of features.</caption>
+			<thead>
+				<tr>
+					<th title="Field #1">\(S\)</th>
+					<th title="Field #2">\(\textcolor{green}{h_1}\)</th>
+					<th title="Field #3">\(\textcolor{red}{h_1}\)</th>
+					<th title="Field #4">\(h_2\)</th>
+					<th title="Field #5">\(h_3\)</th>
+					<th title="Field #6">\(h_4\)</th>
+					<th title="Field #7">\(W\)</th>
+					<th title="Field #8">\(\text{\textcolor{green}{Pos}}\)</th>
+					<th title="Field #9">\(\text{\textcolor{red}{Neg}}\)</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr bgcolor="#F8F8F8">
+					<td>\(\{\}\)</td>
+					<td align="right">\(-1\)</td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(-2\)</td>
+					<td align="right">\(3\)</td>
+					<td align="right">\(4\)</td>
+					<td>\(1/4\)</td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(4\)</td>
+				</tr>
+				<tr bgcolor="#F8F8F8">
+					<td>\(\{2\}\)</td>
+					<td align="right">\(-1\)</td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(2\)</td>
+					<td align="right">\(3\)</td>
+					<td align="right">\(4\)</td>
+					<td>\(1/12\)</td>
+					<td align="right">\(2\)</td>
+					<td align="right">\(4\)</td>
+				</tr>
+				<tr bgcolor="#F8F8F8">
+					<td>\(\{3\}\)</td>
+					<td align="right">\(-1\)</td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(-2\)</td>
+					<td align="right">\(-3\)</td>
+					<td align="right">\(4\)</td>
+					<td>\(1/12\)</td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(3\)</td>
+				</tr>
+				<tr bgcolor="#F8F8F8">
+					<td>\(\{2,3\}\)</td>
+					<td align="right">\(-1\)</td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(2\)</td>
+					<td align="right">\(-3\)</td>
+					<td align="right">\(4\)</td>
+					<td>\(1/12\)</td>
+					<td align="right">\(2\)</td>
+					<td align="right">\(3\)</td>
+				</tr>
+				<tr bgcolor="#E8E8E8">
+					<td>\(\{4\}\)</td>
+					<td align="right">\(-1\)</td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(-2\)</td>
+					<td align="right">\(3\)</td>
+					<td align="right">\(-4\)</td>
+					<td>\(1/12\)</td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(4\)</td>
+				</tr>
+				<tr bgcolor="#E8E8E8">
+					<td>\(\{2,4\}\)</td>
+					<td align="right">\(-1\)</td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(2\)</td>
+					<td align="right">\(3\)</td>
+					<td align="right">\(-4\)</td>
+					<td>\(1/12\)</td>
+					<td align="right">\(2\)</td>
+					<td align="right">\(4\)</td>
+				</tr>
+				<tr bgcolor="#E8E8E8">
+					<td>\(\{3,4\}\)</td>
+					<td align="right">\(-1\)</td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(-2\)</td>
+					<td align="right">\(-3\)</td>
+					<td align="right">\(-4\)</td>
+					<td>\(1/12\)</td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(3\)</td>
+				</tr>
+				<tr bgcolor="#E8E8E8">
+					<td>\(\{2,3,4\}\)</td>
+					<td align="right">\(-1\)</td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(2\)</td>
+					<td align="right">\(-3\)</td>
+					<td align="right">\(-4\)</td>
+					<td>\( 1/4\)</td>
+					<td align="right">\(2\)</td>
+					<td align="right">\(3\)</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+    <p class="w3-opacity w3-justify">
+    	<strong>Observation 1: We can ignore variables that are not present in the tree.</strong>   This is particularly useful for tree ensemble methods where each tree in the ensemble may be small, but the overall number of features is large.
+	</p>
+
+	<p class="w3-opacity w3-justify">
+		In particular, the value of \(h_4\) does not influence the tree or summation.  We can collapse the top and bottom half of Table 1 by summing \(W\) and keeping \(\text{\textcolor{green}{Pos}}\) and \(\text{\textcolor{red}{Neg}}\) values:
+	</p>
+	
+	<!-- Table 2 -->
+	<div style="overflow-x:auto;">
+		<table cellpadding="10" align="center">
+			<caption class="w3-opacity"><strong>Table 2: </strong> We can reduce to \(2^2\) rows and \(2^3\) terms.</caption>
+			<thead>
+				<tr>
+					<th title="Field #1">\(S\)</th>
+					<th title="Field #2">\(\textcolor{green}{h_1}\)</th>
+					<th title="Field #3">\(\textcolor{red}{h_1}\)</th>
+					<th title="Field #4">\(h_2\)</th>
+					<th title="Field #5">\(h_3\)</th>
+					<th title="Field #7">\(W\)</th>
+					<th title="Field #8">\(\text{\textcolor{green}{Pos}}\)</th>
+					<th title="Field #9">\(\text{\textcolor{red}{Neg}}\)</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr bgcolor="#F8F8F8">
+					<td>\(\{\}\)</td>
+					<td align="right">\(-1\)</td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(-2\)</td>
+					<td align="right">\(3\)</td>
+					<td>\(1/3\)</td>
+					<td align="right" bgcolor="#f4eff5">\(1\)</td>
+					<td align="right" bgcolor="#fef5e6">\(4\)</td>
+				</tr>
+				<tr bgcolor="#F8F8F8">
+					<td>\(\{2\}\)</td>
+					<td align="right">\(-1\)</td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(2\)</td>
+					<td align="right">\(3\)</td>
+					<td>\(1/6\)</td>
+					<td align="right" bgcolor="#edf2f8">\(2\)</td>
+					<td align="right" bgcolor="#fef5e6">\(4\)</td>
+				</tr>
+				<tr bgcolor="#F8F8F8">
+					<td>\(\{3\}\)</td>
+					<td align="right">\(-1\)</td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(-2\)</td>
+					<td align="right">\(-3\)</td>
+					<td>\(1/6\)</td>
+					<td align="right" bgcolor="#f4eff5">\(1\)</td>
+					<td align="right" bgcolor="#ffffe5">\(3\)</td>
+				</tr>
+				<tr bgcolor="#F8F8F8">
+					<td>\(\{2,3\}\)</td>
+					<td align="right">\(-1\)</td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(2\)</td>
+					<td align="right">\(-3\)</td>
+					<td>\(1/3\)</td>
+					<td align="right" bgcolor="#edf2f8">\(2\)</td>
+					<td align="right" bgcolor="#ffffe5">\(3\)</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+
+    <p class="w3-opacity w3-justify">
+    	<strong>Observation 2: The number of \(\text{\textcolor{green}{Pos}}\) and \(\text{\textcolor{red}{Neg}}\) terms we need to calculate is equal to the number of leaves in the tree.</strong>  We color each term in Table 2 to illustrate which path in Figure 2 corresponds to each term.  Then, we can collapse the terms in Table 2 based on these paths to obtain Table 3.
+	</p>
+
+
+	<!-- Table 3 -->
+	<div style="overflow-x:auto;">
+		<figure style="float:left">
+			<figcaption class="w3-opacity"><strong>Figure 2:</strong> Paths corresponding <br>to terms in Table 3.</figcaption>
+			<br>
+			<img src="images/tree_example2.jpg" alt="Tree Example" height="220">
+		</figure>
+
+		<br>
+		<table cellpadding="10"> <!-- align="center" -->
+			<caption class="w3-opacity"><strong>Table 3:</strong> We can reduce to \(2^2\) rows and \(2^2\) terms.</caption>
+			<thead>
+				<tr>
+					<th title="Field #1">\(S\)</th>
+					<th title="Field #2">\(\textcolor{green}{h_1}\)</th>
+					<th title="Field #3">\(\textcolor{red}{h_1}\)</th>
+					<th title="Field #4">\(h_2\)</th>
+					<th title="Field #5">\(h_3\)</th>
+					<th title="Field #7">\(W\)</th>
+					<th title="Field #8">\(\text{\textcolor{green}{Pos}}\)</th>
+					<th title="Field #9">\(\text{\textcolor{red}{Neg}}\)</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr bgcolor="#F8F8F8">
+					<td>\(\{\}\)</td>
+					<td align="right">\(-1\)</td>
+					<td align="right"></td>
+					<td align="right">\(-2\)</td>
+					<td align="right">\(3\)</td>
+					<td>\(1/2\)</td>
+					<td align="right" bgcolor="#f4eff5">\(1\)</td>
+					<td align="right"></td>
+				</tr>
+				<tr bgcolor="#F8F8F8">
+					<td>\(\{2\}\)</td>
+					<td align="right">\(-1\)</td>
+					<td align="right"></td>
+					<td align="right">\(2\)</td>
+					<td align="right">\(3\)</td>
+					<td>\(1/2\)</td>
+					<td align="right" bgcolor="#edf2f8">\(2\)</td>
+					<td align="right"></td>
+				</tr>
+				<tr bgcolor="#F8F8F8">
+					<td>\(\{\}\)</td>
+					<td align="right"></td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(-2\)</td>
+					<td align="right">\(3\)</td>
+					<td>\(1/2\)</td>
+					<td align="right"></td>
+					<td align="right" bgcolor="#fef5e6">\(4\)</td>
+				</tr>
+				<tr bgcolor="#F8F8F8">
+					<td>\(\{3\}\)</td>
+					<td align="right"></td>
+					<td align="right">\(1\)</td>
+					<td align="right">\(-2\)</td>
+					<td align="right">\(-3\)</td>
+					<td>\(1/2\)</td>
+					<td align="right"></td>
+					<td align="right" bgcolor="#ffffe5">\(3\)</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>	
+
+	<p class="w3-opacity w3-justify">
+		<strong>Intuition:</strong> Drawing on this observation, we can intuitively see that each path in the tree will correspond to one of the \(\text{\textcolor{green}{Pos}}\) or \(\text{\textcolor{red}{Neg}}\) terms we need to calculate.  In the next section, we will discuss a naive algorithm to obtain these terms.
+	</p>
+    
+    <!-- Naive Implementation -->
+    <h3 class="w3-justify" id="naive_implementation">2.3 Naive Implementation</h3>
+
+
+	<p class="w3-opacity w3-justify">
+    	<strong>Theorem 1: To calculate \(\phi_i(f,x,\hat{x})\), we can calculate contributions for each path from the root to each leaf.</strong>  For a given path \(P\), we define \(N_P\) to be the "unique" features encountered and \(S_P\) to be the "unique" features that came from \(x\).  Finally, define \(v\) to be the value of the path's leaf.  Then, the contribution of the path is:
+
+    	$$
+		\phi_i^P(f,x,\hat{x})=
+	    \begin{cases}
+	    	0 & \text{if}\ i\notin N_P \\
+	    	W(|S_P|-1,|N_P|)\times v & \text{if}\ i\in S_P \\
+	    	-W(|S_P|,|N_P|)\times v & \text{o.w.}
+	    \end{cases}
+    	$$
+
+	</p>
+
+	<!-- Proof -->
+	<div style="background-color:aliceblue;">
+
+		<div style="padding-left:10px;padding-right:10px">
+
+			<p class="w3-justify"><a onclick="hideshow('proof')"><strong>Sketch of Proof (Click)</strong></a></p>
+
+			<div id="proof", style="display:none">
+
+				<p class="w3-opacity w3-justify">
+					If we treat each path in the tree from the root to the leaf as a separate model \(f'(x)\) that returns the value of the leaf if that path is traversed by \(x\) or zero otherwise, then we have \(L\) models that operate on disjoint parts of the input space.  Then, \(f(x)=\sum f'(x)\) and by the additivity of SHAP values, \(\phi_i(f,x,\hat{x})=\sum_f\phi_i(f',x,\hat{x})\).  Then, we can simply calculate \(\phi_i\) for each path model.  Since the path model is zero everywhere except for the associated path, it is easy to arrive to the solution in Theorem 1.
+				</p>
+
+			</div>
+		</div>
+
+	</div>
+
+	<p class="w3-opacity w3-justify">
+		Then the goal of the algorithm is to obtain \(N_P\) and \(S_P\) for each path by doing recursively doing a pre order traversal of the tree.  We will start by explaining the algorithm via an example:
+	</p>
+
+	<figure>
+		<figcaption class="w3-opacity">Figure 3: Example for naive algorithm.  Green paths are associated with \(x\) and red paths are associated with \(x'\).</figcaption>
+		<img src="images/tree_example3.jpg" alt="Tree Example 3" width="300">
+	</figure>
+
+	<p class="w3-opacity w3-justify">
+		In the final algorithm, maintain a list of \(N_P\) and \(S_P\) as we traverse paths.  We will do a bit of work at each node to update the lists depending on a number of cases.  In Figure 3, we can see these cases for each node \(n\) that splits on a feature \(n_{feature}\):
+		<ul class="w3-opacity w3-justify">
+			<li>Case 1: At a leaf.  Compute the contribution in Theorem 1 based on the \(N_P\) and \(S_P\) that land at each leaf.</li>
+			<li>Case 2: The feature has been encountered in the path previously.  In this example's path, \(x_1\) was already split on at the root of the tree and it went the direction of \(x'\).  This means we add nothing to \(N_P\) and \(S_P\) because we have already encountered this feature and traverse down the appropriate path associated with \(x'\).</li>
+			<li>Case 3: Both \(x\) and \(x'\) are on the same side of the threshold.  In this case, we again don't add to \(N_P\) and \(S_P\) because relative to our foreground and background samples, there is no difference.</li>
+			<li>Case 4: \(x\) and \(x'\) go to different children.  In this case, we add \(n_{feature}\) to both \(N_P\) and \(S_P\) for the \(x\) path.  For the \(x'\) path, we only add \(n_{feature}\) to \(N_P\).</li>
+		</ul>
+	</p>
+
+
+
+
+
+	<!-- Pseudocode -->
+	<div style="background-color:#e6ffee;">
+
+		<div style="padding-left:10px;padding-right:10px">
+
+			<p class="w3-justify"><a onclick="hideshow('pseudocode_naive')"><strong>Pseudocode (Click)</strong></a></a></p>
+
+			<div id="pseudocode_naive">
+			<p class="no-margin w3-opacity w3-justify" style="font-family:courier;font-size:16px">
+				ITE_N(array \(x\), array \(\hat{x}\), tree \(T\)):
+			</p>
+
+			<ul class="no-margin w3-opacity w3-justify" style="font-family:courier;font-size:16px">
+				RECURSE(node \(n\), list \(S_P\), list \(N_P\), array \(x\), array \(\hat{x}\)):
+				<ul style="font-size:16px">
+					<font color="#8E44AD">// Case 1: At a leaf</font><br>
+					if n is a leaf:
+					<ul style="font-size:16px">
+						return \(\phi_i^P(f,x,\hat{x})\) based on \(S_P\) and \(N_P\) (Theorem 1)
+					</ul>
+					<font color="#8E44AD">// Find children associated with \(x\) and \(\hat{x}\)</font><br>
+					\(x_{child} =\) \(n_{leftchild}\) if \(x[n_{feature}] < n_{threshold}\) else \(x_{child}\) = \(n_{rightchild}\) <br>
+					\(\hat{x}_{child} =\) \(n_{leftchild}\) if \(\hat{x}[n_{feature}] < n_{threshold}\) else \(\hat{x}_{child}\) = \(n_{rightchild}\) <br>
+					<font color="#8E44AD">// Case 2: Feature was encountered previously</font><br>
+					if \(n_{feature}\in N_P\):
+					<ul style="font-size:16px">
+						if \(n_{feature}\in S_P\):
+						<ul style="font-size:16px">
+							return ITE_N(\(x_{child}\),\(S_P\),\(N_P\),\(x\),\(\hat{x}\))
+						</ul>
+						else: 
+						<ul style="font-size:16px">
+							return ITE_N(\(\hat{x}_{child}\),\(S_P\),\(N_P\),\(x\),\(\hat{x}\))
+						</ul>
+					</ul>
+
+					<font color="#8E44AD">// Case 3: \(x\) and \(\hat{x}\) go to same children</font><br>
+					if \(x_{child}==\hat{x}_{child}\):
+					<ul style="font-size:16px">
+						return ITE_N(\(x_{child}\),\(S_P\),\(N_P\),\(x\),\(\hat{x}\))
+					</ul>
+					<font color="#8E44AD">// Case 4: \(x\) and \(\hat{x}\) go to different children</font><br>
+					if not \(x_{child}==\hat{x}_{child}\):
+					<ul style="font-size:16px">
+						return ITE_N(\(\hat{x}_{child}\),\(S_P\),\(N_P+[n_{feature}]\),\(x\),\(\hat{x}\)) + <br> ITE_N(\(x_{child}\),\(S_P+[n_{feature}]\),\(N_P+[n_{feature}]\),\(x\),\(\hat{x}\))
+					</ul>
+				</ul>
+				return RECURSE(\(T_{rootnode}\), \(S_P=[\ ]\), \(N_P=[\ ]\), \(x\), \(\hat{x}\))
+			</ul>
+			</div>
+
+		</div>
+
+	</div>
+
+
+
+
+<!--     <p class="w3-opacity w3-justify">
+    	<ul class="w3-opacity w3-justify">
+    		<li>Start at the root of the tree.</li>
+    		<li>Traverse down the tree</li>
+    		<li>At each split record whether you split on \(x\) or \(\hat{x}\) as well as keep a list of the features you split on</li>
+    		<li>If \(x\) and \(\hat{x}\) go down the same way don't add to the list of features</li>
+    		<li>At the leaves of the tree, if \(i\) is above in the path compute the contribution to feature \(i\) based on the size of the list of features as well as whether \(i\) was split on by \(x\) or \(\hat{x}\)</li>
+    	</ul>
+	</p> -->
+
+    <p class="w3-opacity w3-justify">
+		Computational complexity to compute \(\phi_i(f,x,\hat{x})\) for all features is \(O(|N|\times T_{numnodes}\times T_{depth})\) where \(T_{numnodes}\) is the number of nodes in the tree and \(T_{depth}\) is the depth of the tree.  Note that we can actually get rid of the multiplicative \(T_{depth}\) factor by simply being more clever with the data structures we use to represent \(S_P\) and \(N_P\).  Using this in conjunction with a dynamic programming observation, we can compute all attributions for all features in linear time in the next section.
+	</p>
+
+    <!-- Dynamic Programming -->
+    <h3 class="w3-justify" id="dynamic_programming_implementation">2.4 Dynamic Programming Implementation</h3>
+
+    <p class="w3-opacity w3-justify">
+	    Using something akin to the collapsibility we observed in <a href="#an_example">our example</a>, we can actually just compute the attributions for all features simultaneously by assigning credit to features based on the feature split on at each node in the tree.  We do a similar algorithm to the one above, except we pass \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) contributions upstream and use them for each feature we encounter.
+	</p>
+
+	<div style="overflow-x:auto;">
+
+		<figure style="float:left">
+			<figcaption class="w3-opacity">Figure 4: Example to illustrate collapsibility for features.</figcaption>
+			<img src="images/tree_example4.jpg" alt="Tree Example 3" width="300">
+		</figure>
+
+		<table cellpadding="10" align="center">
+			<br>
+			<caption class="w3-opacity">Attributions.</caption>
+			<thead class="w3-opacity">
+				<tr>
+					<th>Feature</th>
+					<th>\(\phi_i(f,x,x')\)</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr bgcolor="#F8F8F8">
+					<td align="left">\(x_1\)</td>
+					<td align="left">\(\textcolor{green}{\text{Pos}}_1+\textcolor{green}{\text{Pos}}_2+\textcolor{red}{\text{Neg}}_3+\textcolor{red}{\text{Neg}}_4\)</td>
+				</tr>
+				<tr bgcolor="#F8F8F8">
+					<td align="left">\(x_2\)</td>
+					<td align="left">\(\textcolor{red}{\text{Neg}}_1+\textcolor{green}{\text{Pos}}_2+\textcolor{green}{\text{Pos}}_3+\textcolor{red}{\text{Neg}}_4\)</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+
+
+	<p class="w3-opacity w3-justify">
+		In Figure 4, we can look at the attributions for \(x_1\) and \(x_2\).  First we can observe that for each leaf, according to Theorem 1, there are only two possible values to compute (what we have been calling \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\)).  Based on the attributions for each feature we can see that the positive and negative terms can be grouped for \(x_1\)by the left and right subtrees.  This observation generalizes well and allows us to do a constant amount of work at every node by grouping positive and negative terms and passing them up the tree.
+	</p>
+
+
+	<!-- Pseudocode -->
+	<div style="background-color:#e6ffee;">
+
+		<div style="padding-left:10px;padding-right:10px">
+
+			<p class="w3-justify"><a onclick="hideshow('pseudocode_dynamic')"><strong>Pseudocode (Click)</strong></a></a></p>
+
+			<!-- <div id="pseudocode_dynamic", style="display:none"> -->
+			<div id="pseudocode_dynamic">
+			<p class="no-margin w3-opacity w3-justify">
+				ITE_D(tree \(t\), array \(x\), array \(\hat{x}\)):
+			</p>
+			<ul class="no-margin w3-opacity w3-justify">
+				\(\phi=\) [0]*\(len(x)\) <br>
+
+				RECURSE(node \(n\), int \(S^c\), int \(N^c\), array \(x_a\), array \(\hat{x}_a\)):
+				<ul style="font-family:courier;font-size:16px">
+					<font color="#8E44AD">// Case 1: At a leaf</font><br>
+					if \(n\) is a leaf:
+					<ul style="font-family:courier;font-size:16px">
+						if \(U==0\): return (0,0)<br>
+						else: return (\(W(S^c,N-1)\times n_{value}\),\(-W(S^c,N^c)\times n_{value}\))
+					</ul>
+					<font color="#8E44AD">// Find children associated with \(x\) and \(\hat{x}\)</font><br>
+					\(x_{child} =\) \(n_{leftchild}\) if \(x[n_{feature}] < n_{threshold}\) else \(x_{child}\) = \(n_{rightchild}\) <br>
+					\(\hat{x}_{child} =\) \(n_{leftchild}\) if \(\hat{x}[n_{feature}] < n_{threshold}\) else \(\hat{x}_{child}\) = \(n_{rightchild}\) <br>
+					<font color="#8E44AD">// Case 2: Feature was encountered previously</font><br>
+					if \(x_a[n_{feature}]>0\):
+					<ul style="font-size:16px">
+						return RECURSE(\(x_{child}\),\(S^c\),\(N^c\),\(x_a\),\(\hat{x}_a\))
+					</ul>
+					if \(\hat{x}_a[n_{feature}]>0\):
+					<ul style="font-size:16px">
+						return RECURSE(\(\hat{x}_{child}\),\(S^c\),\(N^c\),\(x_a\),\(\hat{x}_a\))
+					</ul>
+
+					<font color="#8E44AD">// Case 3: \(x\) and \(\hat{x}\) go to same children</font><br>
+					if \(x_{child}==\hat{x}_{child}\):
+					<ul style="font-size:16px">
+						return RECURSE(\(x_{child}\),\(S^c\),\(N^c\),\(x\),\(\hat{x}\))
+					</ul>
+					<font color="#8E44AD">// Case 4: \(x\) and \(\hat{x}\) go to different children</font><br>
+					\(X_a =\) copy(\(x_a\)); \(X_a[n_{feature}]=X_a[n_{feature}]+1\)<br>
+					\(\hat{X}_a =\) copy(\(\hat{x}_a\)); \(\hat{X}_a[n_{feature}]=\hat{X}_a[n_{feature}]+1\)<br>
+					if not \(x_{child}==\hat{x}_{child}\):
+					<ul style="font-size:16px">
+						\(pos_x,neg_x=\) RECURSE(\(x_{child}\),\(S^c+1\),\(N^c+1\),\(X_a\),\(\hat{x}_a\))<br>
+						\(pos_{\hat{x}},neg_{\hat{x}}=\) RECURSE(\(\hat{x}_{child}\),\(S^c\),\(N^c+1\),\(x_a\),\(\hat{X}_a\))<br>
+						\(\phi[n_{feature}]=\phi[n_{feature}]+pos_{x}+neg_{\hat{x}}\)<br>
+						return (\(pox_{x}+pox_{\hat{x}}\),\(neg_{x}+neg_{\hat{x}}\))
+					</ul>
+				</ul>
+				return RECURSE(tree.root, 0, 0, [0]*\(len(x)\), [0]*\(len(x)\))
+			</ul> 
+			</div>
+
+		</div>
+
+	</div>
+
+    <p class="w3-opacity w3-justify">
+		Computational complexity to compute \(\phi_i(f,x,\hat{x})\) for all features is now just \(O(T_{numnodes})\) where \(T_{numnodes}\) is the number of nodes in the tree.
+	</p>
+
+	<p class="w3-opacity w3-justify">
+		In the package, we actually re-implemented this algorithm iteratively which should be faster and more memory efficient than the recursive version.  We won't cover the iterative version here, because the pseudocode would be much less comprehensible.
+	</p>
+
+	<p class="w3-opacity w3-justify">
+		Additionally, to compute the \(\phi_i(f,x)\), you need to compute \(\phi_i(f,x,x')\) for many references.  In practice, using a fixed number of about 100 to 1000 are good sizes to use.
+	</p>
+
+<!-- 	<h3 class="w3-justify" id="comparison_of_implementations">2.5 Comparison of Methods</h3>
+
+    <p class="w3-opacity w3-justify">
+    	Compare between path dependent Tree Explainer, and interventional tree explainer.  Some light discussion about how kernel/sampling explainer compare.
+	</p> -->
+
+    </div>
+  </div>
+
+
+<!-- End Page Content -->
+</div>
+
+<!-- Footer -->
+<footer class="w3-container w3-padding-64 w3-center w3-opacity w3-light-grey w3-xlarge" style="margin-left:300px">
+  <i class="fa fa-linkedin w3-hover-opacity"></i>
+  <!-- <p class="w3-medium">Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p> -->
+</footer>
+
+<script>
+// Automatic Slideshow - change image every 4 seconds
+var myIndex = 0;
+
+// Used to toggle the menu on small screens when clicking on the menu button
+function myFunction() {
+  var x = document.getElementById("navDemo");
+  if (x.className.indexOf("w3-show") == -1) {
+    x.className += " w3-show";
+  } else {
+    x.className = x.className.replace(" w3-show", "");
+  }
+}
+
+// When the user clicks anywhere outside of the modal, close it
+var modal = document.getElementById('ticketModal');
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+
+function hideshow(type) {
+    var x = document.getElementById(type);
+    if (x.style.display === 'none') {
+        x.style.display = 'block';
+    } else {
+        x.style.display = 'none';
+    }
+}
+</script>
+
+</body>
+</html>
