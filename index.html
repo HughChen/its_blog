@@ -87,11 +87,11 @@ figcaption {font-size: 18px}
   <div class="w3-container w3-content w3-center w3-padding-16" style="max-width:800px" id="abstract">
   	<h2 class="w3-justify" id="overview">Overview</h2>
     <p class="w3-opacity w3-justify">
-    	In this article, I explain an algorithm I developed from our <a href="https://www.nature.com/articles/s42256-019-0138-9">paper</a> called Interventional Tree Explainer (ITE).  ITE is currently the default algorithm for explaining trees in the popular <a href="https://github.com/slundberg/shap">SHAP package</a>.  Although ITE is described in our paper, my goal here is to provide a clear and  easy to understand overview of the algorithm.  In this article, I aim to explain SHAP values, how ITE connects to other SHAP methods, and the technical aspects of ITE from the ground up.
+    	In this article, I explain an algorithm I developed called Interventional Tree Explainer (ITE) (if you use the algorithm, feel free to cite us <a href="https://www.nature.com/articles/s42256-019-0138-9">here</a>).  ITE is currently the default algorithm for explaining trees in the popular <a href="https://github.com/slundberg/shap">SHAP package</a>.  Although ITE is described in our paper, the goal of this article is to provide a clear and  easy to understand explanation of the algorithm.  In this article, I will explain SHAP values, how ITE connects to other SHAP methods, and the technical aspects of ITE from the ground up.
     </p>
 
     <p class="w3-opacity w3-justify">
-    	As an overview, I will first define the problem we aim to solve with ITE by describing SHAP values (<a href="#background">Background Section</a>), a local feature attribution with desirable properties.  In general, computing SHAP values exactly is NP-hard.  If we focus on explaining tree-based models (e.g., XGBoost, decision trees, random forests, etc.), we can arrive at a naive polynomial time algorithm.  Leveraging dynamic programming, we can then modify the algorithm to run in linear time (<a href="algorithm">Algorithm Section</a>).  
+    	As an overview, I will first define the problem we aim to solve with ITE by describing SHAP values (<a href="#background">Section 1</a>), a local feature attribution with desirable properties.  In general, computing SHAP values exactly is NP-hard.  If we focus on explaining tree-based models (e.g., XGBoost, decision trees, random forests, etc.), we can arrive at a naive polynomial time algorithm.  Leveraging dynamic programming, we can then modify the algorithm to run in linear time (<a href="algorithm">Section 2</a>).  
 	</p>
   </div>
 
@@ -114,10 +114,11 @@ figcaption {font-size: 18px}
 
     <p class="w3-opacity w3-justify">
     	As an example, let's imagine a company makes a profit \(v(S)\) dollars in 2020, determined by what combination of individuals \(S\) they employ in 2020.  Furthermore, let's assume we know \(v(S)\) for all possible combinations.  Then, the Shapley values assign credit to an individual \(i\) by taking a weighted average of how much the profit increases when \(i\) works together with all possible subsets (combinations) of the remaining individuals:
+    	<!-- (include a simple graphic here?) -->
     	$$
     	\overbrace{\phi_i(v)}^{\text{Shapley value of player }i}=\sum_{S\subseteq \underbrace{N\setminus\{i\}}_{\text{Remaining individuals}}}\overbrace{\frac{|S|!(|N|-|S|-1)!}{|N|!}}^{\text{Weight }W(|S|,|N|)}(\overbrace{v(S\cup\{i\})-v(S)}^{\text{Profit individual }i\text{ adds}})
     	$$
-    	The Shapley values consider how much an individual increases profit when they work together with all other possible teams.  Furthermore, they are a unique solution to spreading credit under several desirable axioms.  In this article I won't delve into why Shapley values are desirable, but if you are interested here are a few resources...
+    	The Shapley values consider how much an individual increases profit when they work together with all other possible teams.  Furthermore, they are a unique solution to spreading credit under several desirable axioms (references).
     </p>
 
 
@@ -132,22 +133,22 @@ figcaption {font-size: 18px}
     </p>
 
     <p class="w3-opacity w3-justify">
-    	In comparison, ML models generally require a fixed length input which makes setting features to be "missing" or "present" less straightforward.  One natural way to do this is with a conditional expectation.  In words, the value of the game is the expected value of the model if we condition on a set of features that are "present".  If we define \(D\) to the background (underlying) distribution \(x\) is drawn from, then:
+    	In comparison, ML models generally require a fixed length input which makes setting features to be "missing" or "present" less straightforward.  One natural way to do this is with a conditional expectation.  In words, the value of the game is the expected value of the model if we condition on a set of features that are "present".  If we define \(D\) to the background (underlying) distribution \(x\) should be compared to, then:
     	$$
-		v(S)=\mathbb{E}_\mathcal{D}[f(x)|x_{S \cup \{i\}}]
+		v(S)=\mathbb{E}_\mathcal{D}[f(x)|x_{S}]
     	$$
-    	One caveat is that modelling the conditional expectation is very difficult.  Further, even if you do perfectly obtain the conditional expectation, the correlations you capture may cause you to attribute to features your model is not truly "using".  Although explaining relationships by modelling the conditional expectation may be desirable for some use cases, our goal is to explain the model itself; therefore, an arguably more natural approach is to use causal inference's <i>interventional conditional expectation</i>:
+    	One caveat is that modelling the conditional expectation is very difficult.  Further, even if you do perfectly obtain the conditional expectation, the correlations you capture may cause you to give weight to features your model does not use as an input.  Although explaining relationships by modelling the conditional expectation may be desirable for some use cases, our goal is to explain the model itself; therefore, an arguably more natural approach is to use causal inference's <i>interventional conditional expectation</i>:
     	$$
-    	v(S)=\mathbb{E}_\mathcal{D}[f(x)|\text{do}(x_{S \cup \{i\}})]
+    	v(S)=\mathbb{E}_\mathcal{D}[f(x)|\text{do}(x_{S})]
     	$$
-    	The motivation for this interventional conditional expectation comes from \cite{janzing2019feature} which is also very close to Random Baseline Shapley in \cite{sundararajan2019many}).  Additionally, this is exactly the assumption made by Kernel Explainer and Sampling Explainer from the SHAP package.
+    	The motivation for this interventional conditional expectation comes from \cite{janzing2019feature} which is also very close to Random Baseline Shapley in \cite{sundararajan2019many}).  Additionally, this is exactly the assumption made by <a href="https://shap.readthedocs.io/en/latest/#shap.KernelExplainer">Kernel Explainer</a> and <a href="https://shap.readthedocs.io/en/latest/#shap.SamplingExplainer">Sampling Explainer</a> from the SHAP package.
     </p>
 
     <!-- Background distribution -->
     <h3 class="w3-justify" id="background_distribution">1.3 SHAP values with a background distribution</h3>
 
 	<p class="w3-opacity w3-justify">
-		As we saw earlier, we need to evaluate the interventional conditional expectation to compute \(\phi_i(f,x)\). The interventional conditional expectation depends on a <i>background distribution</i> \(D\) that our foreground sample \(x\) is compared against to compute the SHAP value.  
+		As we saw earlier, to compute \(\phi_i(f,x)\) we need to evaluate the interventional conditional expectation, which depends on a <i>background distribution</i> \(D\) that our foreground sample \(x\) is compared against to compute the SHAP value.  
 	</p>
 
 	<p class="w3-opacity w3-justify">
@@ -209,13 +210,13 @@ figcaption {font-size: 18px}
     <h3 class="w3-justify" id="brute_force">2.1 Brute force</h3>
 
     <p class="w3-opacity w3-justify">
-    	The brute force approach would be to compute the following:
+    	Based on the proof in Section 1.3, the brute force approach would be to compute the following:
 
     	$$
     	\phi_i(f,x,\hat{x})=\sum_{S\subseteq N\setminus\{i\}} \underbrace{W(|S|,|N|)}_{W}\underbrace{f(\mathcal{X}(x,\hat{x},S\cup \{i\}))}_{\text{\textcolor{green}{Pos} term}} {-} \underbrace{f(\mathcal{X}(x,\hat{x},S)}_{\text{\textcolor{red}{Neg} term}})
     	$$
 
-    	If the cost of computing the weight \(W\) is constant, then the computational complexity of the brute force method is the number of terms in the summation times the cost of making a prediction \(f(x)\) (likely on the order of the depth of the tree \(O(D)\)).  Since we consider two terms (\(\text{\textcolor{green}{Pos}}\) and \(\text{\textcolor{red}{Neg}}\)) for all possible combinations of the full set of features (without \(i\)), the computational complexity is \(O(D\times2^{d})\).
+    	Note that \(\mathcal{X}(x,\hat{x},S)\) returns a hybrid sample \(h\) where the features in \(S\) are from \(x\) and the remaining features are from \(\hat{x}\).  If the cost of computing the weight \(W\) is constant, then the computational complexity of the brute force method is the number of terms in the summation times the cost of making a prediction \(f(x)\) (likely on the order of the depth of the tree \(O(D)\)).  Since we consider two terms (\(\text{\textcolor{green}{Pos}}\) and \(\text{\textcolor{red}{Neg}}\)) for all possible combinations of the full set of features (without \(i\)), the computational complexity is \(O(D\times2^{d})\).
 
     	Finally, the computational complexity to compute \(\phi_i(f,x,\hat{x})\) for all features is \(O(|N|\times D\times 2^{d})\).
 
@@ -230,7 +231,7 @@ figcaption {font-size: 18px}
 	</p> -->
 
 	<p class="w3-opacity w3-justify">
-	    However, if we constrain \(f(x)\) to be a tree-based model (e.g., XGBoost, decision trees, random forests, etc.), then we can come up with a simple polynomial time algorithm to compute \(\phi_i(f,x,\hat{x})\) exactly.  In the following section we discuss an example to provide intuition as to why.
+	    However, if we <i>constrain \(f(x)\) to be a tree-based model</i> (e.g., XGBoost, decision trees, random forests, etc.), then we can come up with a polynomial time algorithm to compute \(\phi_i(f,x,\hat{x})\) exactly.  In the following section we discuss an example to provide intuition as to why.
 	</p>
 
 
@@ -293,7 +294,7 @@ figcaption {font-size: 18px}
 	</p>
 
     <p class="w3-opacity w3-justify">
-    	In Table 1, each row corresponds to a combination \(S\) in the brute force summation.  In addition, we report the hybrid features \(h_i\) that are taken from either \(x\) and \(\hat{x}\).  The weight \(W\) is based on the size of \(S\) and the \(\text{\textcolor{green}{Pos}}\) and \(\text{\textcolor{red}{Neg}}\) terms correspond to \(f(\mathcal{X}(x,\hat{x},S\cup \{i\}))\) and \(f(\mathcal{X}(x,\hat{x},S))\) respectively.
+    	In Table 1, each row corresponds to a combination \(S\) in the brute force summation.  In addition, we report the hybrid features \(h_i\) that are taken from either \(x\) or \(\hat{x}\).  The weight \(W\) is based on the size of \(S\) and the \(\text{\textcolor{green}{Pos}}\) and \(\text{\textcolor{red}{Neg}}\) terms correspond to \(f(\mathcal{X}(x,\hat{x},S\cup \{i\}))\) and \(f(\mathcal{X}(x,\hat{x},S))\) respectively.
 	</p>	
 
     <p class="w3-opacity w3-justify">
@@ -302,7 +303,7 @@ figcaption {font-size: 18px}
 
 	<div style="overflow-x:auto;">
 		<table cellpadding="10" align="center">
-			<caption class="w3-opacity"><strong>Table 1: </strong>Brute force approach to compute \(\phi_1(f,x,\hat{x})\) has \(2^3\) rows and \(2^4\) \(\textcolor{green}{Pos}\)/\(\text{\textcolor{red}{Neg}}\) terms, where \(4\) is the total number of features.</caption>
+			<caption class="w3-opacity"><strong>Table 1: </strong>Brute force approach to compute \(\phi_1(f,x,\hat{x})\) has \(2^3\) rows and \(2^4\) \(\text{\textcolor{green}{Pos}}\)/\(\text{\textcolor{red}{Neg}}\) terms, where \(4\) is the total number of features.</caption>
 			<thead>
 				<tr>
 					<th title="Field #1">\(S\)</th>
@@ -559,6 +560,9 @@ figcaption {font-size: 18px}
     <!-- Naive Implementation -->
     <h3 class="w3-justify" id="naive_implementation">2.3 Naive Implementation</h3>
 
+	<p class="w3-opacity w3-justify">
+		Before we get into the algorithm, we first describe a theorem that is the basis for this naive implementation.
+	</p>    
 
 	<p class="w3-opacity w3-justify">
     	<strong>Theorem 1: To calculate \(\phi_i(f,x,\hat{x})\), we can calculate contributions for each path from the root to each leaf.</strong>  For a given path \(P\), we define \(N_P\) to be the "unique" features encountered and \(S_P\) to be the "unique" features that came from \(x\).  Finally, define \(v\) to be the value of the path's leaf.  Then, the contribution of the path is:
@@ -567,8 +571,8 @@ figcaption {font-size: 18px}
 		\phi_i^P(f,x,\hat{x})=
 	    \begin{cases}
 	    	0 & \text{if}\ i\notin N_P \\
-	    	W(|S_P|-1,|N_P|)\times v & \text{if}\ i\in S_P \\
-	    	-W(|S_P|,|N_P|)\times v & \text{o.w.}
+	    	\textcolor{green}{W(|S_P|-1,|N_P|)\times v} & \text{if}\ i\in S_P \\
+	    	\textcolor{red}{-W(|S_P|,|N_P|)\times v} & \text{o.w.}
 	    \end{cases}
     	$$
 
@@ -593,19 +597,19 @@ figcaption {font-size: 18px}
 	</div>
 
 	<p class="w3-opacity w3-justify">
-		Then the goal of the algorithm is to obtain \(N_P\) and \(S_P\) for each path by doing recursively doing a pre order traversal of the tree.  We will start by explaining the algorithm via an example:
+		Then the goal of the algorithm is to obtain \(N_P\) and \(S_P\) for each path by recurseively performning a pre order traversal of the tree.  We will start by explaining the algorithm via an example:
 	</p>
 
 	<figure>
-		<figcaption class="w3-opacity">Figure 3: Example for naive algorithm.  Green paths are associated with \(x\) and red paths are associated with \(x'\).</figcaption>
+		<figcaption class="w3-opacity">Figure 3: Example for naive algorithm.  Green paths are associated with \(x\) and red paths are associated with \(x'\).  The numbers are associated with the four different cases we can encounter at tree nodes.</figcaption>
 		<img src="images/tree_example3.jpg" alt="Tree Example 3" width="300">
 	</figure>
 
 	<p class="w3-opacity w3-justify">
-		In the final algorithm, maintain a list of \(N_P\) and \(S_P\) as we traverse paths.  We will do a bit of work at each node to update the lists depending on a number of cases.  In Figure 3, we can see these cases for each node \(n\) that splits on a feature \(n_{feature}\):
+		In the final algorithm, we maintain a list of \(N_P\) and \(S_P\) as we traverse the tree.  We will do a bit of work at each node to update the lists depending on a number of cases.  Then at the leafs, we will calculate the contribution for each path.  In Figure 3, we can see these cases for each node \(n\) that splits on a feature \(n_{feature}\):
 		<ul class="w3-opacity w3-justify">
 			<li>Case 1: At a leaf.  Compute the contribution in Theorem 1 based on the \(N_P\) and \(S_P\) that land at each leaf.</li>
-			<li>Case 2: The feature has been encountered in the path previously.  In this example's path, \(x_1\) was already split on at the root of the tree and it went the direction of \(x'\).  This means we add nothing to \(N_P\) and \(S_P\) because we have already encountered this feature and traverse down the appropriate path associated with \(x'\).</li>
+			<li>Case 2: The feature has been encountered in the path previously.  In this example's path, \(x_1\) was already split on at the root of the tree and it went the direction of \(x'\).  This means we add nothing to \(N_P\) and \(S_P\) because we have already encountered this feature and traverse down the child associated with \(x'\).</li>
 			<li>Case 3: Both \(x\) and \(x'\) are on the same side of the threshold.  In this case, we again don't add to \(N_P\) and \(S_P\) because relative to our foreground and background samples, there is no difference.</li>
 			<li>Case 4: \(x\) and \(x'\) go to different children.  In this case, we add \(n_{feature}\) to both \(N_P\) and \(S_P\) for the \(x\) path.  For the \(x'\) path, we only add \(n_{feature}\) to \(N_P\).</li>
 		</ul>
@@ -684,14 +688,18 @@ figcaption {font-size: 18px}
 	</p> -->
 
     <p class="w3-opacity w3-justify">
-		Computational complexity to compute \(\phi_i(f,x,\hat{x})\) for all features is \(O(|N|\times T_{numnodes}\times T_{depth})\) where \(T_{numnodes}\) is the number of nodes in the tree and \(T_{depth}\) is the depth of the tree.  Note that we can actually get rid of the multiplicative \(T_{depth}\) factor by simply being more clever with the data structures we use to represent \(S_P\) and \(N_P\).  Using this in conjunction with a dynamic programming observation, we can compute all attributions for all features in linear time in the next section.
+		Computational complexity to compute \(\phi_i(f,x,\hat{x})\) for all features is \(O(|N|\times T_{numnodes}\times T_{depth})\) where \(T_{numnodes}\) is the number of nodes in the tree and \(T_{depth}\) is the depth of the tree.
+	</p>
+
+    <p class="w3-opacity w3-justify">
+		Note that we can actually get rid of the multiplicative \(T_{depth}\) factor by simply being more clever with the data structures we use to represent \(S_P\) and \(N_P\).  Using this in conjunction with a dynamic programming observation, we can compute all attributions for all features in \(T_{numnodes})\) time rather than \(O(|N|\times T_{numnodes}\times T_{depth})\) in the next section.
 	</p>
 
     <!-- Dynamic Programming -->
     <h3 class="w3-justify" id="dynamic_programming_implementation">2.4 Dynamic Programming Implementation</h3>
 
     <p class="w3-opacity w3-justify">
-	    Using something akin to the collapsibility we observed in <a href="#an_example">our example</a>, we can actually just compute the attributions for all features simultaneously by assigning credit to features based on the feature split on at each node in the tree.  We do a similar algorithm to the one above, except we pass \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) contributions upstream and use them for each feature we encounter.
+	    We can compute the attributions for all features simultaneously as we traverse the tree.  In particular, the algorithm is similar to the naive above, except we pass \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) contributions to the parent and separately sum the \(\textcolor{green}{\text{Pos}}\) contributions from both children as well as the \(\textcolor{red}{\text{Neg}}\) contributions from both children.  Before describing the algorithm in more detail, we first present an example.
 	</p>
 
 	<div style="overflow-x:auto;">
@@ -726,7 +734,7 @@ figcaption {font-size: 18px}
 
 
 	<p class="w3-opacity w3-justify">
-		In Figure 4, we can look at the attributions for \(x_1\) and \(x_2\).  First we can observe that for each leaf, according to Theorem 1, there are only two possible values to compute (what we have been calling \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\)).  Based on the attributions for each feature we can see that the positive and negative terms can be grouped for \(x_1\)by the left and right subtrees.  This observation generalizes well and allows us to do a constant amount of work at every node by grouping positive and negative terms and passing them up the tree.
+		In Figure 4, we can first observe that for each leaf, according to Theorem 1, there are only two possible values to compute (what we have been calling \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\)).  Based on the attributions for \(x_1\) we see that these \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) terms can be grouped by the left and right subtrees below \(x_1\).  In fact, we can always add the \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) terms and pass them up to the parents so that the parents can do a constant amount of work to compute their feature's contribution.
 	</p>
 
 
@@ -794,19 +802,40 @@ figcaption {font-size: 18px}
 		Computational complexity to compute \(\phi_i(f,x,\hat{x})\) for all features is now just \(O(T_{numnodes})\) where \(T_{numnodes}\) is the number of nodes in the tree.
 	</p>
 
-	<p class="w3-opacity w3-justify">
-		In the package, we actually re-implemented this algorithm iteratively which should be faster and more memory efficient than the recursive version.  We won't cover the iterative version here, because the pseudocode would be much less comprehensible.
-	</p>
+    <h3 class="w3-justify" id="dynamic_programming_implementation">Miscellaneous notes</h3>
+
+	<h4 class="w3-justify">How many references?</h4>
 
 	<p class="w3-opacity w3-justify">
-		Additionally, to compute the \(\phi_i(f,x)\), you need to compute \(\phi_i(f,x,x')\) for many references.  In practice, using a fixed number of about 100 to 1000 are good sizes to use.
+		Additionally, to compute the \(\phi_i(f,x)\), you need to compute \(\phi_i(f,x,x')\) for many references.  In practice, using a fixed number of about 100 to 1000 references works well in practice.
 	</p>
 
-<!-- 	<h3 class="w3-justify" id="comparison_of_implementations">2.5 Comparison of Methods</h3>
+
+    <h4 class="w3-justify">Iterative implementation:</h4>
+
+	<p class="w3-opacity w3-justify">
+		In the package, I actually re-implemented this algorithm iteratively which should be faster and more memory efficient than the recursive version.  We won't cover the iterative version here, because the pseudocode would be much less comprehensible.
+	</p>
+
+
+	<h4 class="w3-justify">Why SHAP values?</h4>
+
+	<p class="w3-opacity w3-justify">
+		Discussion on difficulty of empirical evaluation (reference pascal's distill)
+	</p>
+
+
+	<h4 class="w3-justify">Comparison of Methods</h4>
 
     <p class="w3-opacity w3-justify">
-    	Compare between path dependent Tree Explainer, and interventional tree explainer.  Some light discussion about how kernel/sampling explainer compare.
-	</p> -->
+    	Describe differences between path dependent Tree Explainer, and interventional tree explainer.  Some light discussion about how kernel/sampling explainer compare (reference the appropriate figure in our paper).
+	</p>
+
+	<h4 class="w3-justify">If you need a background distribution, in what sense is this exact?</h4>
+
+    <p class="w3-opacity w3-justify">
+    	Exact given a fixed, finite discrete distribution \(D\).
+	</p>
 
     </div>
   </div>
