@@ -587,7 +587,7 @@ figcaption {font-size: 18px}
 	</p>    
 
 	<p class="w3-opacity w3-justify">
-    	<strong>Theorem 1: To calculate \(\phi_i(f,x,\hat{x})\), we can calculate contributions for each path from the root to each leaf.</strong>  For a given path \(P\), we define \(N_P\) to be the "unique" features encountered and \(S_P\) to be the "unique" features that came from \(x\).  Finally, define \(v\) to be the value of the path's leaf.  Then, the contribution of the path is:
+    	<strong>Theorem 1: To calculate \(\phi_i(f,x,\hat{x})\), we can calculate attributions for each path from the root to each leaf.</strong>  For a given path \(P\), we define \(N_P\) to be the "unique" features encountered and \(S_P\) to be the "unique" features that came from \(x\).  Finally, define \(v\) to be the value of the path's leaf.  Then, the attribution of the path is:
 
     	$$
 		\phi_i^P(f,x,\hat{x})=
@@ -628,11 +628,11 @@ figcaption {font-size: 18px}
 	</figure>
 
 	<p class="w3-opacity w3-justify">
-		In the naive algorithm, we maintain lists \(N_P\) and \(S_P\) as we traverse the tree.  At each internal node (Cases 2-4) we update the lists and then pass them to the node's children.  At the leaf nodes (Case 1), we calculate the contribution for each path.  In Figure 3, we see four possible cases:
+		In the naive algorithm, we maintain lists \(N_P\) and \(S_P\) as we traverse the tree.  At each internal node (Cases 2-4) we update the lists and then pass them to the node's children.  At the leaf nodes (Case 1), we calculate the attribution for each path.  In Figure 3, we see four possible cases:
 		<ul class="w3-opacity w3-justify">
 			<li>Case 1: \(n\) is a leaf</li>
 			<ul>
-				<li>Return the contribution in Theorem 1 based on \(N_P\) and \(S_P\)</li>
+				<li>Return the attribution in Theorem 1 based on \(N_P\) and \(S_P\)</li>
 			</ul>
 
 			<li>Case 2: The feature has been encountered already (\(n_{feature}\in N_P\))</li>
@@ -723,7 +723,7 @@ figcaption {font-size: 18px}
     		<li>Traverse down the tree</li>
     		<li>At each split record whether you split on \(x\) or \(\hat{x}\) as well as keep a list of the features you split on</li>
     		<li>If \(x\) and \(\hat{x}\) go down the same way don't add to the list of features</li>
-    		<li>At the leaves of the tree, if \(i\) is above in the path compute the contribution to feature \(i\) based on the size of the list of features as well as whether \(i\) was split on by \(x\) or \(\hat{x}\)</li>
+    		<li>At the leaves of the tree, if \(i\) is above in the path compute the attribution to feature \(i\) based on the size of the list of features as well as whether \(i\) was split on by \(x\) or \(\hat{x}\)</li>
     	</ul>
 	</p> -->
 
@@ -739,7 +739,7 @@ figcaption {font-size: 18px}
     <h3 class="w3-justify" id="dynamic_programming_implementation">2.4 Dynamic Programming Implementation</h3>
 
     <p class="w3-opacity w3-justify">
-	    We can compute the attributions for all features simultaneously as we traverse the tree.  In this algorithm algorithm we pass \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) contributions to the parent.  Before describing the algorithm in more detail, we first present an example that illustrates why passing up the contributions is sufficient.
+	    We can compute the attributions for all features simultaneously as we traverse the tree.  In this algorithm algorithm we pass \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) attributions to the parent.  Before describing the algorithm in more detail, we first present an example that illustrates why passing up the attributions is sufficient.
 	</p>
 
 	<div style="overflow-x:auto;">
@@ -778,7 +778,7 @@ figcaption {font-size: 18px}
 	</p>
 
 	<p class="w3-opacity w3-justify">
-		<strong>Observation:  In order to compute the contribution for any feature \(i\) it is sufficient to consider the paths that correspond to each Case 4 node's children.</strong>  First, focusing on a specific Case 4 node \(n\), we know that one child is associated with \(x\) child and one child is associated with \(\hat{x}\).  Then, the contribution to \(n_{feature}\) is:
+		<strong>Observation:  In order to compute the attribution for any feature \(i\) it is sufficient to consider the paths that correspond to each Case 4 node's children.</strong>  First, focusing on a specific Case 4 node \(n\), we know that one child is associated with \(x\) child and one child is associated with \(\hat{x}\).  Then, the attribution to \(n_{feature}\) is:
 		$$
 		\sum_{\text{paths }P\text{ under }x\text{ child}}\textcolor{green}{\text{Pos}_P} + \sum_{\text{paths }P\text{ under }\hat{x}\text{ child}}\textcolor{red}{\text{Neg}_P}
 		$$
@@ -787,7 +787,7 @@ figcaption {font-size: 18px}
 	</p>
 
 	<p class="w3-opacity w3-justify">
-		Furthermore, this observation suggests that we can always add the \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) terms at a given node and pass them up to the parent.  This information is sufficient to calculate the contributions for each upstream feature.  This aggregation of the \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) terms is the dynamic programming observation that allows each upstream node to only need a constant number of operations to compute its feature's contribution.
+		Furthermore, this observation suggests that we can always add the \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) terms at a given node and pass them up to the parent.  This information is sufficient to calculate the attributions for each upstream feature.  This aggregation of the \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) terms is the dynamic programming observation that allows each upstream node to only need a constant number of operations to compute its feature's attribution.
 	</p>
 
 	<p class="w3-opacity w3-justify">
@@ -882,7 +882,7 @@ figcaption {font-size: 18px}
     			<li>An extension of Interactions-based Method for Explanation (IME) (<a href="#Strumbelj2010efficientexplanations">Strumbelj and Kononenko 2010</a>).</li> 
     			<li>This approach is sampling based and converges to the SHAP values ITE obtains, but in practice is much slower than ITE.</li>
     		</ul>    		
-    		<li>Kernel Explainer</li>
+    		<li>Kernel Explainer (<a href="#lundberg_unified">Lundberg 2019</a>):</li>
     		<ul>
     			<li>A model agnostic approach to obtain SHAP values.</li>
     			<li>An extension of Local Interpretable Model-agnostic Explanations (LIME) (<a href="#ribeiro2016lime">Ribeiro et. al. 2016</a>).</li> 
