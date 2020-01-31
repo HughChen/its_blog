@@ -164,7 +164,7 @@ figcaption {font-size: 18px}
     	$$
     	v(S)=\mathbb{E}_\mathcal{D}[f(x)|\text{do}(x_{S})]
     	$$
-    	The <i>do</i> notation is Judea Pearl's <i>do</i>-operator Pearl 2000. The motivation behind this decision comes from <a href="#janzing2019feature">Janzing et. al. (2019)</a> which is also very close to Random Baseline Shapley in <a href="#sundararajan2019many">Sundararajan et. al. (2019)</a>).  Additionally, this is exactly the assumption made by <a href="https://shap.readthedocs.io/en/latest/#shap.KernelExplainer">Kernel Explainer</a> and <a href="https://shap.readthedocs.io/en/latest/#shap.SamplingExplainer">Sampling Explainer</a> from the SHAP package.
+    	The <i>do</i> notation is Judea Pearl's <i>do</i>-operator (<a href="pearl_2000_causality">Pearl 2000</a>). The motivation behind this decision comes from <a href="#janzing2019feature">Janzing et. al. (2019)</a> which is also very close to Random Baseline Shapley in <a href="#sundararajan2019many">Sundararajan et. al. (2019)</a>).  Additionally, this is exactly the assumption made by <a href="https://shap.readthedocs.io/en/latest/#shap.KernelExplainer">Kernel Explainer</a> and <a href="https://shap.readthedocs.io/en/latest/#shap.SamplingExplainer">Sampling Explainer</a> from the SHAP package.
     </p>
 
     <!-- Background distribution -->
@@ -183,7 +183,7 @@ figcaption {font-size: 18px}
 		$$
 		\mathbb{E}_\mathcal{D_{\hat{x}}}[f(x)|\text{do}(x_{S})]=\mathcal{X}(x,\hat{x},S)
 		$$
-		Where \(\mathcal{X}(x,\hat{x},S)\) to return a hybrid sample \(h\) where the features in \(S\) are from \(x\) and the remaining features are from \(\hat{x}\).  In words, the interventional conditional expectation of \(x\) given a set of features \(S\), is a hybrid sample where the features in \(S\) are from \(x\) and the remaining features are from \(\hat{x}\).
+		Where \(\mathcal{X}(x,\hat{x},S)\) to return a hybrid sample \(h\) where the features in \(S\) are from \(x\) and the remaining features are from \(\hat{x}\).  In words, the interventional conditional expectation of \(x\) given a set of features \(S\), is a hybrid sample where the features in \(S\) are from \(x\) and the remaining features are from \(\hat{x}\).  This is as if <i>we intervene on features in the foreground sample with features from the background sample</i>. 
 	</p>  
 
 		<!-- Proof -->
@@ -905,6 +905,8 @@ figcaption {font-size: 18px}
     	<li id="young_uniquesol">Young, H. Peyton. "Monotonic solutions of cooperative games." International Journal of Game Theory 14.2 (1985): 65-72.</li>
 
     	<li id="lundberg_unified">Lundberg, Scott M., and Su-In Lee. "A unified approach to interpreting model predictions." Advances in neural information processing systems. 2017.</li>
+
+    	<li id="pearl_2000_causality">Pearl, Judea. Causality. Cambridge university press, 2009.</li>
 
     	<li id="janzing2019feature">Janzing, Dominik, Lenon Minorics, and Patrick Blöbaum. "Feature relevance quantification in explainable AI: A causality problem." arXiv preprint arXiv:1910.13413 (2019).</li>
 
