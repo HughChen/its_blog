@@ -59,8 +59,13 @@ figcaption {font-size: 18px}
 }
 
 .responsive {
-  width: 100%;
-  height: auto;
+	width: 100%;
+	height: auto;
+}
+
+#table_container {
+	margin: 0 auto;
+	background-color : #F4F6F6;
 }
 
 </style>
@@ -104,10 +109,12 @@ figcaption {font-size: 18px}
       Nowadays, machine learning (ML) is widespread.  In particular, trees are one of the most popular ML model classes.  In a 2017 <a href="https://www.kaggle.com/surveys/2017">Kaggle survey</a>, tree models were both the second and third most popular data science method, only being beaten by Logistic Regression (based on 7,301 responses) (See Figure 1).  Although small tree models can be interpretable (<a href="#rudin2019">Rudin 2019</a>), most tree models are generally large and hard for humans to interpret.  
     </p>
 
+    <div style="background-color:#F4F6F6;">
     <figure>
 		<img src="images/methods.png" alt="Data Science Methods" class="responsive">
 		<figcaption class="w3-opacity">Figure 1: .</figcaption>
 	</figure>
+	</div>
 
     <p class="w3-opacity w3-justify">
     In order to rigorously explain these models, we turn to Shapley values (a unique game-theoretic solution for spreading credit between features).  Then, we discuss an extension of Shapley values to machine learning models (SHAP values) and trade-offs of different versions of SHAP values (Section 1).  Finally, computing SHAP values exactly is NP-hard (<a href="#matsui2001NP">Matsui et. al. 2001</a>), but by focusing on explaining trees, we can devise an exact linear time algorithm for obtaining SHAP values (Section 2).
@@ -148,8 +155,101 @@ figcaption {font-size: 18px}
     	To make these concepts more concrete, we can imagine a company that makes a profit \(v(S)\) that is determined by what combination of individuals they employ \(S\).  Furthermore, let's assume we know \(v(S)\) for all possible combinations of employees.  Then, the Shapley values assign credit to an individual \(i\) by taking a weighted average of how much the profit increases when \(i\) works with a group \(S\) versus when he does not work with \(S\).  Repeating this for all possible subsets \(S\) gives us the Shapley Values:
     	<!-- (include a simple graphic here?) -->
     	$$
-    	\overbrace{\phi_i(v)}^{\text{Shapley value of }i}=\sum_{S\subseteq \underbrace{N\setminus\{i\}}}\overbrace{\frac{|S|!(|N|-|S|-1)!}{|N|!}}^{\text{Weight }W(|S|,|N|)}(\overbrace{v(S\cup\{i\})-v(S)}^{\text{Profit individual }i\text{ adds}})
+    	\overbrace{\phi_i(v)}^{\text{Shapley value of }i}=\sum_{S\subseteq N\setminus\{i\}}\underbrace{\frac{|S|!(|N|-|S|-1)!}{|N|!}}_{\text{Weight }W(|S|,|N|)}(\overbrace{v(S\cup\{i\})-v(S)}^{\text{Profit individual }i\text{ adds}})
     	$$
+
+    </p>
+
+	<div id="table_container" style="overflow-x:auto;align:center;">
+	  <table class="w3-opacity w3-center" style="width:300px;display:inline;margin-right:25px;font-size:18px;">
+		<tr>
+			<th>Subset \(S\)</th>
+			<th>Profit \(v(S)\)</th>
+		</tr>
+		<tr>
+			<td>\(\{\}\)</td>
+			<td><input type="number" id="shapley_null" value="1" onchange="calcShapleyValues()" style="width:100px"></td>
+		</tr>
+		<tr>
+			<td>\(\{Ava\}\)</td>
+			<td><input type="number" id="shapley_a" value="2" onchange="calcShapleyValues()" style="width:100px"></td>
+		</tr>
+		<tr>
+			<td>\(\{Ben\}\)</td>
+			<td><input type="number" id="shapley_b" value="3" onchange="calcShapleyValues()" style="width:100px"></td>
+		</tr>
+		<tr>
+			<td>\(\{Cat\}\)</td>
+			<td><input type="number" id="shapley_c" value="4" onchange="calcShapleyValues()" style="width:100px"></td>
+		</tr>
+		<tr>
+			<td>\(\{Ava,Ben\}\)</td>
+			<td><input type="number" id="shapley_ab" value="5" onchange="calcShapleyValues()" style="width:100px"></td>
+		</tr>
+		<tr>
+			<td>\(\{Ava,Cat\}\)</td>
+			<td><input type="number" id="shapley_ac" value="6" onchange="calcShapleyValues()" style="width:100px"></td>
+		</tr>
+		<tr>
+			<td>\(\{Ben,Cat\}\)</td>
+			<td><input type="number" id="shapley_bc" value="7" onchange="calcShapleyValues()" style="width:100px"></td>
+		</tr>
+		<tr>
+			<td>\(\{Ava,Ben,Cat\}\)</td>
+			<td><input type="number" id="shapley_abc" value="8" onchange="calcShapleyValues()" style="width:100px"></td>
+		</tr>
+	  	<caption align="bottom" style="font-size:20px;">A coalitional game</caption>
+	  </table>
+	  <table class="w3-opacity w3-center fixed" style="width:200px;display:inline;margin-left:25px;font-size:20px;">
+		<col width="100px"/>
+    	<col width="100px"/>
+		<tr>
+			<td>\(\phi_{Ava}(v)\)</td>
+			<td id="phi_a">1.5</td>
+		</tr>
+		<tr>
+			<td>\(\phi_{Ben}(v)\)</td>
+			<td id="phi_b">2.5</td>
+		</tr>
+		<tr>
+			<td>\(\phi_{Cat}(v)\)</td>
+			<td id="phi_c">3</td>
+		</tr>
+	  	<caption align="bottom" style="font-size:20px;">Shapley values</caption>
+	  </table>
+	</div>
+
+	<script>
+	function calcShapleyValues() {
+
+		var s_null = document.getElementById("shapley_null").value
+		var s_a = document.getElementById("shapley_a").value
+		var s_b = document.getElementById("shapley_b").value
+		var s_c = document.getElementById("shapley_c").value
+		var s_ab = document.getElementById("shapley_ab").value
+		var s_ac = document.getElementById("shapley_ac").value
+		var s_bc = document.getElementById("shapley_bc").value
+		var s_abc = document.getElementById("shapley_abc").value
+
+		if (isNaN(s_null) || isNaN(s_a) || isNaN(s_b) || isNaN(s_c) ||
+			isNaN(s_ab) || isNaN(s_ac) || isNaN(s_bc) || isNaN(s_abc)) {
+			alert("The values must be between -100 and 100");
+			return;
+		}
+
+		var phi_a = 1/4*(s_abc-s_bc)+1/4*(s_ab-s_b)+1/4*(s_ac-s_c)+1/4*(s_a-s_null);
+		var phi_b = 1/4*(s_abc-s_ac)+1/4*(s_ab-s_a)+1/4*(s_bc-s_c)+1/4*(s_b-s_null);
+		var phi_c = 1/4*(s_abc-s_ab)+1/4*(s_ac-s_a)+1/4*(s_bc-s_b)+1/4*(s_c-s_null);
+
+		document.getElementById("phi_a").innerHTML = phi_a;
+		document.getElementById("phi_b").innerHTML = phi_b;
+		document.getElementById("phi_c").innerHTML = phi_c;
+		
+		MathJax.typeset();
+	}
+	</script>
+
+	<p class="w3-opacity w3-justify">
     	The Shapley values consider how much an individual increases profit when they work together with all other possible teams.  Furthermore, they are a unique solution to spreading credit as defined by several desirable properties (<a href="#young_uniquesol">Young 1985</a>):
     	<ul class="w3-opacity w3-justify">
     		<li>Local Accuracy/Efficiency: The sum of Shapley values for all employees adds up to the profit with all employees minus the profit with no employees:</li>
@@ -167,105 +267,8 @@ figcaption {font-size: 18px}
     	</ul>
     </p>
 
-	<table class="w3-opacity w3-center" style="width:400px" align="center">
-	<caption>An interactive Shapley value example.</caption>
-	<tr>
-		<th>Subset \(S\)</th>
-		<th>Profit \(v(S)\)</th>
-	</tr>
-	<tr>
-		<td>\(\{\}\)</td>
-		<td><input type="number" id="shapley_null" value="1" onchange="calcShapleyValues()" style="width:100px"></td>
-	</tr>
-	<tr>
-		<td>\(\{Ava\}\)</td>
-		<td><input type="number" id="shapley_a" value="2" onchange="calcShapleyValues()" style="width:100px"></td>
-	</tr>
-	<tr>
-		<td>\(\{Ben\}\)</td>
-		<td><input type="number" id="shapley_b" value="3" onchange="calcShapleyValues()" style="width:100px"></td>
-	</tr>
-	<tr>
-		<td>\(\{Cat\}\)</td>
-		<td><input type="number" id="shapley_c" value="4" onchange="calcShapleyValues()" style="width:100px"></td>
-	</tr>
-	<tr>
-		<td>\(\{Ava,Ben\}\)</td>
-		<td><input type="number" id="shapley_ab" value="5" onchange="calcShapleyValues()" style="width:100px"></td>
-	</tr>
-	<tr>
-		<td>\(\{Ava,Cat\}\)</td>
-		<td><input type="number" id="shapley_ac" value="6" onchange="calcShapleyValues()" style="width:100px"></td>
-	</tr>
-	<tr>
-		<td>\(\{Ben,Cat\}\)</td>
-		<td><input type="number" id="shapley_bc" value="7" onchange="calcShapleyValues()" style="width:100px"></td>
-	</tr>
-	<tr>
-		<td>\(\{Ava,Ben,Cat\}\)</td>
-		<td><input type="number" id="shapley_abc" value="8" onchange="calcShapleyValues()" style="width:100px"></td>
-	</tr>
-	</table>
-
-	<br>
-
-	<p class="w3-opacity w3-center" style="font-size:16px" id="interactive_phi">
-		$$
-		\begin{aligned}
-		\phi_{A}=&\frac{1}{4}(v(\{A,B,C\})-v(\{B,C\}))
-		+\frac{1}{4}(v(\{A,B\})-v(\{B\}))+\\
-		&\frac{1}{4}(v(\{A,C\})-v(\{C\}))
-		+\frac{1}{4}(v(\{A\})-v(\{\}))
-		\end{aligned}
-		$$
-	</p>
-
-	<!-- Function to calculate the  -->
-	<script>
-
-	function invalid(value) {
-		return(isNaN(value) || value < -100 || value > 100)
-	}
-
-	function calcShapleyValues() {
-
-		var s_null = document.getElementById("shapley_null").value
-		var s_a = document.getElementById("shapley_a").value
-		var s_b = document.getElementById("shapley_b").value
-		var s_c = document.getElementById("shapley_c").value
-		var s_ab = document.getElementById("shapley_ab").value
-		var s_ac = document.getElementById("shapley_ac").value
-		var s_bc = document.getElementById("shapley_bc").value
-		var s_abc = document.getElementById("shapley_abc").value
-
-		if (invalid(s_null) || invalid(s_a) || invalid(s_b) || invalid(s_c) ||
-			invalid(s_ab) || invalid(s_ac) || invalid(s_bc) || invalid(s_abc)) {
-			alert("The values must be between -100 and 100");
-		}
-
-		var phi_a = 1/4*(s_abc-s_bc)+1/4*(s_ab-s_b)+1/4*(s_ac-s_c)+1/4*(s_a-s_null);
-
-		document.getElementById("interactive_phi").innerHTML = 
-		`
-		\$\$
-		\\begin\{aligned\}
-		\\phi_\{A\}=&\\frac\{1\}\{4\}(v(\\\{A,B,C\\\})-v(\\\{B,C\\\}))
-		+\\frac\{1\}\{4\}(v(\\\{A,B\\\})-v(\\\{B\\\}))+\\\\
-		&\\frac\{1\}\{4\}(v(\\\{A,C\\\})-v(\\\{C\\\}))
-		+\\frac\{1\}\{4\}(v(\\\{A\\\})-v(\\\{\\\}))\\\\
-		=&${phi_a}
-		\\end\{aligned\}
-		\$\$
-		`
-		// `\\(1/4(${s_abc}-${s_bc})+1/4(${s_ab}-${s_b})+1/4(${s_ac}-${s_c})+1/4(${s_a}-${s_null})=${phi_a}\\)`;
-		
-		MathJax.typeset();
-
-	}
-	</script>
-
 	<p class="w3-opacity w3-justify">
-    	<a href="#lundberg_unified">Lundberg and Lee (2017)</a> extend Shapley values for explaining ML models (SHAP values) (<a href="#shap_values">Section 1.2</a>).
+    	<a href="#lundberg_unified">Lundberg and Lee (2017)</a> extend Shapley values to explain ML models (SHAP values) (<a href="#shap_values">Section 1.2</a>).
     </p>
 
 
@@ -389,7 +392,7 @@ figcaption {font-size: 18px}
 
 		<figure  style="float:left">
 			<figcaption class="w3-opacity">Figure 1: Binary tree example.</figcaption>
-			<img src="images/tree_example.jpg" alt="Tree Example" width="300">
+			<img src="images/tree_example.png" alt="Tree Example" width="300">
 		</figure>
 
 		<table cellpadding="10" align="center">
@@ -637,7 +640,7 @@ figcaption {font-size: 18px}
 		<figure style="float:left">
 			<figcaption class="w3-opacity"><strong>Figure 2:</strong> Paths corresponding <br>to terms in Table 3.</figcaption>
 			<br>
-			<img src="images/tree_example2.jpg" alt="Tree Example" height="220">
+			<img src="images/tree_example2.png" alt="Tree Example" height="220">
 		</figure>
 
 		<br>
@@ -747,10 +750,12 @@ figcaption {font-size: 18px}
 		Then the goal of the algorithm is to obtain \(N_P\) and \(S_P\) for each path by recursively traversing the tree.  We will start by explaining the algorithm via an example:
 	</p>
 
+	<div>
 	<figure>
 		<figcaption class="w3-opacity">Figure 3: Green paths are associated with \(\textcolor{green}{x}\) and red paths are \(\textcolor{red}{\hat{x}}\).</figcaption>
-		<img src="images/tree_example3.jpg" alt="Tree Example 3" width="400">
+		<img src="images/tree_example3.png" alt="Tree Example 3" width="400">
 	</figure>
+	</div>
 
 	<p class="w3-opacity w3-justify">
 		In the naive algorithm, we maintain lists \(N_P\) and \(S_P\) as we traverse the tree.  At each internal node (Cases 2-4) we update the lists and then pass them to the node's children.  At the leaf nodes (Case 1), we calculate the attribution for each path.  In Figure 3, we see four possible cases:
@@ -871,7 +876,7 @@ figcaption {font-size: 18px}
 
 		<figure style="float:left">
 			<figcaption class="w3-opacity">Figure 4: Example to illustrate collapsibility for features.  Green paths are associated with \(\textcolor{green}{x}\) and red paths are \(\textcolor{red}{\hat{x}}\)</figcaption>
-			<img src="images/tree_example4.jpg" alt="Tree Example 3" width="300">
+			<img src="images/tree_example4.png" alt="Tree Example 3" width="300">
 		</figure>
 
 		<table cellpadding="10" align="center">
