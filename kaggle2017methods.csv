@@ -1,0 +1,10 @@
+﻿Regression/Logistic Regression,7301,4636,63.498151
+Decision Trees,7301,3640,49.856184
+Random Forests,7301,3378,46.267635
+Neural Networks,7301,2743,37.570196
+Bayesian Techniques,7301,2236,30.625942
+Ensemble Methods,7301,2078,28.461855
+SVMs,7301,1948,26.681277
+Gradient Boosted Machines,7301,1742,23.859745
+CNNs,7301,1383,18.942611
+RNNs,7301,895,12.258595

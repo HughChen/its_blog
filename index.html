@@ -7,9 +7,15 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+<!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+ -->
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
     onload="renderMathInElement(document.body);"></script>
+<!-- <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script> -->
 
 <style>
 hover a {
@@ -52,13 +58,19 @@ figcaption {font-size: 18px}
 	font-size:16px;
 }
 
+.responsive {
+  width: 100%;
+  height: auto;
+}
+
 </style>
 <body>
 
 
 <div class="sidenav">
 	<a href="#" class="w3-justify w3-button"><h3>Top</h3></a>
-	<a href="#overview" class="w3-justify w3-button"><h3>Overview</h3></a>
+	<a href="#introduction" class="w3-justify w3-button"><h3>Introduction</h3></a>
+		<a href="#motivation" class="w3-justify w3-button" style="margin-left:20px"><h5>Motivation</h5></a>
 	<a href="#background" class="w3-justify w3-button"><h3>1. Background</h3></a>
 		<a href="#shapley_values" class="w3-justify w3-button" style="margin-left:20px"><h5>1.1 Shapley values</h5></a>
 		<a href="#shap_values" class="w3-justify w3-button" style="margin-left:20px"><h5>1.2 SHAP values</h5></a>
@@ -85,16 +97,30 @@ figcaption {font-size: 18px}
     </div>
   </div>
 
-  <!-- Overview -->
+  <!-- Introduction -->
   <div class="w3-container w3-content w3-center w3-padding-16" style="max-width:800px" id="abstract">
-  	<h2 class="w3-justify" id="overview">Overview</h2>
+    <h2 class="w3-justify" id="introduction">Introduction</h2>
     <p class="w3-opacity w3-justify">
-    	In this article, I explain an algorithm I developed called Interventional Tree Explainer (ITE).  ITE is currently the default algorithm for explaining trees in the popular <a href="https://github.com/slundberg/shap">SHAP package</a>.  Although ITE is described in <a href="https://www.nature.com/articles/s42256-019-0138-9" target="_blank">our paper</a> (<a href="#lundberg2020fromlocal">Lundberg et. al. 2020</a>), the goal of this article is to explain SHAP values, how ITE connects to other SHAP methods, and provide an easy to understand explanation of the technical aspects of ITE.
+      Nowadays, machine learning (ML) is widespread.  In particular, trees are one of the most popular ML model classes.  In a 2017 <a href="https://www.kaggle.com/surveys/2017">Kaggle survey</a>, tree models were both the second and third most popular data science method, only being beaten by Logistic Regression (based on 7,301 responses) (See Figure 1).  Although small tree models can be interpretable (<a href="#rudin2019">Rudin 2019</a>), most tree models are generally large and hard for humans to interpret.  
     </p>
 
+    <figure>
+		<img src="images/methods.png" alt="Data Science Methods" class="responsive">
+		<figcaption class="w3-opacity">Figure 1: .</figcaption>
+	</figure>
+
     <p class="w3-opacity w3-justify">
-    	I will first define the problem we aim to solve with ITE by describing SHAP values (<a href="#background">Section 1</a>), a local feature attribution with desirable properties.  In general, computing SHAP values exactly is NP-hard (<a href="#matsui2001NP">Matsui et. al. 2001</a>).  If we focus on explaining tree-based models (e.g., XGBoost, decision trees, random forests, etc.), we can arrive at a naive polynomial time algorithm.  Leveraging dynamic programming, we can then modify the algorithm to run in linear time (<a href="algorithm">Section 2</a>).  
-	</p>
+    In order to rigorously explain these models, we turn to Shapley values (a unique game-theoretic solution for spreading credit between features).  Then, we discuss an extension of Shapley values to machine learning models (SHAP values) and trade-offs of different versions of SHAP values (Section 1).  Finally, computing SHAP values exactly is NP-hard (<a href="#matsui2001NP">Matsui et. al. 2001</a>), but by focusing on explaining trees, we can devise an exact linear time algorithm for obtaining SHAP values (Section 2).
+    </p>
+
+    <h3 class="w3-justify" id="motivation">Motivation</h3>
+    <p class="w3-opacity w3-justify">
+    My goal is to explain an algorithm I developed called Interventional Tree Explainer (ITE) that is currently the default algorithm for explaining trees in the popular SHAP package. ITE is introduced in our paper (<a href="#lundberg2020fromlocal">Lundberg et. al. 2020</a>); however, it is a complicated algorithm with motivations that we did not have room to fully explain in the paper.  
+  </p>
+
+    <p class="w3-opacity w3-justify">
+    Furthermore, there is a long history of model explanations going awry when users do not understand what an explanation means (e.g., p-values for linear models (<a href="#schervish1996">Schervish 1996</a>)).  Since the vast majority of explainability methods are for humans, I believe it is extremely important to have a broadly accessible explanation of SHAP values and how they are obtained for tree models to ensure that people can understand what they mean.
+  </p>
   </div>
 
 
@@ -122,13 +148,13 @@ figcaption {font-size: 18px}
     	To make these concepts more concrete, we can imagine a company that makes a profit \(v(S)\) that is determined by what combination of individuals they employ \(S\).  Furthermore, let's assume we know \(v(S)\) for all possible combinations of employees.  Then, the Shapley values assign credit to an individual \(i\) by taking a weighted average of how much the profit increases when \(i\) works with a group \(S\) versus when he does not work with \(S\).  Repeating this for all possible subsets \(S\) gives us the Shapley Values:
     	<!-- (include a simple graphic here?) -->
     	$$
-    	\overbrace{\phi_i(v)}^{\text{Shapley value of player }i}=\sum_{S\subseteq \underbrace{N\setminus\{i\}}_{\text{Remaining individuals}}}\overbrace{\frac{|S|!(|N|-|S|-1)!}{|N|!}}^{\text{Weight }W(|S|,|N|)}(\overbrace{v(S\cup\{i\})-v(S)}^{\text{Profit individual }i\text{ adds}})
+    	\overbrace{\phi_i(v)}^{\text{Shapley value of }i}=\sum_{S\subseteq \underbrace{N\setminus\{i\}}}\overbrace{\frac{|S|!(|N|-|S|-1)!}{|N|!}}^{\text{Weight }W(|S|,|N|)}(\overbrace{v(S\cup\{i\})-v(S)}^{\text{Profit individual }i\text{ adds}})
     	$$
     	The Shapley values consider how much an individual increases profit when they work together with all other possible teams.  Furthermore, they are a unique solution to spreading credit as defined by several desirable properties (<a href="#young_uniquesol">Young 1985</a>):
     	<ul class="w3-opacity w3-justify">
     		<li>Local Accuracy/Efficiency: The sum of Shapley values for all employees adds up to the profit with all employees minus the profit with no employees:</li>
 	    		$$
-	    			\sum_{i\in N} \phi_i(v)=v(N)-v(\emptyset)
+	    			\sum_{i\in N} \phi_i(v)=v(N)-v(\{\})
 	    		$$
     		<li>Consistency/Monotonicity: If an employee \(i\) always increases company \(v_1\)'s profit more than they would company \(v_2\) for all teams of other employees, then \(i\)'s attribution for \(v_1\) should be greater than or equal to their attribution in \(v_2\):</li>
     			$$
@@ -140,8 +166,106 @@ figcaption {font-size: 18px}
     			$$
     	</ul>
     </p>
+
+	<table class="w3-opacity w3-center" style="width:400px" align="center">
+	<caption>An interactive Shapley value example.</caption>
+	<tr>
+		<th>Subset \(S\)</th>
+		<th>Profit \(v(S)\)</th>
+	</tr>
+	<tr>
+		<td>\(\{\}\)</td>
+		<td><input type="number" id="shapley_null" value="1" onchange="calcShapleyValues()" style="width:100px"></td>
+	</tr>
+	<tr>
+		<td>\(\{Ava\}\)</td>
+		<td><input type="number" id="shapley_a" value="2" onchange="calcShapleyValues()" style="width:100px"></td>
+	</tr>
+	<tr>
+		<td>\(\{Ben\}\)</td>
+		<td><input type="number" id="shapley_b" value="3" onchange="calcShapleyValues()" style="width:100px"></td>
+	</tr>
+	<tr>
+		<td>\(\{Cat\}\)</td>
+		<td><input type="number" id="shapley_c" value="4" onchange="calcShapleyValues()" style="width:100px"></td>
+	</tr>
+	<tr>
+		<td>\(\{Ava,Ben\}\)</td>
+		<td><input type="number" id="shapley_ab" value="5" onchange="calcShapleyValues()" style="width:100px"></td>
+	</tr>
+	<tr>
+		<td>\(\{Ava,Cat\}\)</td>
+		<td><input type="number" id="shapley_ac" value="6" onchange="calcShapleyValues()" style="width:100px"></td>
+	</tr>
+	<tr>
+		<td>\(\{Ben,Cat\}\)</td>
+		<td><input type="number" id="shapley_bc" value="7" onchange="calcShapleyValues()" style="width:100px"></td>
+	</tr>
+	<tr>
+		<td>\(\{Ava,Ben,Cat\}\)</td>
+		<td><input type="number" id="shapley_abc" value="8" onchange="calcShapleyValues()" style="width:100px"></td>
+	</tr>
+	</table>
+
+	<br>
+
+	<p class="w3-opacity w3-center" style="font-size:16px" id="interactive_phi">
+		$$
+		\begin{aligned}
+		\phi_{A}=&\frac{1}{4}(v(\{A,B,C\})-v(\{B,C\}))
+		+\frac{1}{4}(v(\{A,B\})-v(\{B\}))+\\
+		&\frac{1}{4}(v(\{A,C\})-v(\{C\}))
+		+\frac{1}{4}(v(\{A\})-v(\{\}))
+		\end{aligned}
+		$$
+	</p>
+
+	<!-- Function to calculate the  -->
+	<script>
+
+	function invalid(value) {
+		return(isNaN(value) || value < -100 || value > 100)
+	}
+
+	function calcShapleyValues() {
+
+		var s_null = document.getElementById("shapley_null").value
+		var s_a = document.getElementById("shapley_a").value
+		var s_b = document.getElementById("shapley_b").value
+		var s_c = document.getElementById("shapley_c").value
+		var s_ab = document.getElementById("shapley_ab").value
+		var s_ac = document.getElementById("shapley_ac").value
+		var s_bc = document.getElementById("shapley_bc").value
+		var s_abc = document.getElementById("shapley_abc").value
+
+		if (invalid(s_null) || invalid(s_a) || invalid(s_b) || invalid(s_c) ||
+			invalid(s_ab) || invalid(s_ac) || invalid(s_bc) || invalid(s_abc)) {
+			alert("The values must be between -100 and 100");
+		}
+
+		var phi_a = 1/4*(s_abc-s_bc)+1/4*(s_ab-s_b)+1/4*(s_ac-s_c)+1/4*(s_a-s_null);
+
+		document.getElementById("interactive_phi").innerHTML = 
+		`
+		\$\$
+		\\begin\{aligned\}
+		\\phi_\{A\}=&\\frac\{1\}\{4\}(v(\\\{A,B,C\\\})-v(\\\{B,C\\\}))
+		+\\frac\{1\}\{4\}(v(\\\{A,B\\\})-v(\\\{B\\\}))+\\\\
+		&\\frac\{1\}\{4\}(v(\\\{A,C\\\})-v(\\\{C\\\}))
+		+\\frac\{1\}\{4\}(v(\\\{A\\\})-v(\\\{\\\}))\\\\
+		=&${phi_a}
+		\\end\{aligned\}
+		\$\$
+		`
+		// `\\(1/4(${s_abc}-${s_bc})+1/4(${s_ab}-${s_b})+1/4(${s_ac}-${s_c})+1/4(${s_a}-${s_null})=${phi_a}\\)`;
+		
+		MathJax.typeset();
+
+	}
+	</script>
+
 	<p class="w3-opacity w3-justify">
-    	<a href="#lundberg_unified">Lundberg and Lee (2017)</a> show that these properties hold for SHAP values (<a href="#shap_values">Section 1.2</a>).
+    	<a href="#lundberg_unified">Lundberg and Lee (2017)</a> extend Shapley values for explaining ML models (SHAP values) (<a href="#shap_values">Section 1.2</a>).
     </p>
 
 
@@ -221,7 +345,8 @@ figcaption {font-size: 18px}
   </div>
 
 
-    <div class="w3-container w3-content w3-center w3-padding-16" style="max-width:800px">
+  <!-- The Algorithm Section -->
+  <div class="w3-container w3-content w3-center w3-padding-16" style="max-width:800px">
     <h2 class="w3-justify" id="algorithm">2. Algorithm</h2>
     
     <p class="w3-opacity w3-justify">
@@ -898,9 +1023,13 @@ figcaption {font-size: 18px}
 
     <h2 class="w3-justify" id="references">References</h2>
     <ol class="w3-justify w3-opacity">
-    	<li id="lundberg2020fromlocal">Lundberg, Scott M., et al. "From local explanations to global understanding with explainable AI for trees." Nature Machine Intelligence (2020)</li>
+    	 <li id="rudin2019">Rudin, Cynthia. "Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead." Nature Machine Intelligence 1.5 (2019): 206-215.</li>
 
-    	<li id="matsui2001NP">Matsui, Yasuko, and Tomomi Matsui. "NP-completeness for calculating power indices of weighted majority games." Theoretical Computer Science 263.1-2 (2001): 305-310.</li>
+      <li id="matsui2001NP">Matsui, Yasuko, and Tomomi Matsui. "NP-completeness for calculating power indices of weighted majority games." Theoretical Computer Science 263.1-2 (2001): 305-310.</li>
+
+      <li id="lundberg2020fromlocal">Lundberg, Scott M., et al. "From local explanations to global understanding with explainable AI for trees." Nature Machine Intelligence (2020)</li>
+
+      <li id="schervish1996">Schervish, Mark J. "P values: what they are and what they are not." The American Statistician 50.3 (1996): 203-206.</li>
 
     	<li id="young_uniquesol">Young, H. Peyton. "Monotonic solutions of cooperative games." International Journal of Game Theory 14.2 (1985): 65-72.</li>
 
