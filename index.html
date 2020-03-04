@@ -68,6 +68,45 @@ figcaption {font-size: 18px}
 	background-color : #F4F6F6;
 }
 
+/* Slider code */
+.slidecontainer {
+  width: 100%;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 15px;
+  border-radius: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+/* End slider code */
 </style>
 <body>
 
@@ -96,8 +135,8 @@ figcaption {font-size: 18px}
   <div class="w3-display-container w3-center">
     <img src="images/trees.jpg" style="width:100%">
     <div class="w3-display-bottommiddle w3-container w3-text-white w3-hide-small">
-      <h2 class="w3-wide"><strong>An End to End Explanation of Interventional Tree Explainer</strong></h2>
-      <h2>Exact game-theoretic explanations of trees in linear time</h2>
+      <h2><strong>An Exact Linear Time Algorithm to <br>Compute Shapley values for Trees</strong></h2>
+      <!-- <h2>Exact game-theoretic explanations of trees in linear time</h2> -->
       <h2>Hugh Chen</h2>
     </div>
   </div>
@@ -144,10 +183,10 @@ figcaption {font-size: 18px}
     <!-- What are Shapley Values? -->
     <h3 class="w3-justify" id="shapley_values">1.1 Shapley values</h3>
 	<p class="w3-opacity w3-justify">
-    	Shapley values are a concept from cooperative game theory that spreads credit among players in a coalitional game.  We can define the players to be a set \(N=\{1,\cdots,d\}\).  Then, the game is a function that maps subsets of players (\(S\)) to a scalar value:
+    	Shapley values are a concept from cooperative game theory that spreads credit among players in a coalitional game.  We can define the players to be a set \(N=\{1,\cdots,d\}\).  Then, the game is a function that maps the players (\(N\)) to a scalar value:
 
     	$$
-    	v(S):2^d\to\mathbb{R}^1
+    	v(S):2^N\to\mathbb{R}^1
     	$$
     </p>
 
@@ -161,91 +200,126 @@ figcaption {font-size: 18px}
     </p>
 
 	<div id="table_container" style="overflow-x:auto;align:center;">
+		<p class="w3-opacity w3-center">Example 1: An interactive example for Shapley values.  Imagine a company that makes a profit \(v(S)\) based on it's three prospective employees \(Ava\), \(Ben\), and \(Cat\).</p>
 	  <table class="w3-opacity w3-center" style="width:300px;display:inline;margin-right:25px;font-size:18px;">
+	  	<caption align="top" style="font-size:20px;">A coalitional game</caption>
+	  	<col width="200px"/>
+    	<col width="150px"/>
+    	<col width="50px"/>
 		<tr>
 			<th>Subset \(S\)</th>
 			<th>Profit \(v(S)\)</th>
+			<th></th>
 		</tr>
 		<tr>
 			<td>\(\{\}\)</td>
-			<td><input type="number" id="shapley_null" value="1" onchange="calcShapleyValues()" style="width:100px"></td>
+			<td><input type="range" min="-15" max="15" value="1" class="slider" id="s_n" onchange="calcSV()"></td>
+			<td><span id="s_n_out"></span></td>
 		</tr>
 		<tr>
 			<td>\(\{Ava\}\)</td>
-			<td><input type="number" id="shapley_a" value="2" onchange="calcShapleyValues()" style="width:100px"></td>
+			<td><input type="range" min="-15" max="15" value="2" class="slider" id="s_a" onchange="calcSV()"></td>
+			<td><span id="s_a_out"></span></td>
 		</tr>
 		<tr>
 			<td>\(\{Ben\}\)</td>
-			<td><input type="number" id="shapley_b" value="3" onchange="calcShapleyValues()" style="width:100px"></td>
+			<td><input type="range" min="-15" max="15" value="3" class="slider" id="s_b" onchange="calcSV()"></td>
+			<td><span id="s_b_out"></span></td>
 		</tr>
 		<tr>
 			<td>\(\{Cat\}\)</td>
-			<td><input type="number" id="shapley_c" value="4" onchange="calcShapleyValues()" style="width:100px"></td>
+			<td><input type="range" min="-15" max="15" value="4" class="slider" id="s_c" onchange="calcSV()"></td>
+			<td><span id="s_c_out"></span></td>
 		</tr>
 		<tr>
 			<td>\(\{Ava,Ben\}\)</td>
-			<td><input type="number" id="shapley_ab" value="5" onchange="calcShapleyValues()" style="width:100px"></td>
+			<td><input type="range" min="-15" max="15" value="5" class="slider" id="s_ab" onchange="calcSV()"></td>
+			<td><span id="s_ab_out"></span></td>
 		</tr>
 		<tr>
 			<td>\(\{Ava,Cat\}\)</td>
-			<td><input type="number" id="shapley_ac" value="6" onchange="calcShapleyValues()" style="width:100px"></td>
+			<td><input type="range" min="-15" max="15" value="6" class="slider" id="s_ac" onchange="calcSV()"></td>
+			<td><span id="s_ac_out"></span></td>
 		</tr>
 		<tr>
 			<td>\(\{Ben,Cat\}\)</td>
-			<td><input type="number" id="shapley_bc" value="7" onchange="calcShapleyValues()" style="width:100px"></td>
+			<td><input type="range" min="-15" max="15" value="7" class="slider" id="s_bc" onchange="calcSV()"></td>
+			<td><span id="s_bc_out"></span></td>
 		</tr>
 		<tr>
 			<td>\(\{Ava,Ben,Cat\}\)</td>
-			<td><input type="number" id="shapley_abc" value="8" onchange="calcShapleyValues()" style="width:100px"></td>
+			<td><input type="range" min="-15" max="15" value="8" class="slider" id="s_abc" onchange="calcSV()"></td>
+			<td><span id="s_abc_out"></span></td>
 		</tr>
-	  	<caption align="bottom" style="font-size:20px;">A coalitional game</caption>
 	  </table>
+
 	  <table class="w3-opacity w3-center fixed" style="width:200px;display:inline;margin-left:25px;font-size:20px;">
+	  	<caption align="top" style="font-size:20px;">Shapley values</caption>
 		<col width="100px"/>
     	<col width="100px"/>
 		<tr>
 			<td>\(\phi_{Ava}(v)\)</td>
-			<td id="phi_a">1.5</td>
+			<td id="phi_a">1.33</td>
 		</tr>
 		<tr>
 			<td>\(\phi_{Ben}(v)\)</td>
-			<td id="phi_b">2.5</td>
+			<td id="phi_b">2.33</td>
 		</tr>
 		<tr>
 			<td>\(\phi_{Cat}(v)\)</td>
-			<td id="phi_c">3</td>
+			<td id="phi_c">3.33</td>
 		</tr>
-	  	<caption align="bottom" style="font-size:20px;">Shapley values</caption>
 	  </table>
+
+	  <br><br>
+	  <input type="button" value="Reset Sliders" class="w3-button w3-green" onclick="reset_ex1()">
+	  <br><br>
 	</div>
 
+	<!-- Update value next to slider -->
 	<script>
-	function calcShapleyValues() {
+	var slider_elements = ["s_n","s_a","s_b","s_c","s_ab","s_ac","s_bc","s_abc"];
 
-		var s_null = document.getElementById("shapley_null").value
-		var s_a = document.getElementById("shapley_a").value
-		var s_b = document.getElementById("shapley_b").value
-		var s_c = document.getElementById("shapley_c").value
-		var s_ab = document.getElementById("shapley_ab").value
-		var s_ac = document.getElementById("shapley_ac").value
-		var s_bc = document.getElementById("shapley_bc").value
-		var s_abc = document.getElementById("shapley_abc").value
+	for (var i = 0; i < slider_elements.length; i++) {
+		var s = document.getElementById(slider_elements[i]);
+		var s_out = document.getElementById(slider_elements[i]+"_out");
+		s_out.innerHTML = s.value;
+		s.paired_out = s_out;
+		s.oninput = function() {this.paired_out.innerHTML = this.value;}
+	}
+
+	function reset_ex1() {
+		for (var i = 0; i < slider_elements.length; i++) {
+			var s = document.getElementById(slider_elements[i])
+			s.value = i + 1;
+			s.oninput();
+			s.onchange();
+		}
+	}
+
+	function calcSV() {
+
+		var s_null = document.getElementById("s_n").value
+		var s_a = document.getElementById("s_a").value
+		var s_b = document.getElementById("s_b").value
+		var s_c = document.getElementById("s_c").value
+		var s_ab = document.getElementById("s_ab").value
+		var s_ac = document.getElementById("s_ac").value
+		var s_bc = document.getElementById("s_bc").value
+		var s_abc = document.getElementById("s_abc").value
 
 		if (isNaN(s_null) || isNaN(s_a) || isNaN(s_b) || isNaN(s_c) ||
 			isNaN(s_ab) || isNaN(s_ac) || isNaN(s_bc) || isNaN(s_abc)) {
-			alert("The values must be between -100 and 100");
 			return;
 		}
 
-		var phi_a = 1/4*(s_abc-s_bc)+1/4*(s_ab-s_b)+1/4*(s_ac-s_c)+1/4*(s_a-s_null);
-		var phi_b = 1/4*(s_abc-s_ac)+1/4*(s_ab-s_a)+1/4*(s_bc-s_c)+1/4*(s_b-s_null);
-		var phi_c = 1/4*(s_abc-s_ab)+1/4*(s_ac-s_a)+1/4*(s_bc-s_b)+1/4*(s_c-s_null);
+		var phi_a = 1/3*(s_abc-s_bc)+1/6*(s_ab-s_b)+1/6*(s_ac-s_c)+1/3*(s_a-s_null);
+		var phi_b = 1/3*(s_abc-s_ac)+1/6*(s_ab-s_a)+1/6*(s_bc-s_c)+1/3*(s_b-s_null);
+		var phi_c = 1/3*(s_abc-s_ab)+1/6*(s_ac-s_a)+1/6*(s_bc-s_b)+1/3*(s_c-s_null);
 
-		document.getElementById("phi_a").innerHTML = phi_a;
-		document.getElementById("phi_b").innerHTML = phi_b;
-		document.getElementById("phi_c").innerHTML = phi_c;
-		
-		MathJax.typeset();
+		document.getElementById("phi_a").innerHTML = Math.round(phi_a*100)/100;
+		document.getElementById("phi_b").innerHTML = Math.round(phi_b*100)/100;
+		document.getElementById("phi_c").innerHTML = Math.round(phi_c*100)/100;
 	}
 	</script>
 
@@ -390,9 +464,9 @@ figcaption {font-size: 18px}
 
 	<div style="overflow-x:auto;">
 
-		<figure  style="float:left">
+		<figure style="float:left">
 			<figcaption class="w3-opacity">Figure 1: Binary tree example.</figcaption>
-			<img src="images/tree_example.png" alt="Tree Example" width="300">
+			<img src="images/tree_example.png" alt="Tree Example" width="250">
 		</figure>
 
 		<table cellpadding="10" align="center">
