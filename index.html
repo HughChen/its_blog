@@ -7,15 +7,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
-<!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
- -->
+
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
     onload="renderMathInElement(document.body);"></script>
-<!-- <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
-    onload="renderMathInElement(document.body);"></script> -->
+<script language="JavaScript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.2.1/math.js"></script>
 
 <style>
 hover a {
@@ -165,7 +161,7 @@ figcaption {font-size: 18px}
   </p>
 
     <p class="w3-opacity w3-justify">
-    Furthermore, there is a long history of model explanations going awry when users do not understand what an explanation means (e.g., p-values for linear models (<a href="#schervish1996">Schervish 1996</a>)).  Since the vast majority of explainability methods are for humans, I believe it is extremely important to have a broadly accessible explanation of SHAP values and how they are obtained for tree models to ensure that people can understand what they mean.
+    Furthermore, there is a long history of model explanations going awry when users do not understand what an explanation means (e.g., p-values for linear models (<a href="#schervish1996">Schervish 1996</a>)).  Since the vast majority of explainability methods are for humans, I believe it is extremely important to have a broadly accessible explanation of SHAP values and how they are obtained for tree models to ensure that people know what they mean.
   </p>
   </div>
 
@@ -200,7 +196,7 @@ figcaption {font-size: 18px}
     </p>
 
 	<div id="table_container" style="overflow-x:auto;align:center;">
-		<p class="w3-opacity w3-center">Example 1: An interactive example for Shapley values.  Imagine a company that makes a profit \(v(S)\) based on it's three prospective employees \(Ava\), \(Ben\), and \(Cat\).</p>
+		<p class="w3-opacity w3-left" align="left" style="margin:20px"><strong>Example 1</strong>: Shapley values for a company that makes a profit \(v(S)\) based on it's three prospective employees \(Ava\), \(Ben\), and \(Cat\).</p>
 	  <table class="w3-opacity w3-center" style="width:300px;display:inline;margin-right:25px;font-size:18px;">
 	  	<caption align="top" style="font-size:20px;">A coalitional game</caption>
 	  	<col width="200px"/>
@@ -272,7 +268,7 @@ figcaption {font-size: 18px}
 	  </table>
 
 	  <br><br>
-	  <input type="button" value="Reset Sliders" class="w3-button w3-green" onclick="reset_ex1()">
+	  <input type="button" value="Reset Sliders" class="w3-button w3-green" style="font-size:20px;" onclick="reset_ex1()">
 	  <br><br>
 	</div>
 
@@ -361,12 +357,306 @@ figcaption {font-size: 18px}
     	$$
 		v(S)=\mathbb{E}_\mathcal{D}[f(x)|x_{S}]
     	$$
+    </p>
+
+	<p class="w3-opacity w3-justify">
     	One caveat is that modelling the conditional expectation is very difficult.  Further, even if you do perfectly obtain the conditional expectation, the correlations you capture may cause you to give weight to features your model does not use as an input.  Although explaining relationships by modelling the conditional expectation may be desirable for some use cases, our goal is to explain the model itself; therefore, an arguably more natural approach is to use causal inference's <i>interventional conditional expectation</i>:
     	$$
     	v(S)=\mathbb{E}_\mathcal{D}[f(x)|\text{do}(x_{S})]
     	$$
     	The <i>do</i> notation is Judea Pearl's <i>do</i>-operator (<a href="pearl_2000_causality">Pearl 2000</a>). The motivation behind this decision comes from <a href="#janzing2019feature">Janzing et. al. (2019)</a> which is also very close to Random Baseline Shapley in <a href="#sundararajan2019many">Sundararajan et. al. (2019)</a>).  Additionally, this is exactly the assumption made by <a href="https://shap.readthedocs.io/en/latest/#shap.KernelExplainer">Kernel Explainer</a> and <a href="https://shap.readthedocs.io/en/latest/#shap.SamplingExplainer">Sampling Explainer</a> from the SHAP package.
     </p>
+
+    	<div id="table_container" style="overflow-x:auto;align:center;">
+		<p class="w3-opacity w3-left" align="left" style="margin:20px">
+			<strong>Example 2</strong>: Comparing choices of set function for Shapley values: conditional expectation (CE) and interventional conditional expectation (ICE).  We make two simplifying assumptions:
+		</p>
+		<ul class="w3-opacity" align="left" style="margin:20px">
+			<li>The function is linear (\(f=\beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \beta_4 x_4\))</li>
+			<li>The data-generating distribution is multivariate normal (\(D\sim \mathcal{N}_4(0,\Sigma)\))</li>
+		</ul>
+
+		<table class="w3-opacity" style="width:300px;display:inline;margin-right:25px;font-size:20px;">
+	      <col width="50px">
+	      <col width="60px">
+	      <col width="60px">
+	      <col width="60px">
+	      <col width="60px">
+	      <tr align="center">
+	      	<td colspan="5">Covariance \(\Sigma\)</td>
+	      </tr>
+	      <tr align="left">
+		    <th></th>
+		    <th>\(x_1\)</th>
+		    <th>\(x_2\)</th>
+		    <th>\(x_3\)</th>
+		    <th>\(x_4\)</th>
+		  </tr>
+		  <tr align="right">
+		    <td>\(x_1\)</td>
+		    <td><input class="w3-input" type="text" id="ex2_cor11" value="1"></td>
+		    <td><input class="w3-input" type="text" id="ex2_cor12" value="0"></td>
+		    <td><input class="w3-input" type="text" id="ex2_cor13" value="0"></td>
+		    <td><input class="w3-input" type="text" id="ex2_cor14" value="0"></td>
+		  </tr>
+		  <tr align="right">
+		    <td>\(x_2\)</td>
+		    <td><input class="w3-input" type="text" id="ex2_cor21" value="0"></td>
+		    <td><input class="w3-input" type="text" id="ex2_cor22" value="1"></td>
+		    <td><input class="w3-input" type="text" id="ex2_cor23" value="0"></td>
+		    <td><input class="w3-input" type="text" id="ex2_cor24" value="0"></td>
+		  </tr>
+		  <tr align="right">
+		    <td>\(x_3\)</td>
+		    <td><input class="w3-input" type="text" id="ex2_cor31" value="0"></td>
+		    <td><input class="w3-input" type="text" id="ex2_cor32" value="0"></td>
+		    <td><input class="w3-input" type="text" id="ex2_cor33" value="1"></td>
+		    <td><input class="w3-input" type="text" id="ex2_cor34" value=".99"></td>
+		  </tr>
+		  <tr align="right">
+		    <td>\(x_4\)</td>
+		    <td><input class="w3-input" type="text" id="ex2_cor41" value="0"></td>
+		    <td><input class="w3-input" type="text" id="ex2_cor42" value="0"></td>
+		    <td><input class="w3-input" type="text" id="ex2_cor43" value=".99"></td>
+		    <td><input class="w3-input" type="text" id="ex2_cor44" value="1"></td>
+		  </tr>
+		</table>
+
+		<table class="w3-opacity" style="width:300px;display:inline;margin-right:25px;font-size:20px;">
+	      <col width="60px">
+	      <col width="60px">
+	      <col width="60px">
+	      <col width="60px">
+	      <tr align="center">
+	      	<td colspan="2">Explicand</td>
+	      	<td colspan="2">Linear</td>
+	  	  </tr>
+	      <tr align="center">
+	      	<td colspan="2">Sample</td>
+	      	<td colspan="2">Model</td>
+	  	  </tr>
+		  <tr align="right">
+		    <td>\(x_1\)</td>
+		    <td><input class="w3-input" type="text" id="ex2_x1" value="1"></td>
+		    <td>\(\beta_1\)</td>
+		    <td><input class="w3-input" type="text" id="ex2_b1" value="1"></td>
+		  </tr>
+		  <tr align="right">
+		    <td>\(x_2\)</td>
+		    <td><input class="w3-input" type="text" id="ex2_x2" value="1"></td>
+		    <td>\(\beta_2\)</td>
+		    <td><input class="w3-input" type="text" id="ex2_b2" value="2"></td>
+		  </tr>
+		  <tr align="right">
+		    <td>\(x_3\)</td>
+		    <td><input class="w3-input" type="text" id="ex2_x3" value="1"></td>
+		    <td>\(\beta_3\)</td>
+		    <td><input class="w3-input" type="text" id="ex2_b3" value="3"></td>
+		  </tr>
+		  <tr align="right">
+		    <td>\(x_4\)</td>
+		    <td><input class="w3-input" type="text" id="ex2_x4" value="1"></td>
+		    <td>\(\beta_4\)</td>
+		    <td><input class="w3-input" type="text" id="ex2_b4" value="4"></td>
+		  </tr>
+		</table>
+
+		<br><br>
+
+	  	<table class="w3-opacity" style="width:300px;display:inline;margin-right:25px;font-size:20px;">
+	      <col width="180px">
+	      <col width="80px">
+	      <col width="80px">
+	      <col width="80px">
+	      <col width="80px">
+	      <tr align="center">
+	      	<td></td>
+	      	<td>\(\phi_1\)</td>
+	      	<td>\(\phi_2\)</td>
+	      	<td>\(\phi_3\)</td>
+	      	<td>\(\phi_4\)</td>
+	  	  </tr>
+		  <tr align="center">
+		    <td>CE Shapley Values</td>
+		    <td id="ex2_CE_phi1">1</td>
+		    <td id="ex2_CE_phi2">2</td>
+		    <td id="ex2_CE_phi3">3.495</td>
+		    <td id="ex2_CE_phi4">3.505</td>
+		  </tr>
+		  <tr align="center">
+		  	<td>ICE Shapley Values</td>
+		    <td id="ex2_ICE_phi1">1</td>
+		    <td id="ex2_ICE_phi2">2</td>
+		    <td id="ex2_ICE_phi3">3</td>
+		    <td id="ex2_ICE_phi4">4</td>
+		  </tr>
+		</table>
+
+		<script>
+		for (var i=0; i<4; i++)
+			for (var j=0; j<4; j++)
+				document.getElementById("ex2_cor"+(i+1)+(j+1)).onchange = ex2_updateSV;
+
+		for (var i=0; i<4; i++) {
+		    document.getElementById("ex2_x"+(i+1)).onchange = ex2_updateSV;
+		    document.getElementById("ex2_b"+(i+1)).onchange = ex2_updateSV;
+		}
+
+		function round(num,places) {
+			return(Math.round(num * (10**places))/(10**places));
+		}
+
+		function ex2_updateSV() {
+			//// Load the covariance matrix ////
+			// Initialize
+			var cov = [];
+			for (var i=0; i<4; i++)
+			    cov[i] = new Array(4);
+
+			// Load values from inputs
+			for (var i=0; i<4; i++)
+				for (var j=0; j<4; j++)
+					cov[i][j] = Number(document.getElementById("ex2_cor"+(i+1)+(j+1)).value);
+
+			//// Load explicand and beta ////
+			var x = new Array(4);
+			var b = new Array(4);
+			for (var i=0; i<4; i++) {
+			    x[i] = Number(document.getElementById("ex2_x"+(i+1)).value);
+			    b[i] = Number(document.getElementById("ex2_b"+(i+1)).value);
+			}
+
+			//// Update CE phi ////
+			CE_phi = CE_SV(x, b, cov);
+			for (var i=0; i<4; i++)
+			    document.getElementById("ex2_CE_phi"+(i+1)).innerHTML = round(CE_phi[i],4);
+
+			//// Update ICE phi ////
+			ICE_phi = ICE_SV(x, b);
+			for (var i=0; i<4; i++)
+			    document.getElementById("ex2_ICE_phi"+(i+1)).innerHTML = round(ICE_phi[i],4);
+
+		}
+
+		// Calculate conditional expectation 
+		// shapley value
+		const powerSet = Arr => Arr.reduce((subsets, value) => 
+			subsets.concat(subsets.map(set => [value,...set])),[[]]);
+
+		// Index into matrix with lists for xind and yind
+		function matSub(mat, xind, yind) {
+			var mat2 = new Array();
+			for (var i = 0; i < xind.length; i++) {
+				mat2.push(mat[xind[i]]);
+			}
+
+			var mat3 = new Array();
+			for (var i = 0; i < mat2.length; i++) {
+				var row = new Array();
+				for (var j = 0; j < yind.length; j++) {
+					row.push(mat[xind[i]][yind[j]]);
+				}
+				mat3.push(row);
+			}
+
+			return(mat3);
+		}
+
+		// Multiply matrices
+		function matMul(m1, m2) {
+		    var result = [];
+		    for (var i = 0; i < m1.length; i++) {
+		        result[i] = [];
+		        for (var j = 0; j < m2[0].length; j++) {
+		            var sum = 0;
+		            for (var k = 0; k < m1[0].length; k++) {
+		                sum += m1[i][k] * m2[k][j];
+		            }
+		            result[i][j] = sum;
+		        }
+		    }
+		    return result;
+		}
+
+		function get_hybrid(x, S, cov) {
+			if (S.length == 0) {
+				return([0.0,0.0,0.0,0.0]);
+			} else if (S.length == 4) {
+				return(x);
+			} else {
+				S_inv = new Array();
+				for (var j=0; j<4; j++)
+					if (!S.includes(j))
+						S_inv.push(j);
+
+				var x_S = new Array();
+				for (var j=0; j<S.length; j++)
+					x_S.push([x[S[j]]]);
+
+				// Estimate conditional expectation
+				var cov22 = matSub(cov,S,S);
+				var cov12 = matSub(cov,S_inv,S);
+				mu_new = matMul(matMul(cov12,math.inv(cov22)), x_S);
+
+				// Form hybrid x_h
+				var x_h = new Array();
+				for (var j=0; j<x.length; j++)
+					x_h[j] = x[j];
+				for (var j=0; j<S_inv.length; j++)
+					x_h[S_inv[j]] = mu_new[j][0];
+				return(x_h);
+			}
+		}
+
+		// Linear function
+		function f(x, b) {
+			var y = 0;
+			for (var i=0; i<4; i++)
+				y += x[i]*b[i];
+			return(y);
+		}
+
+		function CE_SV(x, b, cov) {
+			set_lst = powerSet([0,1,2,3]);
+			phi  = [0,0,0,0];
+			fact = [1,1,2,6,24];
+
+			for (var i=0; i<set_lst.length; i++) {
+				S = set_lst[i];
+				S.sort();
+				console.log(S);
+				var x_h = get_hybrid(x, S, cov);
+
+				// Get the weighting terms
+				if (S.length != x.length)
+					W_neg = fact[S.length]*fact[x.length-S.length-1]/fact[x.length];
+				if (S.length != 0)
+					W_pos = fact[S.length-1]*fact[x.length-(S.length-1)-1]/fact[x.length];
+
+				for (var j = 0; j < x.length; j++) {
+					if (S.includes(j))
+						phi[j] += W_pos * f(x_h, b);
+					else
+						phi[j] -= W_neg * f(x_h, b);
+				}
+			}
+			return(phi);
+		}
+
+		// Calculate interventional conditional
+		// expectation shapley value
+		function ICE_SV(x, b) {
+			var phi = new Array(4);
+			for (var i=0; i<4; i++)
+				phi[i] = x[i]*b[i];
+			return(phi);
+		}
+		
+		</script>
+
+		<br><br>
+
+	</div>
 
     <!-- Background distribution -->
     <h3 class="w3-justify" id="background_distribution">1.3 SHAP values with a background distribution</h3>
