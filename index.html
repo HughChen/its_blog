@@ -124,6 +124,25 @@ div.tooltip {
 	position: absolute;
 }
 
+.container {
+	width: 770px;
+	/*margin: auto;*/
+}
+
+.first {
+	width: 385px;
+	float: left;
+	height: 500px;
+	/*background-color: blue;*/
+}
+
+.second {
+	width: 385px;
+	float: left;
+	height: 500px;
+	/*background-color: green;*/
+}
+
 </style>
 <body>
 
@@ -280,21 +299,21 @@ div.tooltip {
 		</tr>
 		<tr>
 			<td>\(\phi_{Ben}(v)\)</td>
-			<td id="phi_b">2</td>
+			<td id="phi_b">1</td>
 		</tr>
 		<tr>
 			<td>\(\phi_{Cat}(v)\)</td>
-			<td id="phi_c">3</td>
+			<td id="phi_c">1</td>
 		</tr>
 	  </table>
 
 	  <br><br>
-	  <input type="button" value="Preset A" class="w3-button w3-green" style="font-size:20px;" onclick="ex1_presetA()"> 
-	  <input type="button" value="Preset B" class="w3-button w3-green" style="font-size:20px;" onclick="ex1_presetB()"> 
-	  <input type="button" value="Preset C" class="w3-button w3-green" style="font-size:20px;" onclick="ex1_presetC()"> 
+	  <input type="button" value="Preset A" class="w3-button w3-green" id="ex1_presetA" style="font-size:20px;" onclick="ex1_presetA()"> 
+	  <input type="button" value="Preset B" class="w3-button w3-teal" id="ex1_presetB" style="font-size:20px;" onclick="ex1_presetB()"> 
+	  <input type="button" value="Preset C" class="w3-button w3-green" id="ex1_presetC" style="font-size:20px;" onclick="ex1_presetC()"> 
 	  <br>
 
-	  <p class="w3-opacity w3-center" align="center" id="ex1_preset_text" style="margin:20px"><strong>Preset B: </strong>All equals.</p>
+	  <p class="w3-opacity w3-center" align="center" id="ex1_preset_text" style="margin:20px">All equals.</p>
 
 	</div>
 
@@ -310,18 +329,35 @@ div.tooltip {
 		s.oninput = function() {this.paired_out.innerHTML = this.value;}
 	}
 
+	function ex1_set_preset(prefix,letter) {
+		letters = ["A", "B", "C"];
+		for (var i = 0; i < letters.length; i++) {
+			if (letters[i] == letter) {
+				document.getElementById(prefix+letters[i]).className = "w3-button w3-teal";
+			} else {
+				document.getElementById(prefix+letters[i]).className = "w3-button w3-green";
+			}
+		}
+	}
+
 	function ex1_presetA() {
+		ex1_set_preset("ex1_preset","A");
 		for (var i = 0; i < slider_elements.length; i++) {
 			var s = document.getElementById(slider_elements[i])
-			s.value = i + 1;
+			if (i == 0) {
+				s.value = 0;
+			} else {
+				s.value = i-1;
+			}
 			s.oninput();
 			s.onchange();
 			var text = document.getElementById("ex1_preset_text");
-			text.innerHTML = '<strong>Preset A: </strong>Increasing set function.';
+			text.innerHTML = 'Increasing set function.';
 		}
 	}
 
 	function ex1_presetB() {
+		ex1_set_preset("ex1_preset","B");
 		values = [0,1,1,1,2,2,2,3];
 		for (var i = 0; i < slider_elements.length; i++) {
 			var s = document.getElementById(slider_elements[i])
@@ -329,19 +365,20 @@ div.tooltip {
 			s.oninput();
 			s.onchange();
 			var text = document.getElementById("ex1_preset_text");
-			text.innerHTML = '<strong>Preset B: </strong>All equals.';
+			text.innerHTML = 'All equals.';
 		}
 	}
 
 	function ex1_presetC() {
-		values = [0,5,1,1,6,6,2,10];
+		ex1_set_preset("ex1_preset","C");
+		values = [0,5,1,1,6,6,2,7];
 		for (var i = 0; i < slider_elements.length; i++) {
 			var s = document.getElementById(slider_elements[i])
 			s.value = values[i];
 			s.oninput();
 			s.onchange();
 			var text = document.getElementById("ex1_preset_text");
-			text.innerHTML = '<strong>Preset C: </strong>Ava the superstar.';
+			text.innerHTML = 'Ava the superstar.';
 		}
 	}
 
@@ -563,18 +600,31 @@ div.tooltip {
 
 		<br><br>
 
-		<input type="button" value="Preset A" class="w3-button w3-green" style="font-size:20px;" onclick="ex2_presetA()">
-	  	<input type="button" value="Preset B" class="w3-button w3-green" style="font-size:20px;" onclick="ex2_presetB()">
-	  	<input type="button" value="Preset C" class="w3-button w3-green" style="font-size:20px;" onclick="ex2_presetC()">
-	  	<input type="button" value="Preset D" class="w3-button w3-green" style="font-size:20px;" onclick="ex2_presetD()">
+		<input type="button" value="Preset A" class="w3-button w3-teal" style="font-size:20px;" id="ex2_presetA" onclick="ex2_presetA()">
+	  	<input type="button" value="Preset B" class="w3-button w3-green" style="font-size:20px;" id="ex2_presetB" onclick="ex2_presetB()">
+	  	<input type="button" value="Preset C" class="w3-button w3-green" style="font-size:20px;" id="ex2_presetC" onclick="ex2_presetC()">
+	  	<input type="button" value="Preset D" class="w3-button w3-green" style="font-size:20px;" id="ex2_presetD" onclick="ex2_presetD()">
 
-		<p class="w3-opacity w3-center" align="center" id="ex2_preset_text" style="margin:20px"><strong>Preset A: </strong>Independent variables.</p>
+		<p class="w3-opacity w3-center" align="center" id="ex2_preset_text" style="margin:20px">Independent variables.</p>
 
 		<script>
 		///////////////////////////
 		////// Ex. 2 Presets //////
 		///////////////////////////
+		function ex2_set_preset(prefix,letter) {
+			letters = ["A", "B", "C", "D"];
+			for (var i = 0; i < letters.length; i++) {
+				if (letters[i] == letter) {
+					document.getElementById(prefix+letters[i]).className = "w3-button w3-teal";
+				} else {
+					document.getElementById(prefix+letters[i]).className = "w3-button w3-green";
+				}
+			}
+		}
+
 		function ex2_presetA() {
+			ex2_set_preset("ex2_preset","A");
+
 			// Reset covariance
 			for (var i=0; i<4; i++)
 				for (var j=0; j<4; j++)
@@ -591,7 +641,7 @@ div.tooltip {
 
 			// Update preset text
 			var text = document.getElementById("ex2_preset_text");
-			text.innerHTML = "<strong>Preset A: </strong>Independent variables.";
+			text.innerHTML = "Independent variables.";
 
 			// Update shapley values
 			ex2_updateSV();
@@ -601,12 +651,14 @@ div.tooltip {
 			// Reset covariance
 			ex2_presetA();
 
+			ex2_set_preset("ex2_preset","B");
+
 			document.getElementById("ex2_cor"+3+4).value = 0.99;
 			document.getElementById("ex2_cor"+4+3).value = 0.99;
 
 			// Update preset text
 			var text = document.getElementById("ex2_preset_text");
-			text.innerHTML = "<strong>Preset B: </strong>Pair of highly correlated variables.";
+			text.innerHTML = "Pair of highly correlated variables.";
 
 			// Update shapley values
 			ex2_updateSV();
@@ -616,11 +668,13 @@ div.tooltip {
 			// Reset covariance
 			ex2_presetA();
 
+			ex2_set_preset("ex2_preset","C");
+
 		    document.getElementById("ex2_b"+4).value = 0;
 
 			// Update preset text
 			var text = document.getElementById("ex2_preset_text");
-			text.innerHTML = "<strong>Preset C: </strong>Variable not used by model (independent).";
+			text.innerHTML = "Variable not used by model (independent).";
 
 			// Update shapley values
 			ex2_updateSV();
@@ -630,11 +684,13 @@ div.tooltip {
 			// Reset covariance
 			ex2_presetB();
 
+			ex2_set_preset("ex2_preset","D");
+
 		    document.getElementById("ex2_b"+4).value = 0;
 
 			// Update preset text
 			var text = document.getElementById("ex2_preset_text");
-			text.innerHTML = "<strong>Preset D: </strong>Variable not used by model (pair correlation).";
+			text.innerHTML = "Variable not used by model (pair correlation).";
 
 			// Update shapley values
 			ex2_updateSV();
@@ -1520,6 +1576,152 @@ div.tooltip {
     <p class="w3-opacity w3-justify">
 	    There are a number of sampling based approaches to obtain SHAP values that use an interventional conditional expectation.  Two notable ones are Sampling Explainer and Kernel Explainer.  To approximate \(\phi_i(f,x)\) Sampling Explainer uses monte carlo sampling and Kernel Explainer uses a special weighted linear regression.  These methods are model-agnostic and all they require is the ability to evaluate \(f(x)\).  
 	</p> -->
+
+    <div id="table_container" style="overflow-x:auto;align:center;font-size:18px">
+    	<p class="w3-opacity w3-left" align="left" style="margin:20px">
+			<strong>Example 4</strong>: Brute force algorithm applied to the tree and samples specified in Example 3.
+		</p>
+	</div>
+
+    <div id="table_container" style="overflow-x:auto;align:center;font-size:18px">
+	  <div class="container">
+	    <div class="first">
+	    	<div id="ex4_div1"></div>
+	    </div>
+	    <div id="ex4_div2" class="second w3-opacity">
+      		<table cellpadding="10" align="center">
+		      <col width="40px"/>
+		      <col width="120px"/>
+		      <col width="120px"/>
+		      <col width="120px"/>
+		      <col width="120px"/>
+			<thead>
+				<tr>
+					<th title="Field #7">\(W\)</th>
+					<th title="Field #1">\(S\)</th>
+					<th title="Field #9">\(f(x_S)\)</th>
+					<th title="Field #1">\(S\cup{i}\)</th>
+					<th title="Field #8">\(f(x_{S\cup{i}})\)</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- <tr bgcolor="#F8F8F8"> -->
+				<tr>
+					<td>1/3</td>
+					<td>{}</td>
+					<td id="s1_pos">1</td>
+					<td>{1}</td>
+					<td>4</td>
+				</tr>
+				<tr>
+					<td>1/6</td>
+					<td>{2}</td>
+					<td>2</td>
+					<td>{1,2}</td>
+					<td>4</td>
+				</tr>
+				<tr>
+					<td>1/6</td>
+					<td>{3}</td>
+					<td>1</td>
+					<td>{1,3}</td>
+					<td>3</td>
+				</tr>
+				<tr>
+					<td>1/3</td>
+					<td>{2,3}</td>
+					<td>2</td>
+					<td>{1,2,3}</td>
+					<td>3</td>
+				</tr>
+			</tbody>
+		</table>
+	    </div>
+	    <div class="clear"></div>
+	  </div>
+    </div>
+
+    <script>
+		//// Generate the tree diagram ////
+		var margin = {top: 0, right: 0, bottom: 0, left: 0},
+		  width = 360 - margin.right - margin.left,
+		  height = 360 - margin.top - margin.bottom;
+
+		var tree = d3.layout.tree()
+		  .size([height, width]);
+
+		var diagonal = d3.svg.diagonal()
+		  .projection(function(d) { return [d.x, d.y]; });
+
+		var svg = d3.select("#ex4_div1").append("svg")
+		  .attr("width", width + margin.right + margin.left)
+		  .attr("height", height + margin.top + margin.bottom)
+		  .append("g")
+		  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+		// Get tooltip element
+		var divtooltip = d3.select('div.tooltip');
+
+		// Erase tool tips
+		function rectclick(d) {divtooltip[0][0].innerHTML = "";}
+		svg.append("rect")
+		  .attr("width", "100%")
+		  .attr("height", "100%")
+		  .attr("fill", "#ffffff")
+		  .style("fill-opacity", .1)
+		  .on("click", rectclick);
+
+		update(treeData[0]);
+
+		function update(source) {
+		/* @desc Update tree SVG (doesn't seem to update text for some reason) */
+
+		// Compute the new tree layout.
+		var nodes = tree.nodes(treeData[0]).reverse(),
+		links = tree.links(nodes);
+
+		// Normalize for fixed-depth.
+		nodes.forEach(function(d) { d.y = d.depth * 100 + 20; });
+		nodes.forEach(function(d) { d.x = d.x - 10; });
+
+		// Declare the nodes…
+		var node = svg.selectAll("g.node")
+			.data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+		// Enter the nodes.
+		var nodeEnter = node.enter().append("g")
+			.attr("class", "node")
+			.attr("transform", function(d) { 
+			  return "translate(" + d.x + "," + d.y + ")"; })
+
+		nodeEnter.append("circle")
+			.attr("r", 10)
+			.style("fill", "#fff");
+
+		nodeEnter.append("text")
+			.attr("y", function(d) { 
+			  return d.children || d._children ? 0 : 20; })
+			.attr("x", function(d) { 
+			  return d.children || d._children ? 15 : 0; })
+			.attr("dy", ".35em")
+			.attr("text-anchor", function(d) {
+				if (d.name.startsWith("Leaf")) {
+					return "middle"
+				}
+			})
+		.text(function(d) { 
+			if (d.name.startsWith("Leaf")) {
+				return d.value;
+			} else {
+				return d.variable + ">" + d.threshold;   
+			}
+		})
+		.style("font-family", "courier")
+		.style("font-size", "16px")
+		.style("fill-opacity", 1);
+	}
+    </script>
+
 
 	<p class="w3-opacity w3-justify">
 	    However, if we <i>constrain \(f(x)\) to be a tree-based model</i> (e.g., XGBoost, decision trees, random forests, etc.), then we can come up with a polynomial time algorithm to compute \(\phi_i(f,x,\hat{x})\) exactly.  In the following section we discuss an example to provide intuition as to why.
