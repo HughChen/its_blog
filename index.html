@@ -910,53 +910,56 @@ div.tooltip {
 			<strong>Example 3</strong>: Choose \(x^f\), \(x^b\), and tree parameters for the remainder of this section.
 		</p>
 
-    	<table class="w3-opacity w3-center" style="width:300px;display:inline;margin-right:25px;font-size:18px;">
+    	<table class="w3-center" style="width:300px;display:inline;margin-right:25px;font-size:18px;">
 	      <col width="100px"/>
 	      <col width="150px"/>
 	      <col width="50px"/>
 	      <col width="150px"/>
 	      <col width="50px"/>
-	    <tr>
+	      <col width="50px"/>
+	    <tr class="w3-opacity">
 	      <th>Variable</th>
 	      <th colspan="2">Foreground Sample \(x^f\)</th>
 	      <th colspan="2">Background Sample \(x^b\)</th>
+	      <th></th>
 	    </tr>
 	    <tr>
-	      <td>\(x_1\)</td>
+	      <td class="w3-opacity">\(x_1\)</td>
 	      <td><input type="range" min="-15" max="15" value="0" class="slider" id="fx1"></td>
-	      <td align="left" id="fx1_out"></td>
+	      <td class="w3-opacity" align="left" id="fx1_out"></td>
 	      <td><input type="range" min="-15" max="15" value="10" class="slider" id="bx1"></td>
-	      <td align="left" id="bx1_out"></td>
+	      <td class="w3-opacity" align="left" id="bx1_out"></td>
+	      <td></td>
 	    </tr>
 	    <tr>
-	      <td>\(x_2\)</td>
+	      <td class="w3-opacity">\(x_2\)</td>
 	      <td><input type="range" min="-15" max="15" value="0" class="slider" id="fx2"></td>
-	      <td align="left" id="fx2_out"></td>
+	      <td class="w3-opacity" align="left" id="fx2_out"></td>
 	      <td><input type="range" min="-15" max="15" value="10" class="slider" id="bx2"></td>
-	      <td align="left" id="bx2_out"></td>
+	      <td class="w3-opacity" align="left" id="bx2_out"></td>
+	      <td><input type="button" value="Reset" class="w3-button w3-green" style="font-size:20px;" onclick="ex3_reset()"> </td>
 	    </tr>
 	    <tr>
-	      <td>\(x_3\)</td>
+	      <td class="w3-opacity">\(x_3\)</td>
 	      <td><input type="range" min="-15" max="15" value="10" class="slider" id="fx3"></td>
-	      <td align="left" id="fx3_out"></td>
+	      <td class="w3-opacity" align="left" id="fx3_out"></td>
 	      <td><input type="range" min="-15" max="15" value="0" class="slider" id="bx3"></td>
-	      <td align="left" id="bx3_out"></td>
+	      <td class="w3-opacity" align="left" id="bx3_out"></td>
+	      <td></td>
 	    </tr>
 	  </table>
 
 	  <br><br>
 
 		<p class="w3-opacity w3-center" style="line-height:0;font-size:18px">
-			<strong>Tree Parameters (Click nodes)</strong> <br>
+			<strong>Tree Parameters* (Click nodes)</strong> <br>
 		</p>
 
 	  <div id="graphic"></div> 
 	  <div class="tooltip" id="tooltip"></div>
-		<p class="w3-opacity w3-center" style="margin:20px;font-size:18px">
-			Green links indicate the foreground sample goes down a particular split, red indicates the background sample does, and blue indicates both samples do.
+		<p class="w3-opacity w3-center" style="margin:-30px 0px 30px 0px;font-size:18px">
+			*Green links indicate the foreground sample goes down a particular split, red indicates the background sample does, and blue indicates both samples do.
 		</p>
-		<input type="button" value="Reset" class="w3-button w3-green" style="font-size:20px;" onclick="ex3_reset()"> 
-		<br><br>
 	</div>
 
 	<script>
@@ -965,8 +968,28 @@ div.tooltip {
 
 	function ex3_reset() {
 		treeData = JSON.parse(JSON.stringify(treeData0));
-		update_all_text();
-		update_links();
+
+		function s_update(s_name, value) {
+			var s     = document.getElementById(s_name);
+			var s_out = document.getElementById(s_name+"_out");
+			s.value = value;
+			s_out.innerHTML = value;
+		}
+		s_update("fx1",0);
+		s_update("fx2",0);
+		s_update("fx3",10);
+		s_update("bx1",10);
+		s_update("bx2",10);
+		s_update("bx3",0);
+		foregroundx = [0,0,10];
+		backgroundx = [10,10,0];
+
+		setup_all_sliders();
+
+		svg.selectAll("path.link").remove();
+		svg.selectAll("g.node").remove();
+
+		update(treeData[0]);
 	}
 
 	/////////////////////////////////////////////////////////////////
@@ -975,21 +998,26 @@ div.tooltip {
 	function slider_setup(s_name, sample, index) {
 	  var s     = document.getElementById(s_name);
 	  var s_out = document.getElementById(s_name+"_out");
+	  s.value = sample[index];
 	  s_out.innerHTML = s.value;
 	  s.paired_out = s_out;
 	  s.oninput = function() {
-	    sample[index] = this.value;
+	    sample[index] = Number(this.value);
 	    this.paired_out.innerHTML = this.value;
 	    update(treeData[0]);
 	  }
 	}
 
-	slider_setup("fx1", foregroundx, 0);
-	slider_setup("fx2", foregroundx, 1);
-	slider_setup("fx3", foregroundx, 2);
-	slider_setup("bx1", backgroundx, 0);
-	slider_setup("bx2", backgroundx, 1);
-	slider_setup("bx3", backgroundx, 2);
+	function setup_all_sliders() {
+		slider_setup("fx1", foregroundx, 0);
+		slider_setup("fx2", foregroundx, 1);
+		slider_setup("fx3", foregroundx, 2);
+		slider_setup("bx1", backgroundx, 0);
+		slider_setup("bx2", backgroundx, 1);
+		slider_setup("bx3", backgroundx, 2);
+	}
+
+	setup_all_sliders();
 
 	/////////////////////////////////////
 	////// Tree data and functions //////
@@ -1225,7 +1253,7 @@ div.tooltip {
 	function update_internal_tooltip(var_name, thres_val, new_click) {
 	  /* @desc Update tooltip based on variable and threshold */
 	  var content;
-	  content =  "<div style='text-align: center;background: white;width:200px; box-shadow:3px 3px 5px #797878;height:190px; padding:8%'>";
+	  content =  "<div style='text-align: center;background: white;width:200px; box-shadow:3px 3px 5px #797878;height:190px; padding:8%;position:relative;z-index:10'>";
 	  content += '<table style="width:300px;display:inline;margin-right:25px;font-size:16px;">'
 	  content += '<col width="60px"><col width="60px"><col width="60px">'
 	  content += '<tr align="center"><td colspan="3">Variable</td></tr>'
@@ -1294,7 +1322,7 @@ div.tooltip {
 	function update_leaf_tooltip(value, new_click) {
 	  /* @desc Update leaf tooltip based on variable and threshold */
 	  var content;
-	  content =  "<div style='text-align: center;background:white;width:200px; box-shadow:3px 3px 5px #797878;height:105px; padding:8%'>";
+	  content =  "<div style='text-align:center;background:white;width:200px;box-shadow:3px 3px 5px #797878;height:105px; padding:8%;position:relative;z-index:10'>";
 	  content += '<table style="width:300px;display:inline;margin-right:25px;font-size:16px;">'
 
 	  content += '<col width="60px"><col width="60px"><col width="60px">'
