@@ -1,4 +1,5 @@
-﻿Regression/Logistic Regression,7301,4636,63.498151
+﻿Method,N,Count,Frequency
+Regression/Logistic Regression,7301,4636,63.498151
 Decision Trees,7301,3640,49.856184
 Random Forests,7301,3378,46.267635
 Neural Networks,7301,2743,37.570196
