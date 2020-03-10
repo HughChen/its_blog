@@ -12,6 +12,9 @@
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
     onload="renderMathInElement(document.body);"></script>
 <script language="JavaScript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.2.1/math.js"></script>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>d3v4 = d3;</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
 
 <style>
@@ -58,6 +61,51 @@ figcaption {font-size: 18px}
 .responsive {
 	width: 100%;
 	height: auto;
+}
+
+/*Figure 1*/
+.bar {
+    fill: #4DAF51;
+}
+
+.bar:hover {
+	fill: #019788;
+}
+
+.axis {
+    font-size: 16px;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    display: none;
+    shape-rendering: crispEdges;
+}
+
+.label {
+	color: #4DAF51;
+    font-size: 16px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
 }
 
 #table_container {
@@ -125,21 +173,21 @@ div.tooltip {
 }
 
 .container {
-	width: 770px;
+	width: 760px;
 	/*margin: auto;*/
 }
 
 .first {
-	width: 385px;
+	width: 380px;
 	float: left;
-	height: 500px;
+	height: 630px;
 	/*background-color: blue;*/
 }
 
 .second {
-	width: 385px;
+	width: 380px;
 	float: left;
-	height: 500px;
+	height: 630px;
 	/*background-color: green;*/
 }
 
@@ -166,8 +214,6 @@ div.tooltip {
 
 <!-- Page content -->
 <div class="w3-content" style="max-width:2000px;margin-left:300px">
-<!-- margin-left: 250px; /* Same as the width of the sidebar */ -->
-  <!-- Automatic Slideshow Images -->
   <div class="w3-display-container w3-center">
     <img src="images/trees.jpg" style="width:100%">
     <div class="w3-display-bottommiddle w3-container w3-text-white w3-hide-small">
@@ -181,14 +227,12 @@ div.tooltip {
   <div class="w3-container w3-content w3-center w3-padding-16" style="max-width:800px" id="abstract">
     <h2 class="w3-justify" id="introduction">Introduction</h2>
     <p class="w3-opacity w3-justify">
-      Nowadays, machine learning (ML) is widespread.  In particular, trees are one of the most popular ML model classes.  In a 2017 <a href="https://www.kaggle.com/surveys/2017">Kaggle survey</a>, tree models were both the second and third most popular class of method, beaten only by Logistic Regression (Figure 1).  Although small tree models can be interpretable (<a href="#rudin2019">Rudin 2019</a>), most tree models are generally large and hard for humans to interpret.  
+      Nowadays, machine learning (ML) is widespread.  In particular, trees are one of the most popular ML model classes.  In a recent survey of data scientists and researchers, tree models were both the second and third most popular class of method, beaten only by Logistic Regression (Figure 1).  Although small tree models can be interpretable (<a href="#rudin2019">Rudin 2019</a>), most tree models are generally large and hard for humans to interpret.  
     </p>
 
-    <div style="background-color:#F4F6F6;">
-    <figure>
-		<img src="images/methods.png" alt="Data Science Methods" class="responsive">
-		<figcaption class="w3-opacity" style="font-size:20px;">Figure 1: Most popular data science methods according to a <a href="https://www.kaggle.com/surveys/2017">2017 Kaggle survey</a> (7,301 responses).</figcaption>
-	</figure>
+	<div id="table_container" style="overflow-x:auto;align:center;">
+    <p class="w3-opacity" style="font-size:20px;margin:20px 20px 0px 20px"><strong>Figure 1</strong>: The most popular data science methods according to a <a href="https://www.kaggle.com/surveys/2017">2017 Kaggle survey</a> (based on a total of 7,301 responses).</p>
+    <div id="fig1"></div>
 	</div>
 
     <p class="w3-opacity w3-justify">
@@ -197,11 +241,11 @@ div.tooltip {
 
     <h3 class="w3-justify" id="motivation">Motivation</h3>
     <p class="w3-opacity w3-justify">
-    My goal is to explain an algorithm I developed called Interventional Tree Explainer (ITE) that is currently the default algorithm for explaining trees in the popular SHAP package. ITE is introduced in our paper (<a href="#lundberg2020fromlocal">Lundberg et. al. 2020</a>); however, it is a complicated algorithm with motivations that we did not have room to fully explain in the paper.  
+    The goal of this article is to explain an algorithm we developed called Interventional Tree Explainer (ITE) that is currently the default algorithm for explaining trees in the popular SHAP package. ITE is introduced in <a href="#lundberg2020fromlocal">Lundberg et. al. 2020</a>; however, it is a complicated algorithm we did not have room to fully explain in the paper.  
   </p>
 
     <p class="w3-opacity w3-justify">
-    Furthermore, there is a long history of model explanations going awry when users do not understand what an explanation means (e.g., p-values for linear models (<a href="#schervish1996">Schervish 1996</a>)).  Since the vast majority of explainability methods are for humans, I believe it is extremely important to have a broadly accessible explanation of SHAP values and how they are obtained for tree models to ensure that people know what they mean.
+    Given that there is a long history of model explanations going awry when users do not understand what an explanation means (e.g., p-values for linear models (<a href="#schervish1996">Schervish 1996</a>)), it is extremely important to have a broadly accessible explanation of SHAP values and how they are obtained for tree models to ensure that people do not misuse them.
   </p>
   </div>
 
@@ -316,97 +360,6 @@ div.tooltip {
 	  <p class="w3-opacity w3-center" align="center" id="ex1_preset_text" style="margin:20px">All equals.</p>
 
 	</div>
-
-	<!-- Update value next to slider -->
-	<script>
-	var slider_elements = ["s_n","s_a","s_b","s_c","s_ab","s_ac","s_bc","s_abc"];
-
-	for (var i = 0; i < slider_elements.length; i++) {
-		var s = document.getElementById(slider_elements[i]);
-		var s_out = document.getElementById(slider_elements[i]+"_out");
-		s_out.innerHTML = s.value;
-		s.paired_out = s_out;
-		s.oninput = function() {this.paired_out.innerHTML = this.value;}
-	}
-
-	function ex1_set_preset(prefix,letter) {
-		letters = ["A", "B", "C"];
-		for (var i = 0; i < letters.length; i++) {
-			if (letters[i] == letter) {
-				document.getElementById(prefix+letters[i]).className = "w3-button w3-teal";
-			} else {
-				document.getElementById(prefix+letters[i]).className = "w3-button w3-green";
-			}
-		}
-	}
-
-	function ex1_presetA() {
-		ex1_set_preset("ex1_preset","A");
-		for (var i = 0; i < slider_elements.length; i++) {
-			var s = document.getElementById(slider_elements[i])
-			if (i == 0) {
-				s.value = 0;
-			} else {
-				s.value = i-1;
-			}
-			s.oninput();
-			s.onchange();
-			var text = document.getElementById("ex1_preset_text");
-			text.innerHTML = 'Increasing set function.';
-		}
-	}
-
-	function ex1_presetB() {
-		ex1_set_preset("ex1_preset","B");
-		values = [0,1,1,1,2,2,2,3];
-		for (var i = 0; i < slider_elements.length; i++) {
-			var s = document.getElementById(slider_elements[i])
-			s.value = values[i];
-			s.oninput();
-			s.onchange();
-			var text = document.getElementById("ex1_preset_text");
-			text.innerHTML = 'All equals.';
-		}
-	}
-
-	function ex1_presetC() {
-		ex1_set_preset("ex1_preset","C");
-		values = [0,5,1,1,6,6,2,7];
-		for (var i = 0; i < slider_elements.length; i++) {
-			var s = document.getElementById(slider_elements[i])
-			s.value = values[i];
-			s.oninput();
-			s.onchange();
-			var text = document.getElementById("ex1_preset_text");
-			text.innerHTML = 'Ava the superstar.';
-		}
-	}
-
-	function calcSV() {
-
-		var s_null = document.getElementById("s_n").value
-		var s_a = document.getElementById("s_a").value
-		var s_b = document.getElementById("s_b").value
-		var s_c = document.getElementById("s_c").value
-		var s_ab = document.getElementById("s_ab").value
-		var s_ac = document.getElementById("s_ac").value
-		var s_bc = document.getElementById("s_bc").value
-		var s_abc = document.getElementById("s_abc").value
-
-		if (isNaN(s_null) || isNaN(s_a) || isNaN(s_b) || isNaN(s_c) ||
-			isNaN(s_ab) || isNaN(s_ac) || isNaN(s_bc) || isNaN(s_abc)) {
-			return;
-		}
-
-		var phi_a = 1/3*(s_abc-s_bc)+1/6*(s_ab-s_b)+1/6*(s_ac-s_c)+1/3*(s_a-s_null);
-		var phi_b = 1/3*(s_abc-s_ac)+1/6*(s_ab-s_a)+1/6*(s_bc-s_c)+1/3*(s_b-s_null);
-		var phi_c = 1/3*(s_abc-s_ab)+1/6*(s_ac-s_a)+1/6*(s_bc-s_b)+1/3*(s_c-s_null);
-
-		document.getElementById("phi_a").innerHTML = Math.round(phi_a*100)/100;
-		document.getElementById("phi_b").innerHTML = Math.round(phi_b*100)/100;
-		document.getElementById("phi_c").innerHTML = Math.round(phi_c*100)/100;
-	}
-	</script>
 
 	<p class="w3-opacity w3-justify">
     	The Shapley values consider how much an individual increases profit when they work together with all other possible teams.  Furthermore, they are a unique solution to spreading credit as defined by several desirable properties (<a href="#young_uniquesol">Young 1985</a>):
@@ -606,297 +559,6 @@ div.tooltip {
 	  	<input type="button" value="Preset D" class="w3-button w3-green" style="font-size:20px;" id="ex2_presetD" onclick="ex2_presetD()">
 
 		<p class="w3-opacity w3-center" align="center" id="ex2_preset_text" style="margin:20px">Independent variables.</p>
-
-		<script>
-		///////////////////////////
-		////// Ex. 2 Presets //////
-		///////////////////////////
-		function ex2_set_preset(prefix,letter) {
-			letters = ["A", "B", "C", "D"];
-			for (var i = 0; i < letters.length; i++) {
-				if (letters[i] == letter) {
-					document.getElementById(prefix+letters[i]).className = "w3-button w3-teal";
-				} else {
-					document.getElementById(prefix+letters[i]).className = "w3-button w3-green";
-				}
-			}
-		}
-
-		function ex2_presetA() {
-			ex2_set_preset("ex2_preset","A");
-
-			// Reset covariance
-			for (var i=0; i<4; i++)
-				for (var j=0; j<4; j++)
-					document.getElementById("ex2_cor"+(i+1)+(j+1)).value = 0.0;
-
-			for (var i=0; i<4; i++)
-				document.getElementById("ex2_cor"+(i+1)+(i+1)).value = 1.0;
-
-			// Reset explicand and beta
-			for (var i=0; i<4; i++) {
-			    document.getElementById("ex2_x"+(i+1)).value = 1;
-			    document.getElementById("ex2_b"+(i+1)).value = i+1;
-			}
-
-			// Update preset text
-			var text = document.getElementById("ex2_preset_text");
-			text.innerHTML = "Independent variables.";
-
-			// Update shapley values
-			ex2_updateSV();
-		}
-
-		function ex2_presetB() {
-			// Reset covariance
-			ex2_presetA();
-
-			ex2_set_preset("ex2_preset","B");
-
-			document.getElementById("ex2_cor"+3+4).value = 0.99;
-			document.getElementById("ex2_cor"+4+3).value = 0.99;
-
-			// Update preset text
-			var text = document.getElementById("ex2_preset_text");
-			text.innerHTML = "Pair of highly correlated variables.";
-
-			// Update shapley values
-			ex2_updateSV();
-		}
-
-		function ex2_presetC() {
-			// Reset covariance
-			ex2_presetA();
-
-			ex2_set_preset("ex2_preset","C");
-
-		    document.getElementById("ex2_b"+4).value = 0;
-
-			// Update preset text
-			var text = document.getElementById("ex2_preset_text");
-			text.innerHTML = "Variable not used by model (independent).";
-
-			// Update shapley values
-			ex2_updateSV();
-		}
-
-		function ex2_presetD() {
-			// Reset covariance
-			ex2_presetB();
-
-			ex2_set_preset("ex2_preset","D");
-
-		    document.getElementById("ex2_b"+4).value = 0;
-
-			// Update preset text
-			var text = document.getElementById("ex2_preset_text");
-			text.innerHTML = "Variable not used by model (pair correlation).";
-
-			// Update shapley values
-			ex2_updateSV();
-		}
-
-		/////////////////////////////////////
-		////// Ex2 Initialize elements //////
-		/////////////////////////////////////
-		// @desc Set paired output for symmetric matrix
-		for (var i=0; i<4; i++) {
-			for (var j=0; j<4; j++) {
-				if (i != j) {
-					var s = document.getElementById("ex2_cor"+(i+1)+(j+1));
-					var o = document.getElementById("ex2_cor"+(j+1)+(i+1));
-					s.paired_out = o;					
-				}
-			}
-		}
-
-		// @desc Set onchange functions
-		for (var i=0; i<4; i++)
-			for (var j=0; j<4; j++)
-				document.getElementById("ex2_cor"+(i+1)+(j+1)).onchange = ex2_updateSV;
-
-		// @desc Set onchange functions
-		for (var i=0; i<4; i++) {
-		    document.getElementById("ex2_x"+(i+1)).onchange = ex2_updateSV;
-		    document.getElementById("ex2_b"+(i+1)).onchange = ex2_updateSV;
-		}
-
-		//////////////////////////////////
-		////// Ex2 Helper functions //////
-		//////////////////////////////////
-		function round(num,places) {
-			return(Math.round(num * (10**places))/(10**places));
-		}
-
-		const powerSet = Arr => Arr.reduce((subsets, value) => 
-			subsets.concat(subsets.map(set => [value,...set])),[[]]);
-
-		function ex2_updateSV() {
-			/** 
-			* @desc Update the shapley value HTML elements
-			* @author Hugh Chen hugh.chen1@gmail.com
-			**/
-			// Update paired element
-			if (this.paired_out) this.paired_out.value = this.value;
-
-			//// Load the covariance matrix ////
-			// Initialize
-			var cov = [];
-			for (var i=0; i<4; i++) cov[i] = new Array(4);
-
-			// Load values from inputs
-			for (var i=0; i<4; i++)
-				for (var j=0; j<4; j++)
-					cov[i][j] = Number(document.getElementById("ex2_cor"+(i+1)+(j+1)).value);
-
-			//// Load explicand and beta ////
-			var x = new Array(4);
-			var b = new Array(4);
-			for (var i=0; i<4; i++) {
-			    x[i] = Number(document.getElementById("ex2_x"+(i+1)).value);
-			    b[i] = Number(document.getElementById("ex2_b"+(i+1)).value);
-			}
-
-			//// Update CE phi ////
-			CE_phi = CE_SV(x, b, cov);
-			for (var i=0; i<4; i++)
-			    document.getElementById("ex2_CE_phi"+(i+1)).innerHTML = round(CE_phi[i],4);
-
-			//// Update ICE phi ////
-			ICE_phi = ICE_SV(x, b);
-			for (var i=0; i<4; i++)
-			    document.getElementById("ex2_ICE_phi"+(i+1)).innerHTML = round(ICE_phi[i],4);
-
-		}
-
-		function matSub(mat, xind, yind) {
-			/** 
-			* @desc Index into matrix with lists for xind and yind
-			**/
-			var mat2 = new Array();
-			for (var i = 0; i < xind.length; i++) {
-				mat2.push(mat[xind[i]]);
-			}
-
-			var mat3 = new Array();
-			for (var i = 0; i < mat2.length; i++) {
-				var row = new Array();
-				for (var j = 0; j < yind.length; j++) {
-					row.push(mat[xind[i]][yind[j]]);
-				}
-				mat3.push(row);
-			}
-
-			return(mat3);
-		}
-
-		function matMul(m1, m2) {
-			/** 
-			* @desc Multiply matrices
-			**/
-		    var result = [];
-		    for (var i = 0; i < m1.length; i++) {
-		        result[i] = [];
-		        for (var j = 0; j < m2[0].length; j++) {
-		            var sum = 0;
-		            for (var k = 0; k < m1[0].length; k++) {
-		                sum += m1[i][k] * m2[k][j];
-		            }
-		            result[i][j] = sum;
-		        }
-		    }
-		    return result;
-		}
-
-		function get_hybrid(x, S, cov) {
-			/** 
-			* @desc Get hybrid sample based on conditional expectation
-			* from the covariance cov and the set S
-			**/
-			if (S.length == 0) {
-				return([0.0,0.0,0.0,0.0]);
-			} else if (S.length == 4) {
-				return(x);
-			} else {
-				S_inv = new Array();
-				for (var j=0; j<4; j++)
-					if (!S.includes(j))
-						S_inv.push(j);
-
-				var x_S = new Array();
-				for (var j=0; j<S.length; j++)
-					x_S.push([x[S[j]]]);
-
-				// Estimate conditional expectation
-				var cov22 = matSub(cov,S,S);
-				var cov12 = matSub(cov,S_inv,S);
-				mu_new = matMul(matMul(cov12,math.inv(cov22)), x_S);
-
-				// Form hybrid x_h
-				var x_h = new Array();
-				for (var j=0; j<x.length; j++)
-					x_h[j] = x[j];
-				for (var j=0; j<S_inv.length; j++)
-					x_h[S_inv[j]] = mu_new[j][0];
-				return(x_h);
-			}
-		}
-
-		// Linear function
-		function f(x, b) {
-			/** 
-			* @desc Linear function
-			**/
-			var y = 0;
-			for (var i=0; i<4; i++)
-				y += x[i]*b[i];
-			return(y);
-		}
-
-		function CE_SV(x, b, cov) {
-			/** 
-			* @desc Conditional expectation shapley values.
-			* Assuming linear model f and multivariate normal
-			* distribution.
-			**/
-			set_lst = powerSet([0,1,2,3]);
-			phi  = [0,0,0,0];
-			fact = [1,1,2,6,24];
-
-			for (var i=0; i<set_lst.length; i++) {
-				S = set_lst[i];
-				S.sort();
-				var x_h = get_hybrid(x, S, cov);
-
-				// Get the weighting terms
-				if (S.length != x.length)
-					W_neg = fact[S.length]*fact[x.length-S.length-1]/fact[x.length];
-				if (S.length != 0)
-					W_pos = fact[S.length-1]*fact[x.length-(S.length-1)-1]/fact[x.length];
-
-				for (var j = 0; j < x.length; j++) {
-					if (S.includes(j))
-						phi[j] += W_pos * f(x_h, b);
-					else
-						phi[j] -= W_neg * f(x_h, b);
-				}
-			}
-			return(phi);
-		}
-
-		function ICE_SV(x, b) {
-			/** 
-			* @desc Interventional conditional expectation shapley 
-			* values.  Assuming linear model f.
-			**/
-			var phi = new Array(4);
-			for (var i=0; i<4; i++)
-				phi[i] = x[i]*b[i];
-			return(phi);
-		}
-		
-		</script>
-
 	</div>
 
     <!-- Background distribution -->
@@ -1018,541 +680,6 @@ div.tooltip {
 		</p>
 	</div>
 
-	<script>
-	var foregroundx = [0,0,10];
-	var backgroundx = [10,10,0];
-
-	function ex3_reset() {
-		treeData = JSON.parse(JSON.stringify(treeData0));
-
-		function s_update(s_name, value) {
-			var s     = document.getElementById(s_name);
-			var s_out = document.getElementById(s_name+"_out");
-			s.value = value;
-			s_out.innerHTML = value;
-		}
-		s_update("fx1",0);
-		s_update("fx2",0);
-		s_update("fx3",10);
-		s_update("bx1",10);
-		s_update("bx2",10);
-		s_update("bx3",0);
-		foregroundx = [0,0,10];
-		backgroundx = [10,10,0];
-
-		setup_all_sliders();
-
-		svg.selectAll("path.link").remove();
-		svg.selectAll("g.node").remove();
-
-		update(treeData[0]);
-	}
-
-	/////////////////////////////////////////////////////////////////
-	////// Sliders for inputting foreground/background samples //////
-	/////////////////////////////////////////////////////////////////
-	function slider_setup(s_name, sample, index) {
-	  var s     = document.getElementById(s_name);
-	  var s_out = document.getElementById(s_name+"_out");
-	  s.value = sample[index];
-	  s_out.innerHTML = s.value;
-	  s.paired_out = s_out;
-	  s.oninput = function() {
-	    sample[index] = Number(this.value);
-	    this.paired_out.innerHTML = this.value;
-	    update(treeData[0]);
-	  }
-	}
-
-	function setup_all_sliders() {
-		slider_setup("fx1", foregroundx, 0);
-		slider_setup("fx2", foregroundx, 1);
-		slider_setup("fx3", foregroundx, 2);
-		slider_setup("bx1", backgroundx, 0);
-		slider_setup("bx2", backgroundx, 1);
-		slider_setup("bx3", backgroundx, 2);
-	}
-
-	setup_all_sliders();
-
-	/////////////////////////////////////
-	////// Tree data and functions //////
-	/////////////////////////////////////
-	var treeData0 = [
-	  {
-	    "name" : "n1",
-	    "childtype" : "none",
-	    "variable" : "x1",
-	    "threshold" : 5,
-	    "parent": "null",
-	    "children": [
-	      {
-	        "name": "n2",
-	        "childtype" : "left",
-	        "variable" : "x2",
-	        "threshold" : -5,
-	        "parent": "n1",
-	        "children": [
-	          {
-	            "name": "n3",
-	            "childtype" : "left",
-	            "variable" : "x1",
-	            "threshold" : 5,
-	            "parent": "n2",
-	            "children": [
-	              {
-	                "name": "Leaf1",
-	                "childtype" : "left",
-	                "value": 1,
-	                "parent": "n3"
-	              },
-	              {
-	                "name": "Leaf2",
-	                "childtype" : "right",
-	                "value": 2,
-	                "parent": "n3"
-	              }
-	            ]
-	          },
-	          {
-	            "name": "n4",
-	            "childtype" : "right",
-	            "variable" : "x3",
-	            "threshold" : 5,
-	            "parent": "n2",
-	            "children": [
-	              {
-	                "name": "Leaf3",
-	                "childtype" : "left",
-	                "value": 3,
-	                "parent": "n4"
-	              },
-	              {
-	                "name": "Leaf4",
-	                "childtype" : "right",
-	                "value": 4,
-	                "parent": "n4"
-	              }
-	            ]
-	          }
-	        ]
-	      },
-	      {
-	        "name": "n5",
-	        "childtype" : "right",
-	        "variable" : "x2",
-	        "threshold" : 5,
-	        "parent": "n1",
-	        "children": [
-	          {
-	            "name": "n6",
-	            "childtype" : "left",
-	            "variable" : "x3",
-	            "threshold" : -5,
-	            "parent": "n5",
-	            "children": [
-	              {
-	                "name": "Leaf5",
-	                "childtype" : "left",
-	                "value": 5,
-	                "parent": "n6"
-	              },
-	              {
-	                "name": "Leaf6",
-	                "childtype" : "right",
-	                "value": 6,
-	                "parent": "n6"
-	              }
-	            ]
-	          },
-	          {
-	            "name": "n7",
-	            "variable" : "x1",
-	            "childtype" : "right",
-	            "threshold" : 5,
-	            "parent": "n5",
-	            "children": [
-	              {
-	                "name": "Leaf7",
-	                "childtype" : "left",
-	                "value": 7,
-	                "parent": "n7"
-	              },
-	              {
-	                "name": "Leaf8",
-	                "childtype" : "right",
-	                "value": 8,
-	                "parent": "n7"
-	              }
-	            ]
-	          }
-	        ]
-	      }
-	    ]
-	  }
-	];
-	// Deep copy - maintain original treedata for resetting
-	var treeData = JSON.parse(JSON.stringify(treeData0));
-	// root = treeData[0];
-
-	//// Generate the tree diagram ////
-	var margin = {top: 0, right: 10, bottom: 10, left: 10},
-	  width = 680 - margin.right - margin.left,
-	  height = 400 - margin.top - margin.bottom;
-
-	var tree = d3.layout.tree()
-	  .size([height, width]);
-
-	var diagonal = d3.svg.diagonal()
-	  .projection(function(d) { return [d.x, d.y]; });
-
-	var svg = d3.select("#graphic").append("svg")
-	  .attr("width", width + margin.right + margin.left)
-	  .attr("height", height + margin.top + margin.bottom)
-	  .append("g")
-	  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-	// Get tooltip element
-	var divtooltip = d3.select('div.tooltip');
-
-	// Erase tool tips
-	function rectclick(d) {divtooltip[0][0].innerHTML = "";}
-	svg.append("rect")
-	  .attr("width", "100%")
-	  .attr("height", "100%")
-	  .attr("fill", "#ffffff")
-	  .style("fill-opacity", .1)
-	  .on("click", rectclick);
-
-	update(treeData[0]);
-
-	/////////////////////////////////////
-	///// Start of Helper functions /////
-	/////////////////////////////////////
-	function tree_to_list() {
-		var node_queue = [treeData[0]];
-		var node_list  = [];
-
-		while (node_queue.length > 0) {
-			node = node_queue.pop();
-			node_list.push(node);
-			if (node.children) {
-				node_queue.push(node.children[0]);
-				node_queue.push(node.children[1]);
-			}
-		}
-		return(node_list);
-	}
-
-	function update_all_text() {
-		tree_nodes = tree_to_list();
-
-		for (var i=0; i<tree_nodes.length; i++) {
-			d = tree_nodes[i]
-			if (d.name.startsWith("Leaf")) {
-				update_node_text(d,true,false);
-			} else {
-				update_node_text(d,false,false);
-			}
-		}
-	}
-
-	function update_links() {
-	  /* @desc Update the colors for links in the tree */
-	  var nodes = tree.nodes(treeData[0]).reverse(), links = tree.links(nodes);
-	  var link = svg.selectAll("path.link")
-	    .data(links, function(d) { return d.target.id; });
-
-	  // Update colors
-	  link[0].forEach(function(d) {
-	    var d2 = d.__data__;
-	    if (d2.source.variable == "x1") {
-	      fxval = foregroundx[0];
-	      bxval = backgroundx[0];
-	    } else if (d2.source.variable == "x2") {
-	      fxval = foregroundx[1];
-	      bxval = backgroundx[1];
-	    } else if (d2.source.variable == "x3") {
-	      fxval = foregroundx[2];
-	      bxval = backgroundx[2];
-	    }
-
-	    fleft = false;
-	    bleft = false;
-
-	    if (fxval <= d2.source.threshold) fleft = true;
-	    if (bxval <= d2.source.threshold) bleft = true;
-
-	    var stroke = document.createAttribute("stroke");
-	    if (d2.target.childtype == "left") {
-	      if (fleft && !bleft) {
-	        stroke.value = "#b3de69"; // Green
-	      } else if (!fleft && bleft) {
-	        stroke.value = "#fb8072"; // Red
-	      } else if (fleft && bleft) {
-	        stroke.value = "#80b1d3"; // Blue
-	      } 
-	    } else {
-	      if (fleft && !bleft) {
-	        stroke.value = "#fb8072"; // Red
-	      } else if (!fleft && bleft) {
-	        stroke.value = "#b3de69"; // Green
-	      } else if (!fleft && !bleft) {
-	        stroke.value = "#80b1d3"; // Blue
-	      } 
-	    }
-
-	    d.attributes.setNamedItem(stroke);
-	  });
-	}
-
-	function update_internal_tooltip(var_name, thres_val, new_click) {
-	  /* @desc Update tooltip based on variable and threshold */
-	  var content;
-	  content =  "<div style='text-align: center;background: white;width:200px; box-shadow:3px 3px 5px #797878;height:190px; padding:8%;position:relative;z-index:10'>";
-	  content += '<table style="width:300px;display:inline;margin-right:25px;font-size:16px;">'
-	  content += '<col width="60px"><col width="60px"><col width="60px">'
-	  content += '<tr align="center"><td colspan="3">Variable</td></tr>'
-	  content += '<tr align="center">'
-	  if (var_name == "x1") {
-	    content += "<td><input class='w3-button w3-indigo' type='button' id='x1button' value='x1'/></td>";
-	  } else {
-	    content += "<td><input class='w3-button w3-teal' type='button' id='x1button' value='x1'/></td>";
-	  }
-
-	  if (var_name == "x2") {
-	    content += "<td><input class='w3-button w3-indigo' type='button' id='x2button' value='x2'/></td>";
-	  } else {
-	    content += "<td><input class='w3-button w3-teal' type='button' id='x2button' value='x2'/></td>";
-	  }
-
-	  if (var_name == "x3") {
-	    content += "<td><input class='w3-button w3-indigo' type='button' id='x3button' value='x3'/></td>";
-	  } else {
-	    content += "<td><input class='w3-button w3-teal' type='button' id='x3button' value='x3'/></td>";
-	  }
-	  content += '</tr>';  
-	  content += '<tr align="center"><td colspan="3"><br>Threshold</td></tr>'
-	  content += '<tr align="center"><td colspan="3"><input type="range" min="-15" max="15" value="'+thres_val+'" class="slider" id="xthres"></td></tr>';
-	  content += '<tr align="center"><td colspan="3" id="xthres_out"></td></tr>';
-	  content += '</table>';
-
-	  // Check if new_click
-	  if (new_click) {
-	    divtooltip.html(content)
-	      .style("left", (d3.event.pageX) + "px") 
-	      .style("top", (d3.event.pageY) + "px")
-	      .style("display", "block");
-	  } else {
-	    divtooltip.html(content);
-	  }
-
-	  // Update the slider output
-	  s_name = "xthres";
-	  var s     = document.getElementById(s_name);
-	  var s_out = document.getElementById(s_name+"_out");
-	  s_out.innerHTML = s.value;
-	  s.paired_out    = s_out;
-	  s.oninput = function() {this.paired_out.innerHTML = this.value;}
-
-	  let d = curr_node;
-	  function get_click_f(var_name) {
-	  	return function () {
-	  	  d.variable = var_name;
-	      update_node_text(d, false, false);
-	      update_internal_tooltip(d.variable, d.threshold, false);
-	  	}
-	  }
-	  divtooltip.select('input#x1button').on('click', get_click_f("x1"));
-	  divtooltip.select('input#x2button').on('click', get_click_f("x2"));
-	  divtooltip.select('input#x3button').on('click', get_click_f("x3"));
-
-	  divtooltip.select('input#xthres').on('click', function () {
-	    var thresval = document.getElementById("xthres").value;
-	    d.threshold = Number(thresval);
-	    update_node_text(d, false, false);
-	  })
-	}
-
-	// Update leaf tooltip
-	function update_leaf_tooltip(value, new_click) {
-	  /* @desc Update leaf tooltip based on variable and threshold */
-	  var content;
-	  content =  "<div style='text-align:center;background:white;width:200px;box-shadow:3px 3px 5px #797878;height:105px; padding:8%;position:relative;z-index:10'>";
-	  content += '<table style="width:300px;display:inline;margin-right:25px;font-size:16px;">'
-
-	  content += '<col width="60px"><col width="60px"><col width="60px">'
-	  content += '<tr align="center"><td colspan="3">Value</td></tr>'
-	  content += '<tr align="center"><td colspan="3"><input type="range" min="-15" max="15" value="'+value+'" class="slider" id="leafvalue"></td></tr>'
-	  content += '<tr align="center"><td colspan="3" id="leafvalue_out">Value</td></tr>'
-	  content += '</table>'
-
-	  // Check if new_click
-	  if (new_click) {
-	    divtooltip.html(content)
-	      .style("left", (d3.event.pageX) + "px") 
-	      .style("top", (d3.event.pageY) + "px")
-	      .style("display", "block");
-	  } else {
-	    divtooltip.html(content);
-	  }
-
-	  // Update the slider output
-	  s_name = "leafvalue";
-	  var s     = document.getElementById(s_name);
-	  var s_out = document.getElementById(s_name+"_out");
-	  s_out.innerHTML = s.value;
-	  s.paired_out    = s_out;
-	  s.oninput = function() {
-	    this.paired_out.innerHTML = this.value;
-	  }
-
-	  d = curr_node;
-	  divtooltip.select('input#leafvalue').on('click', function () {
-	    var leafvalue = document.getElementById("leafvalue").value;
-	    d.value = leafvalue;
-	    update_node_text(d, true, false);
-	  })
-	}
-
-	function update(source) {
-	  /* @desc Update tree SVG (doesn't seem to update text for some reason) */
-
-	  // Compute the new tree layout.
-	  var nodes = tree.nodes(treeData[0]).reverse(),
-	    links = tree.links(nodes);
-
-	  // Normalize for fixed-depth.
-	  nodes.forEach(function(d) { d.y = d.depth * 100 + 20; });
-	  nodes.forEach(function(d) { d.x = d.x + 130; });
-
-	  // Declare the nodes…
-	  var node = svg.selectAll("g.node")
-	    .data(nodes, function(d) { return d.id || (d.id = ++i); });
-
-	  // Enter the nodes.
-	  var nodeEnter = node.enter().append("g")
-	    .attr("class", "node")
-	    .attr("transform", function(d) { 
-	      return "translate(" + d.x + "," + d.y + ")"; })
-	    .on("click", click)
-	    .on("mouseover", function(d) {
-	        d3.select(this).style("cursor", "pointer"); })
-	    .on("mouseout", function(d) {
-	        d3.select(this).style("cursor", "default"); });
-
-	  nodeEnter.append("circle")
-	    .attr("r", 10)
-	    .style("fill", "#fff");
-
-	  nodeEnter.append("text")
-	    .attr("y", function(d) { 
-	      return d.children || d._children ? 0 : 20; })
-	    .attr("x", function(d) { 
-	      return d.children || d._children ? 15 : 0; })
-	    .attr("dy", ".35em")
-	    .attr("text-anchor", function(d) {
-	      if (d.name.startsWith("Leaf")) {
-	        return "middle"
-	      }
-	    })
-	    .text(function(d) { 
-	      if (d.name.startsWith("Leaf")) {
-	        return d.value;
-	      } else {
-	        return d.variable + ">" + d.threshold;   
-	      }
-	    })
-	    .style("font-family", "courier")
-	    .style("font-size", "16px")
-	    .style("fill-opacity", 1);
-
-	  // Declare the links…
-	  var link = svg.selectAll("path.link")
-	    .data(links, function(d) { return d.target.id; });
-
-	  // Enter the links.
-	  link.enter().insert("path", "g")
-	    .attr("class", "link")
-	    .attr("d", diagonal);
-
-	  // Update link colors
-	  update_links();
-	}
-
-	function update_node_text(d, is_leaf, is_tooltip) {
-	  /* @desc Update text of associated node */
-	  node_name = d.name;
-	  if (is_leaf) {
-	    // Get appropriate node
-	    let nodes = tree.nodes(treeData[0]).reverse(), links = tree.links(nodes);
-	    nodes.forEach(function(d) { d.y = d.depth * 100 + 60; });
-	    let node = svg.selectAll("g.node");
-	    let n1 = node[0].filter(n => n.__data__["name"] == d.name);
-
-	    // Update the HTML
-	    n1[0].lastChild.innerHTML = d.value;
-
-	    if (is_tooltip) {
-		    // Update SVG
-		    update_leaf_tooltip(d.value, false);	    	
-	    }
-	  } else {
-	    // Get appropriate node
-	    let nodes = tree.nodes(treeData[0]).reverse(), links = tree.links(nodes);
-	    nodes.forEach(function(d) { d.y = d.depth * 100 + 60; });
-	    let node = svg.selectAll("g.node");
-	    let n1 = node[0].filter(n => n.__data__["name"] == d.name);
-	    
-	    // Update the HTML
-	    n1[0].lastChild.innerHTML = d.variable+"&gt;"+d.threshold;
-
-	    // Update SVG
-	    if (is_tooltip) {
-	    	update_internal_tooltip(d.variable, d.threshold, false);	    	
-	    }
-	    update_links();
-	  }
-	}
-
-	var curr_node;
-
-	// Toggle children on click.
-	function click(d) {
-	  curr_node = d;
-	  if (d.name.startsWith("Leaf")) {
-	    update_leaf_tooltip(d.value, true);
-
-	    divtooltip.select('input#leafvalue').on('click', function () {
-	      var leafvalue = document.getElementById("leafvalue").value;
-	      d.value = leafvalue;
-	      update_node_text(d, true, false);
-	    })
-	  } else { // Internal nodes
-	    update_internal_tooltip(d.variable, d.threshold, true);
-
-		function get_click_f(var_name) {
-			return function () {
-				d.variable = var_name;
-				update_node_text(d, false, false);
-				update_internal_tooltip(d.variable, d.threshold, false);
-			}
-		}
-	    divtooltip.select('input#x1button').on('click', get_click_f("x1"));
-	    divtooltip.select('input#x2button').on('click', get_click_f("x2"));
-	    divtooltip.select('input#x3button').on('click', get_click_f("x3"));
-
-	    divtooltip.select('input#xthres').on('click', function () {
-	      var thresval = document.getElementById("xthres").value;
-	      d.threshold = Number(thresval);
-	      update_node_text(d, false, false);
-	    })
-	    
-	  }
-
-	}
-	</script>
-
     <!-- Brute force -->
     <h3 class="w3-justify" id="brute_force">2.1 Brute force</h3>
 
@@ -1570,157 +697,143 @@ div.tooltip {
 	</p>
 
 
-    <!-- Sampling based -->
-<!--     <h3 class="w3-justify" id="algo_expo">Sampling based approaches</h3>
-
-    <p class="w3-opacity w3-justify">
-	    There are a number of sampling based approaches to obtain SHAP values that use an interventional conditional expectation.  Two notable ones are Sampling Explainer and Kernel Explainer.  To approximate \(\phi_i(f,x)\) Sampling Explainer uses monte carlo sampling and Kernel Explainer uses a special weighted linear regression.  These methods are model-agnostic and all they require is the ability to evaluate \(f(x)\).  
-	</p> -->
-
     <div id="table_container" style="overflow-x:auto;align:center;font-size:18px">
     	<p class="w3-opacity w3-left" align="left" style="margin:20px">
-			<strong>Example 4</strong>: Brute force algorithm applied to the tree and samples specified in Example 3.
+			<strong>Example 4</strong>: Brute force algorithm for the tree and samples specified in Example 3.
 		</p>
 	</div>
 
-    <div id="table_container" style="overflow-x:auto;align:center;font-size:18px">
+    <div id="table_container" style="overflow-x:auto;align:center">
 	  <div class="container">
-	    <div class="first">
-	    	<div id="ex4_div1"></div>
+
+	    <div class="first" style="width:460px;height:300px">
+	    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 20px;font-size:18px;"><strong>Tree Parameters</strong></p>
+	    	<div id="ex4_divtree" style="margin-top:10px;"></div>
 	    </div>
-	    <div id="ex4_div2" class="second w3-opacity">
-      		<table cellpadding="10" align="center">
+
+
+	    <div class="second" style="width:300px;height:300px">
+	    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px -100px;font-size:18px;"><strong>Foreground & background sample</strong></p>
+			<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px -10px">
+				<col width="40px"/>
+				<col width="50px"/>
+				<col width="50px"/>
+				<tr>
+					<th></th>
+					<th>\(x_1\)</th>
+					<th>\(x_2\)</th>
+					<th>\(x_3\)</th>
+				</tr>
+				<tr>
+					<td>\(x^f\)</td>
+					<td id="ex4_fx1">0</td>
+					<td id="ex4_fx2">0</td>
+					<td id="ex4_fx3">10</td>
+				</tr>
+				<tr>
+					<td>\(x^b\)</td>
+					<td id="ex4_bx1">10</td>
+					<td id="ex4_bx2">10</td>
+					<td id="ex4_bx3">0</td>
+				</tr>
+				<tr id="ex4_hS">
+					<td>\(h_S\)</td>
+					<td id="ex4_hs1"></td>
+					<td id="ex4_hs2"></td>
+					<td id="ex4_hs3"></td>
+				</tr>
+				<tr id="ex4_hSi">
+					<td>\(h_{S\cup i}\)</td>
+					<td id="ex4_hsi1"></td>
+					<td id="ex4_hsi2"></td>
+					<td id="ex4_hsi3"></td>
+				</tr>
+			</table>
+	    </div>
+
+	    <div class="clear"></div>
+	    <div class="container">
+	    	<div class="first" style="width:460px;height:280px">
+			<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 20px;font-size:18px;"><strong>Brute Force Values</strong></p>
+      		<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px 90px">
 		      <col width="40px"/>
-		      <col width="120px"/>
-		      <col width="120px"/>
-		      <col width="120px"/>
-		      <col width="120px"/>
+		      <col width="50px"/>
+		      <col width="50px"/>
+		      <col width="60px"/>
+		      <col width="60px"/>
 			<thead>
 				<tr>
-					<th title="Field #7">\(W\)</th>
-					<th title="Field #1">\(S\)</th>
-					<th title="Field #9">\(f(x_S)\)</th>
-					<th title="Field #1">\(S\cup{i}\)</th>
-					<th title="Field #8">\(f(x_{S\cup{i}})\)</th>
+					<th>\(W\)</th>
+					<th>\(S\)</th>
+					<th id="ex4_fxS">\(f(x_S)\)</th>
+					<th>\(S\cup{i}\)</th>
+					<th id="ex4_fxSi">\(f(x_{S\cup{i}})\)</th>
 				</tr>
 			</thead>
 			<tbody>
-				<!-- <tr bgcolor="#F8F8F8"> -->
-				<tr>
+				<tr id="ex4_s1_row">
 					<td>1/3</td>
-					<td>{}</td>
-					<td id="s1_pos">1</td>
-					<td>{1}</td>
-					<td>4</td>
+					<td id="s1"></td>
+					<td id="s1_val"></td>
+					<td id="s1i"></td>
+					<td id="s1i_val"></td>
 				</tr>
-				<tr>
+				<tr id="ex4_s2_row">
 					<td>1/6</td>
-					<td>{2}</td>
-					<td>2</td>
-					<td>{1,2}</td>
-					<td>4</td>
+					<td id="s2"></td>
+					<td id="s2_val"></td>
+					<td id="s2i"></td>
+					<td id="s2i_val"></td>
 				</tr>
-				<tr>
+				<tr id="ex4_s3_row">
 					<td>1/6</td>
-					<td>{3}</td>
-					<td>1</td>
-					<td>{1,3}</td>
-					<td>3</td>
+					<td id="s3"></td>
+					<td id="s3_val"></td>
+					<td id="s3i"></td>
+					<td id="s3i_val"></td>
 				</tr>
-				<tr>
+				<tr id="ex4_s4_row">
 					<td>1/3</td>
-					<td>{2,3}</td>
-					<td>2</td>
-					<td>{1,2,3}</td>
-					<td>3</td>
+					<td id="s4"></td>
+					<td id="s4_val"></td>
+					<td id="s4i"></td>
+					<td id="s4i_val"></td>
 				</tr>
 			</tbody>
-		</table>
+			</table>
+	    	</div>
+
+	    	<div class="second" style="width:300px;height:280px">
+	    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px -110px;font-size:18px;"><strong>Attribution Values</strong></p>
+
+			<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px -10px">
+		      <col width="60px"/>
+		      <col width="80px"/>
+				<thead>
+				<!-- <tr style="background-color:#8BC34A;"> -->
+				<tr id="ex4_phi1">
+					<td>\(\phi_1(f,x^f,x^b)\)</td>
+					<td id="ex4_phi1_val">0</td>
+				</tr>
+				<tr id="ex4_phi2">
+					<td>\(\phi_2(f,x^f,x^b)\)</td>
+					<td id="ex4_phi2_val">0</td>
+				</tr>
+				<tr id="ex4_phi3">
+					<td>\(\phi_3(f,x^f,x^b)\)</td>
+					<td id="ex4_phi3_val">0</td>
+				</tr>
+			</thead>
+			</table>
+	    	</div>
 	    </div>
+	    <input style="font-size:20px;" type="button" class="w3-button w3-green" value="<<" onclick="ex4_reset()">
+	    <input style="font-size:20px;" type="button" class="w3-button w3-green" value=">" onclick="bruteForceStep()">
+	    <input style="font-size:20px;" type="button" class="w3-button w3-green" value=">>" onclick="bruteForceRunAll()">
+	    <br><br>
 	    <div class="clear"></div>
 	  </div>
     </div>
-
-    <script>
-		//// Generate the tree diagram ////
-		var margin = {top: 0, right: 0, bottom: 0, left: 0},
-		  width = 360 - margin.right - margin.left,
-		  height = 360 - margin.top - margin.bottom;
-
-		var tree = d3.layout.tree()
-		  .size([height, width]);
-
-		var diagonal = d3.svg.diagonal()
-		  .projection(function(d) { return [d.x, d.y]; });
-
-		var svg = d3.select("#ex4_div1").append("svg")
-		  .attr("width", width + margin.right + margin.left)
-		  .attr("height", height + margin.top + margin.bottom)
-		  .append("g")
-		  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-		// Get tooltip element
-		var divtooltip = d3.select('div.tooltip');
-
-		// Erase tool tips
-		function rectclick(d) {divtooltip[0][0].innerHTML = "";}
-		svg.append("rect")
-		  .attr("width", "100%")
-		  .attr("height", "100%")
-		  .attr("fill", "#ffffff")
-		  .style("fill-opacity", .1)
-		  .on("click", rectclick);
-
-		update(treeData[0]);
-
-		function update(source) {
-		/* @desc Update tree SVG (doesn't seem to update text for some reason) */
-
-		// Compute the new tree layout.
-		var nodes = tree.nodes(treeData[0]).reverse(),
-		links = tree.links(nodes);
-
-		// Normalize for fixed-depth.
-		nodes.forEach(function(d) { d.y = d.depth * 100 + 20; });
-		nodes.forEach(function(d) { d.x = d.x - 10; });
-
-		// Declare the nodes…
-		var node = svg.selectAll("g.node")
-			.data(nodes, function(d) { return d.id || (d.id = ++i); });
-
-		// Enter the nodes.
-		var nodeEnter = node.enter().append("g")
-			.attr("class", "node")
-			.attr("transform", function(d) { 
-			  return "translate(" + d.x + "," + d.y + ")"; })
-
-		nodeEnter.append("circle")
-			.attr("r", 10)
-			.style("fill", "#fff");
-
-		nodeEnter.append("text")
-			.attr("y", function(d) { 
-			  return d.children || d._children ? 0 : 20; })
-			.attr("x", function(d) { 
-			  return d.children || d._children ? 15 : 0; })
-			.attr("dy", ".35em")
-			.attr("text-anchor", function(d) {
-				if (d.name.startsWith("Leaf")) {
-					return "middle"
-				}
-			})
-		.text(function(d) { 
-			if (d.name.startsWith("Leaf")) {
-				return d.value;
-			} else {
-				return d.variable + ">" + d.threshold;   
-			}
-		})
-		.style("font-family", "courier")
-		.style("font-size", "16px")
-		.style("fill-opacity", 1);
-	}
-    </script>
 
 
 	<p class="w3-opacity w3-justify">
@@ -1743,10 +856,10 @@ div.tooltip {
 			<caption class="w3-opacity">Foreground sample \(x\).</caption>
 			<thead>
 				<tr>
-					<th title="Field #4">\(x_1\)</th>
-					<th title="Field #4">\(x_2\)</th>
-					<th title="Field #5">\(x_3\)</th>
-					<th title="Field #6">\(x_4\)</th>
+					<th>\(x_1\)</th>
+					<th>\(x_2\)</th>
+					<th>\(x_3\)</th>
+					<th>\(x_4\)</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -1765,10 +878,10 @@ div.tooltip {
 			<caption class="w3-opacity">Background sample \(\hat{x}\).</caption>
 			<thead>
 				<tr>
-					<th title="Field #4">\(\hat{x}_1\)</th>
-					<th title="Field #4">\(\hat{x}_2\)</th>
-					<th title="Field #5">\(\hat{x}_3\)</th>
-					<th title="Field #6">\(\hat{x}_4\)</th>
+					<th>\(\hat{x}_1\)</th>
+					<th>\(\hat{x}_2\)</th>
+					<th>\(\hat{x}_3\)</th>
+					<th>\(\hat{x}_4\)</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -1799,15 +912,15 @@ div.tooltip {
 			<caption class="w3-opacity"><strong>Table 1: </strong>Brute force approach to compute \(\phi_1(f,x,\hat{x})\) has \(2^3\) rows and \(2^4\) \(\text{\textcolor{green}{Pos}}\)/\(\text{\textcolor{red}{Neg}}\) terms, where \(4\) is the total number of features.</caption>
 			<thead>
 				<tr>
-					<th title="Field #1">\(S\)</th>
-					<th title="Field #2">\(\textcolor{green}{h_1}\)</th>
-					<th title="Field #3">\(\textcolor{red}{h_1}\)</th>
-					<th title="Field #4">\(h_2\)</th>
-					<th title="Field #5">\(h_3\)</th>
-					<th title="Field #6">\(h_4\)</th>
-					<th title="Field #7">\(W\)</th>
-					<th title="Field #8">\(\text{\textcolor{green}{Pos}}\)</th>
-					<th title="Field #9">\(\text{\textcolor{red}{Neg}}\)</th>
+					<th>\(S\)</th>
+					<th>\(\textcolor{green}{h_1}\)</th>
+					<th>\(\textcolor{red}{h_1}\)</th>
+					<th>\(h_2\)</th>
+					<th>\(h_3\)</th>
+					<th>\(h_4\)</th>
+					<th>\(W\)</th>
+					<th>\(\text{\textcolor{green}{Pos}}\)</th>
+					<th>\(\text{\textcolor{red}{Neg}}\)</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -1917,14 +1030,14 @@ div.tooltip {
 			<caption class="w3-opacity"><strong>Table 2: </strong> We can reduce to \(2^2\) rows and \(2^3\) terms.</caption>
 			<thead>
 				<tr>
-					<th title="Field #1">\(S\)</th>
-					<th title="Field #2">\(\textcolor{green}{h_1}\)</th>
-					<th title="Field #3">\(\textcolor{red}{h_1}\)</th>
-					<th title="Field #4">\(h_2\)</th>
-					<th title="Field #5">\(h_3\)</th>
-					<th title="Field #7">\(W\)</th>
-					<th title="Field #8">\(\text{\textcolor{green}{Pos}}\)</th>
-					<th title="Field #9">\(\text{\textcolor{red}{Neg}}\)</th>
+					<th>\(S\)</th>
+					<th>\(\textcolor{green}{h_1}\)</th>
+					<th>\(\textcolor{red}{h_1}\)</th>
+					<th>\(h_2\)</th>
+					<th>\(h_3\)</th>
+					<th>\(W\)</th>
+					<th>\(\text{\textcolor{green}{Pos}}\)</th>
+					<th>\(\text{\textcolor{red}{Neg}}\)</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -1991,14 +1104,14 @@ div.tooltip {
 			<caption class="w3-opacity"><strong>Table 3:</strong> We can reduce to \(2^2\) rows and \(2^2\) terms.</caption>
 			<thead>
 				<tr>
-					<th title="Field #1">\(S\)</th>
-					<th title="Field #2">\(\textcolor{green}{h_1}\)</th>
-					<th title="Field #3">\(\textcolor{red}{h_1}\)</th>
-					<th title="Field #4">\(h_2\)</th>
-					<th title="Field #5">\(h_3\)</th>
-					<th title="Field #7">\(W\)</th>
-					<th title="Field #8">\(\text{\textcolor{green}{Pos}}\)</th>
-					<th title="Field #9">\(\text{\textcolor{red}{Neg}}\)</th>
+					<th>\(S\)</th>
+					<th>\(\textcolor{green}{h_1}\)</th>
+					<th>\(\textcolor{red}{h_1}\)</th>
+					<th>\(h_2\)</th>
+					<th>\(h_3\)</th>
+					<th>\(W\)</th>
+					<th>\(\text{\textcolor{green}{Pos}}\)</th>
+					<th>\(\text{\textcolor{red}{Neg}}\)</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -2129,7 +1242,107 @@ div.tooltip {
 	</p>
 
 
+    <div id="table_container" style="overflow-x:auto;align:center;font-size:18px">
+    	<p class="w3-opacity w3-left" align="left" style="margin:20px">
+			<strong>Example 5</strong>: Naive algorithm algorithm for the tree and samples from Example 3.
+		</p>
+	</div>
 
+    <div id="table_container" style="overflow-x:auto;align:center">
+    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 20px;font-size:18px;"><strong>Tree Parameters</strong></p>
+    	<div id="ex5_divtree" style="margin-top:10px;"></div>
+    </div>
+
+    <div id="table_container" style="overflow-x:auto;align:center">
+    	<div class="container">
+
+    	<div class="first" style="width:300px;height:220px">
+			<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 30px;font-size:18px;"><strong>Foreground & background sample</strong></p>
+			<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px 60px">
+			<col width="40px"/>
+			<col width="50px"/>
+			<col width="50px"/>
+			<tr>
+				<th></th>
+				<th>\(x_1\)</th>
+				<th>\(x_2\)</th>
+				<th>\(x_3\)</th>
+			</tr>
+			<tr>
+				<td>\(x^f\)</td>
+				<td id="ex5_fx1">0</td>
+				<td id="ex5_fx2">0</td>
+				<td id="ex5_fx3">10</td>
+			</tr>
+			<tr>
+				<td>\(x^b\)</td>
+				<td id="ex5_bx1">10</td>
+				<td id="ex5_bx2">10</td>
+				<td id="ex5_bx3">0</td>
+			</tr>
+			<tr id="ex5_h">
+				<td>\(h\)</td>
+				<td id="ex5_h1"></td>
+				<td id="ex5_h2"></td>
+				<td id="ex5_h3"></td>
+			</tr>
+			</table>
+		</div>
+
+    	<div class="first" style="width:250px;height:220px">
+	    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 30px;font-size:18px;"><strong>Algorithm state</strong></p>
+			<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px 80px">
+				<col width="40px"/>
+				<col width="80px"/>
+				<tr>
+					<td>\(S_P\)</td>
+					<td id="ex5_sp"></td>
+				</tr>
+				<tr>
+					<td>\(N_P\)</td>
+					<td id="ex5_np"></td>
+				</tr>
+			</table>
+    	</div>
+
+
+    	<div class="first" style="width:210px;height:220px">
+	    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 10px;font-size:18px;"><strong>Attribution Values</strong></p>
+
+			<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px 10px">
+		      <col width="60px"/>
+		      <col width="80px"/>
+				<thead>
+				<!-- <tr style="background-color:#8BC34A;"> -->
+				<tr id="ex5_phi1">
+					<td>\(\phi_1(f,x^f,x^b)\)</td>
+					<td id="ex5_phi1_val"></td>
+				</tr>
+				<tr id="ex5_phi2">
+					<td>\(\phi_2(f,x^f,x^b)\)</td>
+					<td id="ex5_phi2_val"></td>
+				</tr>
+				<tr id="ex5_phi3">
+					<td>\(\phi_3(f,x^f,x^b)\)</td>
+					<td id="ex5_phi3_val"></td>
+				</tr>
+			</thead>
+			</table>
+    	</div>
+
+	    <div class="clear"></div>
+		</div>
+
+
+    	<input style="font-size:20px;" type="button" class="w3-button w3-green" value="<<" onclick="ex5_reset()">
+    	<input style="font-size:20px;" type="button" class="w3-button w3-green" value=">" onclick="naiveStep()">
+    	<input style="font-size:20px;" type="button" class="w3-button w3-green" value=">>" onclick="naiveRunAll()">
+
+    	<br><br>
+
+		<p class="w3-opacity w3-center" style="margin: 0px 0px 20px 0px;font-size:18px;" id="ex5_naive_step">Naive algorithm</p>
+
+	</div>
 
 
 	<!-- Pseudocode -->
@@ -2186,19 +1399,6 @@ div.tooltip {
 		</div>
 
 	</div>
-
-
-
-
-<!--     <p class="w3-opacity w3-justify">
-    	<ul class="w3-opacity w3-justify">
-    		<li>Start at the root of the tree.</li>
-    		<li>Traverse down the tree</li>
-    		<li>At each split record whether you split on \(x\) or \(\hat{x}\) as well as keep a list of the features you split on</li>
-    		<li>If \(x\) and \(\hat{x}\) go down the same way don't add to the list of features</li>
-    		<li>At the leaves of the tree, if \(i\) is above in the path compute the attribution to feature \(i\) based on the size of the list of features as well as whether \(i\) was split on by \(x\) or \(\hat{x}\)</li>
-    	</ul>
-	</p> -->
 
     <p class="w3-opacity w3-justify">
 		The computational complexity to compute \(\phi_i(f,x,\hat{x})\) using <font style="font-family:courier">ITE_N()</font> is \(O(T_{numnodes}\times T_{depth})\) where \(T_{numnodes}\) is the number of nodes in the tree and \(T_{depth}\) is the depth of the tree.  This is because in the worst case, each internal node needs to check the lists \(S_P\) and \(N_P\) which are of length \(O(T_{depth})\).  Furthermore, each leaf node needs to check if \(i\) is in \(S_P\) which is also \(O(T_{depth})\) cost.   Note that we can actually get rid of the multiplicative \(T_{depth}\) factor by representing \(S_P\) and \(N_P\) as arrays and keeping track of the sizes of \(|S|\) and \(|N|\).
@@ -2404,47 +1604,447 @@ div.tooltip {
 
   </div>
 
-
-<!-- End Page Content -->
 </div>
 
 <!-- Footer -->
 <footer class="w3-container w3-padding-64 w3-center w3-opacity w3-light-grey w3-xlarge" style="margin-left:300px">
   <i class="fa fa-linkedin w3-hover-opacity"></i>
-  <!-- <p class="w3-medium">Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p> -->
 </footer>
 
+<!-- Figure 1 - Kaggle methods d3 bar plot -->
+<script src="kaggleMethods.js"></script>
+
+<!-- Example 1 - Computing Shapley values -->
+<script src="shapleyValues.js"></script>
+
+<!-- Example 2 - Computing Shapley values CES vs RBS -->
+<script src="linearModelCESvsRBS.js"></script>
+
+<!-- Example 3 - Initial tree parameters -->
+<script src="treeData0.js"></script>
+
+<!-- Example 3 - Creating tree and samples -->
+<script src="createTreeSamples.js"></script>
+
+<!-- Example 4 - Brute force algorithm -->
+<script src="brute_force_ex.js"></script>
+
+<!-- Example 5 - Naive tree algorithm -->
 <script>
-// Automatic Slideshow - change image every 4 seconds
-var myIndex = 0;
+/////////////////////////////////////
+////// Example 5 Tree Diagram ///////
+/////////////////////////////////////
+var margin5 = {top: 0, right: 0, bottom: 0, left: 0},
+  width5 = 500 - margin5.right - margin5.left,
+  height5 = 350 - margin5.top - margin5.bottom;
 
-// Used to toggle the menu on small screens when clicking on the menu button
-function myFunction() {
-  var x = document.getElementById("navDemo");
-  if (x.className.indexOf("w3-show") == -1) {
-    x.className += " w3-show";
-  } else {
-    x.className = x.className.replace(" w3-show", "");
-  }
+var tree5 = d3.layout.tree()
+  .size([height5, width5]);
+
+var diagonal5 = d3.svg.diagonal()
+  .projection(function(d) { return [d.x, d.y]; });
+
+var svg5 = d3.select("#ex5_divtree").append("svg")
+  .attr("width", width5 + margin5.right + margin5.left)
+  .attr("height", height5 + margin5.top + margin5.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin5.left + "," + margin5.top + ")");
+
+update5(treeData[0]);
+
+function update5(source) {
+	/* @desc Update tree SVG (doesn't seem to update text for some reason) */
+
+	// Compute the new tree layout.
+	var nodes = tree5.nodes(source).reverse(),
+	links = tree5.links(nodes);
+
+	// Normalize for fixed-depth.
+	nodes.forEach(function(d) { d.y = d.depth * 90 + 20; });
+	nodes.forEach(function(d) { d.x = d.x * 1.4; });
+
+	// Declare the nodes…
+	var node = svg5.selectAll("g.node")
+		.data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+	// Enter the nodes.
+	var nodeEnter = node.enter().append("g")
+		.attr("class", "node")
+		.attr("transform", function(d) { 
+		  return "translate(" + d.x + "," + d.y + ")"; })
+
+	nodeEnter.append("circle")
+		.attr("r", 10)
+		.style("fill", "#fff")
+
+	nodeEnter.append("text")
+		.attr("y", function(d) { 
+		  return d.children || d._children ? 0 : 20; })
+		.attr("x", function(d) { 
+		  return d.children || d._children ? 15 : 0; })
+		.attr("dy", ".35em")
+		.attr("text-anchor", function(d) {
+			if (d.name.startsWith("Leaf")) {
+				return "middle"
+			}
+		})
+	.text(function(d) { 
+		if (d.name.startsWith("Leaf")) {
+			return d.value;
+		} else {
+			return d.variable + ">" + d.threshold;   
+		}
+	})
+	.style("font-family", "courier")
+	.style("font-size", "16px")
+	.style("fill-opacity", 1);
+
+	// Declare the links…
+	var link = svg5.selectAll("path.link")
+	.data(links, function(d) { return d.target.id; });
+
+	// Enter the links.
+	link.enter().insert("path", "g")
+	.attr("class", "link")
+	.attr("d", diagonal);
 }
 
-// When the user clicks anywhere outside of the modal, close it
-var modal = document.getElementById('ticketModal');
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
+///////////////////////////////////////
+////// Example 5 Naive tree algo //////
+///////////////////////////////////////
+function ex5_reset_tree() {
+	var nodes = tree5.nodes(treeData[0]).reverse(), links = tree5.links(nodes);
+	var link = svg5.selectAll("path.link").data(links, 
+		function(d) { return d.target.id; });
+
+	// Update colors
+	link[0].forEach(function(d) {
+		var stroke = document.createAttribute("stroke");
+		d.attributes.setNamedItem(stroke);
+	});
 }
 
-function hideshow(type) {
-    var x = document.getElementById(type);
-    if (x.style.display === 'none') {
-        x.style.display = 'block';
-    } else {
-        x.style.display = 'none';
-    }
+function ex5_color_tree(s_t_pairs, colors) {
+	var nodes = tree5.nodes(treeData[0]).reverse(), links = tree5.links(nodes);
+	var link = svg5.selectAll("path.link").data(links, 
+		function(d) { return d.target.id; });
+
+	// Remove colors
+	// ex5_reset_tree();
+
+	// Color the appropriate pairs
+	for (var j=0; j<s_t_pairs.length; j++) {
+		s_t_pair = s_t_pairs[j];
+		color    = colors[j]
+
+		// Update colors
+		link[0].forEach(function(d) {
+			var d2 = d.__data__;
+			is_source = (d2.source.name == s_t_pair[0].name)
+			is_target = (d2.target.name == s_t_pair[1].name)
+			if (is_source & is_target) {
+				var stroke = document.createAttribute("stroke");
+				stroke.value = color;
+				d.attributes.setNamedItem(stroke);				
+			}
+		});
+	}
 }
+
+var newColor = "rgb(210, 180, 222)";
+
+function reset_all_node_colors() {
+	var nodes = svg5.selectAll("g.node");
+	nodes[0].forEach(function (d) {
+		oldHTML = d.innerHTML;
+		if (oldHTML.includes(newColor)) {
+			splitHTML = oldHTML.split(newColor);
+			prefix = splitHTML[0];
+			suffix = splitHTML[1];
+			newHTML = prefix + "rgb(255, 255, 255)" + suffix;
+			d.innerHTML = newHTML;			
+		}
+	})
+}
+
+function reset_node_color(node_name) {
+	var nodes = svg5.selectAll("g.node");
+	nodes[0].forEach(function (d) {
+		if (d.__data__["name"] == node_name) {
+			oldHTML = d.innerHTML;
+			if (oldHTML.includes(newColor)) {
+				splitHTML = oldHTML.split(newColor);
+				prefix = splitHTML[0];
+				suffix = splitHTML[1];
+				newHTML = prefix + "rgb(255, 255, 255)" + suffix;
+				d.innerHTML = newHTML;
+			}
+		}
+	})
+}
+
+function change_node_color(node_name) {
+	var nodes = svg5.selectAll("g.node");
+	nodes[0].forEach(function (d) {
+		if (d.__data__["name"] == node_name) {
+			oldHTML = d.innerHTML;
+			if (oldHTML.includes("rgb(255, 255, 255)")) {
+				splitHTML = oldHTML.split("rgb(255, 255, 255)");
+				prefix = splitHTML[0];
+				suffix = splitHTML[1];
+				newHTML = prefix + newColor + suffix;
+				d.innerHTML = newHTML;
+			}
+		}
+	})
+}
+
+function ex5_update_str(str) {
+	document.getElementById("ex5_naive_step").innerHTML = str;
+}
+
+function ex5_update_np_sp() {
+	document.getElementById("ex5_sp").innerHTML = "["+sp_lst+"]";
+	document.getElementById("ex5_np").innerHTML = "["+np_lst+"]";
+}
+
+function ex5_update_phi() {
+	for (var i = 0; i < ex5_phi.length; i++) {
+		document.getElementById("ex5_phi"+(i+1)+"_val").innerHTML = ex5_phi[i];
+	}
+}
+
+function ex5_update_h() {
+	for (var i = 0; i < h.length; i++) {
+		if (h[i] == "none") {
+			document.getElementById("ex5_h"+(i+1)).innerHTML = "";
+		} else {
+			document.getElementById("ex5_h"+(i+1)).innerHTML = h[i];
+		}
+	}
+}
+
+function fact(x) {
+	if (x == 0) {
+		return(1);
+	} else if (x == 1) {
+		return(1);
+	} else if (x == 2) {
+		return(2);
+	} else if (x == 3) {
+		return(6);
+	} else if (x == 4) {
+		return(24);
+	}
+}
+
+function compute_W(s_len, n_len) {
+	var num = fact(s_len) * fact(n_len-s_len-1);
+	var den = fact(n_len);
+	return(num/den);
+}
+
+function ex5_reset() {
+	// Reset variables
+	is_initialize = true;
+	ex5_phi = [0,0,0];
+	prevnode = treeData[0];
+	nextnodes = [];
+	nodesseen = [];
+	np_lst = [];
+	sp_lst = [];
+	h = ["none", "none", "none"];
+	h_dict = {};
+	h_dict[treeData[0].name] = h;
+	np_dict = {};
+	sp_dict = {};
+	np_dict[treeData[0].name] = [];
+	sp_dict[treeData[0].name] = [];
+
+	ex5_update_str("Naive Algorithm");
+	ex5_update_np_sp();
+	ex5_update_phi();
+	ex5_update_h();
+
+	// Reset tree
+	reset_all_node_colors();
+	ex5_reset_tree();
+
+	// Update text
+	svg5.selectAll("g.node").remove();
+	update5(treeData[0]);
+}
+
+var is_initialize = true;
+var ex5_phi = [0,0,0];
+var currnode;
+var prevnode = treeData[0];
+var nextnodes = [];
+var nodesseen = [];
+var np_lst = [];
+var sp_lst = [];
+var h = ["none", "none", "none"];
+var h_dict = {};
+h_dict[treeData[0].name] = h;
+var np_dict = {};
+var sp_dict = {};
+np_dict[treeData[0].name] = [];
+sp_dict[treeData[0].name] = [];
+
+function naiveRunAll() {
+	for (var i = 0; i < 20; i++) {
+		naiveStep();
+	}
+}
+
+function naiveStep() {
+	if (is_initialize) {
+		ex5_update_str('<strong>Case 0</strong>: Initialize');
+		ex5_update_np_sp();
+		ex5_update_phi();
+
+		is_initialize = false;
+		nextnodes.push(treeData[0]);
+		return(1);
+	}
+
+	if (nextnodes.length == 0) {
+		return(1);
+	}
+
+	if (currnode) {
+		reset_node_color(currnode["name"]);
+	}
+	currnode = nextnodes.pop();
+	change_node_color(currnode["name"]);
+
+	np_lst = np_dict[currnode.name];
+	sp_lst = sp_dict[currnode.name];
+	h = h_dict[currnode.name];
+
+	ex5_update_np_sp();
+	ex5_update_h();
+
+	// Case 1: at a leaf
+	if (currnode["name"].includes("Leaf")) {
+		var value = currnode["value"];
+		ex5_update_str('<strong>Case 1</strong>: At a leaf');
+		for (var k = 0; k < ex5_phi.length; k++) {
+			var currvar = "x"+(k+1);
+			if (np_lst.includes(currvar)) {
+				if (sp_lst.includes(currvar)) {
+					currW  = compute_W(sp_lst.length-1, np_lst.length);
+					ex5_phi[k] = ex5_phi[k] + currW*value;
+				} else {
+					currW  = compute_W(sp_lst.length, np_lst.length);
+					ex5_phi[k] = ex5_phi[k] - currW*value;
+				}
+			}
+		}
+		ex5_update_phi();
+		return(1);
+	}
+
+	// Case 2-4: Internal node
+	// Color both children of node
+	n_thres = Number(currnode["threshold"]);
+	n_var   = Number(currnode["variable"][1])-1;
+	fxval   = foregroundx[n_var];
+	bxval   = backgroundx[n_var];
+
+	// Determine where foreground/background goes
+	var lchild = currnode["children"][0];
+	var rchild = currnode["children"][1];
+    var fleft = false;
+    var bleft = false;
+
+	if (fxval <= n_thres) {
+		fleft  = true;
+		fchild = lchild;
+	} else {
+		fchild = rchild;
+	}
+
+	if (bxval <= n_thres) {
+		bleft  = true;
+		bchild = lchild;
+	} else {
+		bchild = rchild;
+	}
+
+	// Color the children of the current node
+	var s_t_pairs = [];
+	var colors = [];
+
+	if (np_lst.includes(currnode.variable)) {
+		ex5_update_str('<strong>Case 2</strong>: Previously seen feature');
+		if (sp_lst.includes(n_var)) {
+			s_t_pairs.push([currnode,fchild]);
+			colors.push("#b3de69");
+			if (!nodesseen.includes(currnode)) {
+				nextnodes.push(fchild);
+				np_dict[bchild.name] = np_lst;
+				sp_dict[bchild.name] = sp_lst;
+				h_dict[bchild.name]  = h;
+			}
+		} else {
+			s_t_pairs.push([currnode,bchild]);
+			colors.push("#fb8072");
+			if (!nodesseen.includes(currnode)) {
+				nextnodes.push(bchild);
+				np_dict[bchild.name] = np_lst;
+				sp_dict[bchild.name] = sp_lst;
+				h_dict[bchild.name]  = h;
+			}
+		}
+	} else if (fchild == bchild) {
+		ex5_update_str('<strong>Case 3</strong>: Foreground and background match');
+		s_t_pairs.push([currnode,fchild]);
+		colors.push("#80b1d3");
+		
+		if (!nodesseen.includes(currnode)) {
+			np_dict[bchild.name] = np_lst;
+			sp_dict[bchild.name] = sp_lst;
+			h_dict[bchild.name]  = h;
+			nextnodes.push(fchild);
+		}
+	} else {
+		ex5_update_str('<strong>Case 4</strong>: Foreground and background differ');
+		s_t_pairs.push([currnode,fchild]);
+		colors.push("#b3de69");
+
+		s_t_pairs.push([currnode,bchild]);
+		colors.push("#fb8072");
+
+		if (!nodesseen.includes(currnode)) {
+			np_dict[fchild.name] = np_lst.concat([currnode.variable]);
+			sp_dict[fchild.name] = sp_lst.concat([currnode.variable]);
+
+			var h2 = h.slice();
+			h2[n_var] = foregroundx[n_var];
+			h_dict[fchild.name]  = h2;
+
+			np_dict[bchild.name] = np_lst.concat([currnode.variable]);
+			sp_dict[bchild.name] = sp_lst;
+
+			var h3 = h.slice();
+			h3[n_var] = backgroundx[n_var];
+			h_dict[bchild.name]  = h3;
+
+			nextnodes.push(rchild);
+			nextnodes.push(currnode);
+			nextnodes.push(lchild);
+		}
+	}
+	ex5_color_tree(s_t_pairs, colors);
+	prevnode = currnode;
+	nodesseen.push(currnode);
+}
+
+
+
 </script>
+
 
 </body>
 </html>
