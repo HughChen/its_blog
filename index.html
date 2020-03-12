@@ -205,10 +205,10 @@ div.tooltip {
 		<a href="#background_distribution" class="w3-justify w3-button" style="margin-left:20px"><h5>1.3 SHAP values with a <br>Background Distribution</h5></a>
 	<a href="#algorithm" class="w3-justify w3-button"><h3>2. Algorithm</h3></a>
 	  	<a href="#brute_force" class="w3-justify w3-button" style="margin-left:20px"><h5>2.1 Brute force <br>implementation</h5></a>
-		<a href="#an_example" class="w3-justify w3-button" style="margin-left:20px"><h5>2.2 An example</h5></a>
-		<a href="#naive_implementation" class="w3-justify w3-button" style="margin-left:20px"><h5>2.3 Naive implementation</h5></a>
-		<a href="#dynamic_programming_implementation" class="w3-justify w3-button" style="margin-left:20px"><h5>2.4 Dynamic programming <br> implementation</h5></a>
-		<a href="#comparison_of_methods" class="w3-justify w3-button" style="margin-left:20px"><h5>2.5 Comparison of SHAP <br> Methods</h5></a>
+		<!-- <a href="#an_example" class="w3-justify w3-button" style="margin-left:20px"><h5>2.2 An example</h5></a> -->
+		<a href="#naive_implementation" class="w3-justify w3-button" style="margin-left:20px"><h5>2.2 Naive implementation</h5></a>
+		<a href="#dynamic_programming_implementation" class="w3-justify w3-button" style="margin-left:20px"><h5>2.3 Dynamic programming <br> implementation</h5></a>
+		<a href="#comparison_of_methods" class="w3-justify w3-button" style="margin-left:20px"><h5>2.4 Comparison of SHAP <br> Methods</h5></a>
 	<a href="#references" class="w3-justify w3-button"><h3>References</h3></a>
 </div>
 
@@ -298,37 +298,37 @@ div.tooltip {
 		</tr>
 		<tr>
 			<td>\(\{Ava\}\)</td>
-			<td><input type="range" min="-15" max="15" value="1" class="slider" id="s_a" onchange="calcSV()"></td>
+			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_a" onchange="calcSV()"></td>
 			<td><span id="s_a_out"></span></td>
 		</tr>
 		<tr>
 			<td>\(\{Ben\}\)</td>
-			<td><input type="range" min="-15" max="15" value="1" class="slider" id="s_b" onchange="calcSV()"></td>
+			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_b" onchange="calcSV()"></td>
 			<td><span id="s_b_out"></span></td>
 		</tr>
 		<tr>
 			<td>\(\{Cat\}\)</td>
-			<td><input type="range" min="-15" max="15" value="1" class="slider" id="s_c" onchange="calcSV()"></td>
+			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_c" onchange="calcSV()"></td>
 			<td><span id="s_c_out"></span></td>
 		</tr>
 		<tr>
 			<td>\(\{Ava,Ben\}\)</td>
-			<td><input type="range" min="-15" max="15" value="2" class="slider" id="s_ab" onchange="calcSV()"></td>
+			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_ab" onchange="calcSV()"></td>
 			<td><span id="s_ab_out"></span></td>
 		</tr>
 		<tr>
 			<td>\(\{Ava,Cat\}\)</td>
-			<td><input type="range" min="-15" max="15" value="2" class="slider" id="s_ac" onchange="calcSV()"></td>
+			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_ac" onchange="calcSV()"></td>
 			<td><span id="s_ac_out"></span></td>
 		</tr>
 		<tr>
 			<td>\(\{Ben,Cat\}\)</td>
-			<td><input type="range" min="-15" max="15" value="2" class="slider" id="s_bc" onchange="calcSV()"></td>
+			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_bc" onchange="calcSV()"></td>
 			<td><span id="s_bc_out"></span></td>
 		</tr>
 		<tr>
 			<td>\(\{Ava,Ben,Cat\}\)</td>
-			<td><input type="range" min="-15" max="15" value="3" class="slider" id="s_abc" onchange="calcSV()"></td>
+			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_abc" onchange="calcSV()"></td>
 			<td><span id="s_abc_out"></span></td>
 		</tr>
 	  </table>
@@ -339,25 +339,26 @@ div.tooltip {
     	<col width="100px"/>
 		<tr>
 			<td>\(\phi_{Ava}(v)\)</td>
-			<td id="phi_a">1</td>
+			<td id="phi_a">0</td>
 		</tr>
 		<tr>
 			<td>\(\phi_{Ben}(v)\)</td>
-			<td id="phi_b">1</td>
+			<td id="phi_b">0</td>
 		</tr>
 		<tr>
 			<td>\(\phi_{Cat}(v)\)</td>
-			<td id="phi_c">1</td>
+			<td id="phi_c">0</td>
 		</tr>
 	  </table>
 
 	  <br><br>
-	  <input type="button" value="Preset A" class="w3-button w3-green" id="ex1_presetA" style="font-size:20px;" onclick="ex1_presetA()"> 
-	  <input type="button" value="Preset B" class="w3-button w3-teal" id="ex1_presetB" style="font-size:20px;" onclick="ex1_presetB()"> 
+	  <input type="button" value="Preset A" class="w3-button w3-teal" id="ex1_presetA" style="font-size:20px;" onclick="ex1_presetA()"> 
+	  <input type="button" value="Preset B" class="w3-button w3-green" id="ex1_presetB" style="font-size:20px;" onclick="ex1_presetB()"> 
 	  <input type="button" value="Preset C" class="w3-button w3-green" id="ex1_presetC" style="font-size:20px;" onclick="ex1_presetC()"> 
+	  <input type="button" value="Preset D" class="w3-button w3-green" id="ex1_presetD" style="font-size:20px;" onclick="ex1_presetD()"> 
 	  <br>
 
-	  <p class="w3-opacity w3-center" align="center" id="ex1_preset_text" style="margin:20px">All equals.</p>
+	  <p class="w3-opacity w3-center" align="center" id="ex1_preset_text" style="margin:20px">No credit.</p>
 
 	</div>
 
@@ -837,334 +838,15 @@ div.tooltip {
 
 
 	<p class="w3-opacity w3-justify">
-	    However, if we <i>constrain \(f(x)\) to be a tree-based model</i> (e.g., XGBoost, decision trees, random forests, etc.), then we can come up with a polynomial time algorithm to compute \(\phi_i(f,x,\hat{x})\) exactly.  In the following section we discuss an example to provide intuition as to why.
+	    However, if we <i>constrain \(f(x)\) to be a tree-based model</i> (e.g., XGBoost, decision trees, random forests, etc.), then we can come up with a polynomial time algorithm to compute \(\phi_i(f,x,\hat{x})\) exactly.  Why is this the case?  Well, looking at example 4, it turns out a single path may be considered multiple times in the brute force algorithm.  However, to compute the SHAP value for a single feature, it is sufficient to consider each path a single time.  This insight leads us to the naive algorithm in <a href="#naive_implementation">Section 2.2</a>.
 	</p>
 
 
-    <!-- Example -->
-    <h3 class="w3-justify" id="an_example">2.2 An Example</h3>
-
-	<div style="overflow-x:auto;">
-
-		<figure style="float:left">
-			<figcaption class="w3-opacity">Figure 1: Binary tree example.</figcaption>
-			<img src="images/tree_example.png" alt="Tree Example" width="250">
-		</figure>
-
-		<table cellpadding="10" align="center">
-			<br>
-			<caption class="w3-opacity">Foreground sample \(x\).</caption>
-			<thead>
-				<tr>
-					<th>\(x_1\)</th>
-					<th>\(x_2\)</th>
-					<th>\(x_3\)</th>
-					<th>\(x_4\)</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr bgcolor="#F8F8F8">
-					<td align="right">\(-1\)</td>
-					<td align="right">\(2\)</td>
-					<td align="right">\(-3\)</td>
-					<td align="right">\(-4\)</td>
-				</tr>
-			</tbody>
-		</table>
-
-	<br>
-
-		<table cellpadding="10" align="center">
-			<caption class="w3-opacity">Background sample \(\hat{x}\).</caption>
-			<thead>
-				<tr>
-					<th>\(\hat{x}_1\)</th>
-					<th>\(\hat{x}_2\)</th>
-					<th>\(\hat{x}_3\)</th>
-					<th>\(\hat{x}_4\)</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr bgcolor="#F8F8F8">
-					<td align="right">\(1\)</td>
-					<td align="right">\(-2\)</td>
-					<td align="right">\(3\)</td>
-					<td align="right">\(4\)</td>
-				</tr>
-			</tbody>			
-		</table>
-	</div>
-
-    <p class="w3-opacity w3-justify">
-    	In this section, we will focus on the tree in Figure 1.  First of all, we can examine a brute force approach to explain feature \(1\) with \(x=[-1,2,-3,-4]\) and \(\hat{x}=[1,-2,3,4]\).  
-	</p>
-
-    <p class="w3-opacity w3-justify">
-    	In Table 1, each row corresponds to a combination \(S\) in the brute force summation.  In addition, we report the hybrid features \(h_i\) that are taken from either \(x\) or \(\hat{x}\).  The weight \(W\) is based on the size of \(S\) and the \(\text{\textcolor{green}{Pos}}\) and \(\text{\textcolor{red}{Neg}}\) terms correspond to \(f(\mathcal{X}(x,\hat{x},S\cup \{i\}))\) and \(f(\mathcal{X}(x,\hat{x},S))\) respectively.
-	</p>	
-
-    <p class="w3-opacity w3-justify">
-		We color \(h_1\) to be green if it came from \(x\) and red if it came from \(\hat{x}\), because if \(h_1\) is from \(x\) it corresponds to the \(\text{\textcolor{green}{Pos}}\) term and if \(h_1\) is from \(\hat{x}\) it corresponds to the \(\text{\textcolor{red}{Neg}}\) term.
-	</p>
-
-	<div style="overflow-x:auto;">
-		<table cellpadding="10" align="center">
-			<caption class="w3-opacity"><strong>Table 1: </strong>Brute force approach to compute \(\phi_1(f,x,\hat{x})\) has \(2^3\) rows and \(2^4\) \(\text{\textcolor{green}{Pos}}\)/\(\text{\textcolor{red}{Neg}}\) terms, where \(4\) is the total number of features.</caption>
-			<thead>
-				<tr>
-					<th>\(S\)</th>
-					<th>\(\textcolor{green}{h_1}\)</th>
-					<th>\(\textcolor{red}{h_1}\)</th>
-					<th>\(h_2\)</th>
-					<th>\(h_3\)</th>
-					<th>\(h_4\)</th>
-					<th>\(W\)</th>
-					<th>\(\text{\textcolor{green}{Pos}}\)</th>
-					<th>\(\text{\textcolor{red}{Neg}}\)</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr bgcolor="#F8F8F8">
-					<td>\(\{\}\)</td>
-					<td align="right">\(-1\)</td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(-2\)</td>
-					<td align="right">\(3\)</td>
-					<td align="right">\(4\)</td>
-					<td>\(1/4\)</td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(4\)</td>
-				</tr>
-				<tr bgcolor="#F8F8F8">
-					<td>\(\{2\}\)</td>
-					<td align="right">\(-1\)</td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(2\)</td>
-					<td align="right">\(3\)</td>
-					<td align="right">\(4\)</td>
-					<td>\(1/12\)</td>
-					<td align="right">\(2\)</td>
-					<td align="right">\(4\)</td>
-				</tr>
-				<tr bgcolor="#F8F8F8">
-					<td>\(\{3\}\)</td>
-					<td align="right">\(-1\)</td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(-2\)</td>
-					<td align="right">\(-3\)</td>
-					<td align="right">\(4\)</td>
-					<td>\(1/12\)</td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(3\)</td>
-				</tr>
-				<tr bgcolor="#F8F8F8">
-					<td>\(\{2,3\}\)</td>
-					<td align="right">\(-1\)</td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(2\)</td>
-					<td align="right">\(-3\)</td>
-					<td align="right">\(4\)</td>
-					<td>\(1/12\)</td>
-					<td align="right">\(2\)</td>
-					<td align="right">\(3\)</td>
-				</tr>
-				<tr bgcolor="#E8E8E8">
-					<td>\(\{4\}\)</td>
-					<td align="right">\(-1\)</td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(-2\)</td>
-					<td align="right">\(3\)</td>
-					<td align="right">\(-4\)</td>
-					<td>\(1/12\)</td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(4\)</td>
-				</tr>
-				<tr bgcolor="#E8E8E8">
-					<td>\(\{2,4\}\)</td>
-					<td align="right">\(-1\)</td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(2\)</td>
-					<td align="right">\(3\)</td>
-					<td align="right">\(-4\)</td>
-					<td>\(1/12\)</td>
-					<td align="right">\(2\)</td>
-					<td align="right">\(4\)</td>
-				</tr>
-				<tr bgcolor="#E8E8E8">
-					<td>\(\{3,4\}\)</td>
-					<td align="right">\(-1\)</td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(-2\)</td>
-					<td align="right">\(-3\)</td>
-					<td align="right">\(-4\)</td>
-					<td>\(1/12\)</td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(3\)</td>
-				</tr>
-				<tr bgcolor="#E8E8E8">
-					<td>\(\{2,3,4\}\)</td>
-					<td align="right">\(-1\)</td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(2\)</td>
-					<td align="right">\(-3\)</td>
-					<td align="right">\(-4\)</td>
-					<td>\( 1/4\)</td>
-					<td align="right">\(2\)</td>
-					<td align="right">\(3\)</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-
-    <p class="w3-opacity w3-justify">
-    	<strong>Observation 1: We can ignore variables that are not present in the tree.</strong>   This is particularly useful for tree ensemble methods where each tree in the ensemble may be small, but the overall number of features is large.
-	</p>
-
-	<p class="w3-opacity w3-justify">
-		In particular, the value of \(h_4\) does not influence the tree or summation.  We can collapse the top and bottom half of Table 1 by summing \(W\) and keeping \(\text{\textcolor{green}{Pos}}\) and \(\text{\textcolor{red}{Neg}}\) values:
-	</p>
-	
-	<!-- Table 2 -->
-	<div style="overflow-x:auto;">
-		<table cellpadding="10" align="center">
-			<caption class="w3-opacity"><strong>Table 2: </strong> We can reduce to \(2^2\) rows and \(2^3\) terms.</caption>
-			<thead>
-				<tr>
-					<th>\(S\)</th>
-					<th>\(\textcolor{green}{h_1}\)</th>
-					<th>\(\textcolor{red}{h_1}\)</th>
-					<th>\(h_2\)</th>
-					<th>\(h_3\)</th>
-					<th>\(W\)</th>
-					<th>\(\text{\textcolor{green}{Pos}}\)</th>
-					<th>\(\text{\textcolor{red}{Neg}}\)</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr bgcolor="#F8F8F8">
-					<td>\(\{\}\)</td>
-					<td align="right">\(-1\)</td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(-2\)</td>
-					<td align="right">\(3\)</td>
-					<td>\(1/3\)</td>
-					<td align="right" bgcolor="#f4eff5">\(1\)</td>
-					<td align="right" bgcolor="#fef5e6">\(4\)</td>
-				</tr>
-				<tr bgcolor="#F8F8F8">
-					<td>\(\{2\}\)</td>
-					<td align="right">\(-1\)</td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(2\)</td>
-					<td align="right">\(3\)</td>
-					<td>\(1/6\)</td>
-					<td align="right" bgcolor="#edf2f8">\(2\)</td>
-					<td align="right" bgcolor="#fef5e6">\(4\)</td>
-				</tr>
-				<tr bgcolor="#F8F8F8">
-					<td>\(\{3\}\)</td>
-					<td align="right">\(-1\)</td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(-2\)</td>
-					<td align="right">\(-3\)</td>
-					<td>\(1/6\)</td>
-					<td align="right" bgcolor="#f4eff5">\(1\)</td>
-					<td align="right" bgcolor="#ffffe5">\(3\)</td>
-				</tr>
-				<tr bgcolor="#F8F8F8">
-					<td>\(\{2,3\}\)</td>
-					<td align="right">\(-1\)</td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(2\)</td>
-					<td align="right">\(-3\)</td>
-					<td>\(1/3\)</td>
-					<td align="right" bgcolor="#edf2f8">\(2\)</td>
-					<td align="right" bgcolor="#ffffe5">\(3\)</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-
-
-    <p class="w3-opacity w3-justify">
-    	<strong>Observation 2: The number of \(\text{\textcolor{green}{Pos}}\) and \(\text{\textcolor{red}{Neg}}\) terms we need to calculate is equal to the number of leaves in the tree.</strong>  We color each term in Table 2 to illustrate which path in Figure 2 corresponds to each term.  Then, we can collapse the terms in Table 2 based on these paths to obtain Table 3.
-	</p>
-
-
-	<!-- Table 3 -->
-	<div style="overflow-x:auto;">
-		<figure style="float:left">
-			<figcaption class="w3-opacity"><strong>Figure 2:</strong> Paths corresponding <br>to terms in Table 3.</figcaption>
-			<br>
-			<img src="images/tree_example2.png" alt="Tree Example" height="220">
-		</figure>
-
-		<br>
-		<table cellpadding="10"> <!-- align="center" -->
-			<caption class="w3-opacity"><strong>Table 3:</strong> We can reduce to \(2^2\) rows and \(2^2\) terms.</caption>
-			<thead>
-				<tr>
-					<th>\(S\)</th>
-					<th>\(\textcolor{green}{h_1}\)</th>
-					<th>\(\textcolor{red}{h_1}\)</th>
-					<th>\(h_2\)</th>
-					<th>\(h_3\)</th>
-					<th>\(W\)</th>
-					<th>\(\text{\textcolor{green}{Pos}}\)</th>
-					<th>\(\text{\textcolor{red}{Neg}}\)</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr bgcolor="#F8F8F8">
-					<td>\(\{\}\)</td>
-					<td align="right">\(-1\)</td>
-					<td align="right"></td>
-					<td align="right">\(-2\)</td>
-					<td align="right">\(3\)</td>
-					<td>\(1/2\)</td>
-					<td align="right" bgcolor="#f4eff5">\(1\)</td>
-					<td align="right"></td>
-				</tr>
-				<tr bgcolor="#F8F8F8">
-					<td>\(\{2\}\)</td>
-					<td align="right">\(-1\)</td>
-					<td align="right"></td>
-					<td align="right">\(2\)</td>
-					<td align="right">\(3\)</td>
-					<td>\(1/2\)</td>
-					<td align="right" bgcolor="#edf2f8">\(2\)</td>
-					<td align="right"></td>
-				</tr>
-				<tr bgcolor="#F8F8F8">
-					<td>\(\{\}\)</td>
-					<td align="right"></td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(-2\)</td>
-					<td align="right">\(3\)</td>
-					<td>\(1/2\)</td>
-					<td align="right"></td>
-					<td align="right" bgcolor="#fef5e6">\(4\)</td>
-				</tr>
-				<tr bgcolor="#F8F8F8">
-					<td>\(\{3\}\)</td>
-					<td align="right"></td>
-					<td align="right">\(1\)</td>
-					<td align="right">\(-2\)</td>
-					<td align="right">\(-3\)</td>
-					<td>\(1/2\)</td>
-					<td align="right"></td>
-					<td align="right" bgcolor="#ffffe5">\(3\)</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>	
-
-	<p class="w3-opacity w3-justify">
-		<strong>Intuition:</strong> Drawing on this observation, we can intuitively see that each path in the tree will correspond to one of the \(\text{\textcolor{green}{Pos}}\) or \(\text{\textcolor{red}{Neg}}\) terms we need to calculate.  In the next section, we will discuss a naive algorithm to obtain these terms.
-	</p>
-    
+    <!--                      -->
     <!-- Naive Implementation -->
-    <h3 class="w3-justify" id="naive_implementation">2.3 Naive Implementation</h3>
+    <!--                      -->
+
+    <h3 class="w3-justify" id="naive_implementation">2.2 Naive Implementation</h3>
 
 	<p class="w3-opacity w3-justify">
 		Before we get into the algorithm, we first describe a theorem that is the basis for this naive implementation.
@@ -1208,7 +890,7 @@ div.tooltip {
 
 	<div>
 	<figure>
-		<figcaption class="w3-opacity">Figure 3: Green paths are associated with \(\textcolor{green}{x}\) and red paths are \(\textcolor{red}{\hat{x}}\).</figcaption>
+		<figcaption class="w3-opacity">Figure 3: Green paths are associated with \(\textcolor{green}{x^f}\) and red paths are \(\textcolor{red}{x^b}\).</figcaption>
 		<img src="images/tree_example3.png" alt="Tree Example 3" width="400">
 	</figure>
 	</div>
@@ -1352,7 +1034,7 @@ div.tooltip {
 
 			<p class="w3-justify"><a onclick="hideshow('pseudocode_naive')"><strong>Naive Pseudocode (Click)</strong></a></a></p>
 
-			<div id="pseudocode_naive">
+			<div id="pseudocode_naive" style="display:none">
 			<p class="no-margin w3-opacity w3-justify" style="font-family:courier;font-size:16px">
 				ITE_N(array \(x\), array \(\hat{x}\), tree \(T\)):
 			</p>
@@ -1409,7 +1091,7 @@ div.tooltip {
 	</p>
 
     <!-- Dynamic Programming -->
-    <h3 class="w3-justify" id="dynamic_programming_implementation">2.4 Dynamic Programming Implementation</h3>
+    <h3 class="w3-justify" id="dynamic_programming_implementation">2.3 Dynamic Programming Implementation</h3>
 
     <p class="w3-opacity w3-justify">
 	    We can compute the attributions for all features simultaneously as we traverse the tree.  In this algorithm algorithm we pass \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) attributions to the parent.  Before describing the algorithm in more detail, we first present an example that illustrates why passing up the attributions is sufficient.
@@ -1467,6 +1149,109 @@ div.tooltip {
 		Using this observation, we devise an algorithm that computes the attributions for all features simultaneously:
 	</p>
 
+    <div id="table_container" style="overflow-x:auto;align:center;font-size:18px">
+    	<p class="w3-opacity w3-left" align="left" style="margin:20px">
+			<strong>Example 6</strong>: DP algorithm for the tree and samples from Example 3.
+		</p>
+	</div>
+
+    <div id="table_container" style="overflow-x:auto;align:center">
+    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 20px;font-size:18px;"><strong>Tree Parameters</strong></p>
+    	<div id="ex6_divtree" style="margin-top:10px;"></div>
+    </div>
+
+    <div id="table_container" style="overflow-x:auto;align:center">
+    	<div class="container">
+
+    	<div class="first" style="width:300px;height:220px">
+			<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 30px;font-size:18px;"><strong>Foreground & background sample</strong></p>
+			<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px 60px">
+			<col width="40px"/>
+			<col width="50px"/>
+			<col width="50px"/>
+			<tr>
+				<th></th>
+				<th>\(x_1\)</th>
+				<th>\(x_2\)</th>
+				<th>\(x_3\)</th>
+			</tr>
+			<tr>
+				<td>\(x^f\)</td>
+				<td id="ex6_fx1">0</td>
+				<td id="ex6_fx2">0</td>
+				<td id="ex6_fx3">10</td>
+			</tr>
+			<tr>
+				<td>\(x^b\)</td>
+				<td id="ex6_bx1">10</td>
+				<td id="ex6_bx2">10</td>
+				<td id="ex6_bx3">0</td>
+			</tr>
+			<tr id="ex6_h">
+				<td>\(h\)</td>
+				<td id="ex6_h1"></td>
+				<td id="ex6_h2"></td>
+				<td id="ex6_h3"></td>
+			</tr>
+			</table>
+		</div>
+
+    	<div class="first" style="width:250px;height:220px">
+	    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 30px;font-size:18px;"><strong>Algorithm state</strong></p>
+			<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px 80px">
+				<col width="40px"/>
+				<col width="80px"/>
+				<tr>
+					<td>\(S_C\)</td>
+					<td id="ex6_sc"></td>
+				</tr>
+				<tr>
+					<td>\(N_C\)</td>
+					<td id="ex6_nc"></td>
+				</tr>
+			</table>
+    	</div>
+
+
+    	<div class="first" style="width:210px;height:220px">
+	    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 10px;font-size:18px;"><strong>Attribution Values</strong></p>
+
+			<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px 10px">
+		      <col width="60px"/>
+		      <col width="80px"/>
+				<thead>
+				<!-- <tr style="background-color:#8BC34A;"> -->
+				<tr id="ex6_phi1">
+					<td>\(\phi_1(f,x^f,x^b)\)</td>
+					<td id="ex6_phi1_val"></td>
+				</tr>
+				<tr id="ex6_phi2">
+					<td>\(\phi_2(f,x^f,x^b)\)</td>
+					<td id="ex6_phi2_val"></td>
+				</tr>
+				<tr id="ex6_phi3">
+					<td>\(\phi_3(f,x^f,x^b)\)</td>
+					<td id="ex6_phi3_val"></td>
+				</tr>
+			</thead>
+			</table>
+    	</div>
+
+	    <div class="clear"></div>
+		</div>
+
+
+    	<input style="font-size:20px;" type="button" class="w3-button w3-green" value="<<" onclick="ex6_reset()">
+    	<input style="font-size:20px;" type="button" class="w3-button w3-green" value=">" onclick="dynamicStep()">
+    	<input style="font-size:20px;" type="button" class="w3-button w3-green" value=">>" onclick="dynamicRunAll()">
+
+    	<br><br>
+
+		<p class="w3-opacity w3-center" style="margin: 0px 0px 20px 0px;font-size:18px;" id="ex6_dynamic_step">dynamic algorithm</p>
+
+	</div>
+
+
 	<!-- Pseudocode -->
 	<div style="background-color:#e6ffee;">
 
@@ -1475,7 +1260,7 @@ div.tooltip {
 			<p class="w3-justify"><a onclick="hideshow('pseudocode_dynamic')"><strong>DP Pseudocode (Click)</strong></a></a></p>
 
 			<!-- <div id="pseudocode_dynamic", style="display:none"> -->
-			<div id="pseudocode_dynamic">
+			<div id="pseudocode_dynamic" style="display:none">
 			<p class="no-margin w3-opacity w3-justify">
 				ITE_D(tree \(t\), array \(x\), array \(\hat{x}\)):
 			</p>
@@ -1522,9 +1307,7 @@ div.tooltip {
 				return RECURSE(tree.root, 0, 0, [0]*\(len(x)\), [0]*\(len(x)\))
 			</ul> 
 			</div>
-
 		</div>
-
 	</div>
 
     <p class="w3-opacity w3-justify">
@@ -1535,7 +1318,7 @@ div.tooltip {
 		Finally, our original goal was to compute \(\phi_i(f,x)\).  We simply need to compute \(\phi_i(f,x,\hat{x})\) for many references, resulting in a run time of \(O(|D|T_{numnodes})\) where \(|D|\) is the number of samples in the background distribution.  In practice, using a fixed number of about 100 to 1000 references works well.
 	</p>
 
-    <h3 class="w3-justify" id="comparison_of_methods">2.5 Comparison of SHAP Methods</h3>
+    <h3 class="w3-justify" id="comparison_of_methods">2.4 Comparison of SHAP Methods</h3>
 
     <p class="w3-opacity w3-justify">
     	It should be noted that there are a number of alternative methods (Path Dependent Tree Explainer, Kernel Explainer, and Sampling Explainer) in the SHAP package.  If you are explaining tree-based models, it may not be clear which one you should use.  In this article we briefly overview the methods and compare them to ITE:
@@ -1630,41 +1413,44 @@ div.tooltip {
 <script src="brute_force_ex.js"></script>
 
 <!-- Example 5 - Naive tree algorithm -->
+<script src="naive_ex.js"></script>
+
+<!-- Example 6 - Naive tree algorithm -->
 <script>
 /////////////////////////////////////
-////// Example 5 Tree Diagram ///////
+////// Example 6 Tree Diagram ///////
 /////////////////////////////////////
-var margin5 = {top: 0, right: 0, bottom: 0, left: 0},
-  width5 = 500 - margin5.right - margin5.left,
-  height5 = 350 - margin5.top - margin5.bottom;
+var margin6 = {top: 0, right: 0, bottom: 0, left: 0},
+  width6 = 700 - margin6.right - margin6.left,
+  height6 = 350 - margin6.top - margin6.bottom;
 
-var tree5 = d3.layout.tree()
-  .size([height5, width5]);
+var tree6 = d3.layout.tree()
+  .size([height6, width6]);
 
-var diagonal5 = d3.svg.diagonal()
+var diagonal6 = d3.svg.diagonal()
   .projection(function(d) { return [d.x, d.y]; });
 
-var svg5 = d3.select("#ex5_divtree").append("svg")
-  .attr("width", width5 + margin5.right + margin5.left)
-  .attr("height", height5 + margin5.top + margin5.bottom)
+var svg6 = d3.select("#ex6_divtree").append("svg")
+  .attr("width", width6 + margin6.right + margin6.left)
+  .attr("height", height6 + margin6.top + margin6.bottom)
   .append("g")
-  .attr("transform", "translate(" + margin5.left + "," + margin5.top + ")");
+  .attr("transform", "translate(" + margin6.left + "," + margin6.top + ")");
 
-update5(treeData[0]);
+update6(treeData[0]);
 
-function update5(source) {
+function update6(source) {
 	/* @desc Update tree SVG (doesn't seem to update text for some reason) */
 
 	// Compute the new tree layout.
-	var nodes = tree5.nodes(source).reverse(),
-	links = tree5.links(nodes);
+	var nodes = tree6.nodes(source).reverse(),
+	links = tree6.links(nodes);
 
 	// Normalize for fixed-depth.
-	nodes.forEach(function(d) { d.y = d.depth * 90 + 20; });
-	nodes.forEach(function(d) { d.x = d.x * 1.4; });
+	nodes.forEach(function(d) { d.y = d.depth * 80 + 30; });
+	nodes.forEach(function(d) { d.x = d.x * 1.95; });
 
 	// Declare the nodes…
-	var node = svg5.selectAll("g.node")
+	var node = svg6.selectAll("g.node")
 		.data(nodes, function(d) { return d.id || (d.id = ++i); });
 
 	// Enter the nodes.
@@ -1700,7 +1486,7 @@ function update5(source) {
 	.style("fill-opacity", 1);
 
 	// Declare the links…
-	var link = svg5.selectAll("path.link")
+	var link = svg6.selectAll("path.link")
 	.data(links, function(d) { return d.target.id; });
 
 	// Enter the links.
@@ -1709,12 +1495,69 @@ function update5(source) {
 	.attr("d", diagonal);
 }
 
-///////////////////////////////////////
-////// Example 5 Naive tree algo //////
-///////////////////////////////////////
-function ex5_reset_tree() {
-	var nodes = tree5.nodes(treeData[0]).reverse(), links = tree5.links(nodes);
-	var link = svg5.selectAll("path.link").data(links, 
+/////////////////////////////////////////
+////// Example 6 dynamic tree algo //////
+/////////////////////////////////////////
+function add_pn_text(n_name,txt,is_pos) {
+	var node = svg6.selectAll("g.node");
+
+	node.append("text")
+		.attr("y", function(d) { 
+			if (d.name.includes("Leaf")) {
+				if (is_pos) {
+					return(-10);
+				} else {
+					return(10);
+				}
+			} else {
+				if (is_pos) {
+					return(-10);
+				} else {
+					return(10);
+				}
+			}})
+		.attr("x", function(d) { 
+			if (d.name.includes("Leaf")) {
+				if ([1,3,5,7].includes(Number(d.name[4]))) {
+					return(-18);
+				} else {
+					return(18);
+				}
+			} else {
+				return(-18);
+			}})
+		.attr("dy", ".35em")
+		.attr("text-anchor", function(d) {
+			if (d.name.startsWith("Leaf")) {
+				if ([1,3,5,7].includes(Number(d.name[4]))) {
+					return "end"
+				} else {
+					return "start"
+				}
+			} else {
+				return "end"
+			}
+		})
+		.text(function(d) { 
+			if (d.name == n_name) {
+				return round(txt,2);
+			}
+		})
+		.style("font-family", "courier")
+		.style("font-size", "16px")
+		.style("fill", function(d) {
+			if (is_pos) {
+				return("green");
+			} else {
+				return("red");
+			}
+		})
+		.style("fill-opacity", 1);
+}
+
+function ex6_reset_tree() {
+	var nodes = tree6.nodes(treeData[0]).reverse(), links = tree6.links(nodes);
+	var link = svg6.selectAll("path.link").data(links, 
 		function(d) { return d.target.id; });
 
 	// Update colors
@@ -1724,13 +1567,10 @@ function ex5_reset_tree() {
 	});
 }
 
-function ex5_color_tree(s_t_pairs, colors) {
-	var nodes = tree5.nodes(treeData[0]).reverse(), links = tree5.links(nodes);
-	var link = svg5.selectAll("path.link").data(links, 
+function ex6_color_tree(s_t_pairs, colors) {
+	var nodes = tree6.nodes(treeData[0]).reverse(), links = tree6.links(nodes);
+	var link = svg6.selectAll("path.link").data(links, 
 		function(d) { return d.target.id; });
-
-	// Remove colors
-	// ex5_reset_tree();
 
 	// Color the appropriate pairs
 	for (var j=0; j<s_t_pairs.length; j++) {
@@ -1753,8 +1593,8 @@ function ex5_color_tree(s_t_pairs, colors) {
 
 var newColor = "rgb(210, 180, 222)";
 
-function reset_all_node_colors() {
-	var nodes = svg5.selectAll("g.node");
+function ex6_reset_all_node_colors() {
+	var nodes = svg6.selectAll("g.node");
 	nodes[0].forEach(function (d) {
 		oldHTML = d.innerHTML;
 		if (oldHTML.includes(newColor)) {
@@ -1767,8 +1607,8 @@ function reset_all_node_colors() {
 	})
 }
 
-function reset_node_color(node_name) {
-	var nodes = svg5.selectAll("g.node");
+function ex6_reset_node_color(node_name) {
+	var nodes = svg6.selectAll("g.node");
 	nodes[0].forEach(function (d) {
 		if (d.__data__["name"] == node_name) {
 			oldHTML = d.innerHTML;
@@ -1783,8 +1623,8 @@ function reset_node_color(node_name) {
 	})
 }
 
-function change_node_color(node_name) {
-	var nodes = svg5.selectAll("g.node");
+function ex6_change_node_color(node_name) {
+	var nodes = svg6.selectAll("g.node");
 	nodes[0].forEach(function (d) {
 		if (d.__data__["name"] == node_name) {
 			oldHTML = d.innerHTML;
@@ -1799,32 +1639,32 @@ function change_node_color(node_name) {
 	})
 }
 
-function ex5_update_str(str) {
-	document.getElementById("ex5_naive_step").innerHTML = str;
+function ex6_update_str(str) {
+	document.getElementById("ex6_dynamic_step").innerHTML = str;
 }
 
-function ex5_update_np_sp() {
-	document.getElementById("ex5_sp").innerHTML = "["+sp_lst+"]";
-	document.getElementById("ex5_np").innerHTML = "["+np_lst+"]";
+function ex6_update_nc_sc() {
+	document.getElementById("ex6_sc").innerHTML = sp_lst6.length;
+	document.getElementById("ex6_nc").innerHTML = np_lst6.length;
 }
 
-function ex5_update_phi() {
-	for (var i = 0; i < ex5_phi.length; i++) {
-		document.getElementById("ex5_phi"+(i+1)+"_val").innerHTML = ex5_phi[i];
+function ex6_update_phi() {
+	for (var i = 0; i < ex6_phi.length; i++) {
+		document.getElementById("ex6_phi"+(i+1)+"_val").innerHTML = round(ex6_phi[i],3);
 	}
 }
 
-function ex5_update_h() {
-	for (var i = 0; i < h.length; i++) {
-		if (h[i] == "none") {
-			document.getElementById("ex5_h"+(i+1)).innerHTML = "";
+function ex6_update_h() {
+	for (var i = 0; i < h6.length; i++) {
+		if (h6[i] == "none") {
+			document.getElementById("ex6_h"+(i+1)).innerHTML = "";
 		} else {
-			document.getElementById("ex5_h"+(i+1)).innerHTML = h[i];
+			document.getElementById("ex6_h"+(i+1)).innerHTML = h6[i];
 		}
 	}
 }
 
-function fact(x) {
+function fact6(x) {
 	if (x == 0) {
 		return(1);
 	} else if (x == 1) {
@@ -1839,122 +1679,138 @@ function fact(x) {
 }
 
 function compute_W(s_len, n_len) {
-	var num = fact(s_len) * fact(n_len-s_len-1);
-	var den = fact(n_len);
+	var num = fact6(s_len) * fact6(n_len-s_len-1);
+	var den = fact6(n_len);
 	return(num/den);
 }
 
-function ex5_reset() {
+function ex6_reset() {
 	// Reset variables
-	is_initialize = true;
-	ex5_phi = [0,0,0];
-	prevnode = treeData[0];
-	nextnodes = [];
-	nodesseen = [];
-	np_lst = [];
-	sp_lst = [];
-	h = ["none", "none", "none"];
-	h_dict = {};
-	h_dict[treeData[0].name] = h;
-	np_dict = {};
-	sp_dict = {};
-	np_dict[treeData[0].name] = [];
-	sp_dict[treeData[0].name] = [];
+	ex6_is_initialize = true;
+	ex6_phi = [0,0,0];
+	nextnodes6 = [];
+	nodesseen6 = [];
+	np_lst6 = [];
+	sp_lst6 = [];
+	h6 = ["none", "none", "none"];
+	h_dict6 = {};
+	h_dict6[treeData[0].name] = h6;
+	np_dict6 = {};
+	sp_dict6 = {};
+	np_dict6[treeData[0].name] = [];
+	sp_dict6[treeData[0].name] = [];
+	nc6 = 0;
+	sc6 = 0;
+	nc_dict6 = {};
+	sc_dict6 = {};
+	nc_dict6[treeData[0].name] = 0;
+	sc_dict6[treeData[0].name] = 0;
+	pos_dict6 = {};
+	neg_dict6 = {};
 
-	ex5_update_str("Naive Algorithm");
-	ex5_update_np_sp();
-	ex5_update_phi();
-	ex5_update_h();
+	ex6_update_str("Dynamic Algorithm");
+	ex6_update_nc_sc();
+	ex6_update_phi();
+	ex6_update_h();
 
 	// Reset tree
-	reset_all_node_colors();
-	ex5_reset_tree();
+	ex6_reset_all_node_colors();
+	ex6_reset_tree();
 
 	// Update text
-	svg5.selectAll("g.node").remove();
-	update5(treeData[0]);
+	svg6.selectAll("g.node").remove();
+	update6(treeData[0]);
 }
 
-var is_initialize = true;
-var ex5_phi = [0,0,0];
-var currnode;
-var prevnode = treeData[0];
-var nextnodes = [];
-var nodesseen = [];
-var np_lst = [];
-var sp_lst = [];
-var h = ["none", "none", "none"];
-var h_dict = {};
-h_dict[treeData[0].name] = h;
-var np_dict = {};
-var sp_dict = {};
-np_dict[treeData[0].name] = [];
-sp_dict[treeData[0].name] = [];
+var ex6_is_initialize = true;
+var ex6_phi = [0,0,0];
+var currnode6;
+var nextnodes6 = [];
+var nodesseen6 = [];
+var h6 = ["none", "none", "none"];
+var h_dict6 = {};
+h_dict6[treeData[0].name] = h6;
+var np_lst6 = [];
+var sp_lst6 = [];
+var np_dict6 = {};
+var sp_dict6 = {};
+np_dict6[treeData[0].name] = [];
+sp_dict6[treeData[0].name] = [];
+var nc6 = 0;
+var sc6 = 0;
+var nc_dict6 = {};
+var sc_dict6 = {};
+nc_dict6[treeData[0].name] = 0;
+sc_dict6[treeData[0].name] = 0;
+var pos_dict6 = {};
+var neg_dict6 = {};
 
-function naiveRunAll() {
+function dynamicRunAll() {
 	for (var i = 0; i < 20; i++) {
-		naiveStep();
+		dynamicStep();
 	}
 }
 
-function naiveStep() {
-	if (is_initialize) {
-		ex5_update_str('<strong>Case 0</strong>: Initialize');
-		ex5_update_np_sp();
-		ex5_update_phi();
+function dynamicStep() {
+	if (ex6_is_initialize) {
+		ex6_update_str('<strong>Case 0</strong>: Initialize');
+		ex6_update_nc_sc();
+		ex6_update_phi();
 
-		is_initialize = false;
-		nextnodes.push(treeData[0]);
+		ex6_is_initialize = false;
+		nextnodes6.push(treeData[0]);
 		return(1);
 	}
 
-	if (nextnodes.length == 0) {
+	if (nextnodes6.length == 0) {
 		return(1);
 	}
 
-	if (currnode) {
-		reset_node_color(currnode["name"]);
+	if (currnode6) {
+		ex6_reset_node_color(currnode6["name"]);
 	}
-	currnode = nextnodes.pop();
-	change_node_color(currnode["name"]);
+	currnode6 = nextnodes6.pop();
+	var nodename = currnode6["name"];
+	ex6_change_node_color(nodename);
 
-	np_lst = np_dict[currnode.name];
-	sp_lst = sp_dict[currnode.name];
-	h = h_dict[currnode.name];
+	np_lst6 = np_dict6[nodename];
+	sp_lst6 = sp_dict6[nodename];
+	h6 = h_dict6[nodename];
 
-	ex5_update_np_sp();
-	ex5_update_h();
+	ex6_update_nc_sc();
+	ex6_update_h();
 
 	// Case 1: at a leaf
-	if (currnode["name"].includes("Leaf")) {
-		var value = currnode["value"];
-		ex5_update_str('<strong>Case 1</strong>: At a leaf');
-		for (var k = 0; k < ex5_phi.length; k++) {
-			var currvar = "x"+(k+1);
-			if (np_lst.includes(currvar)) {
-				if (sp_lst.includes(currvar)) {
-					currW  = compute_W(sp_lst.length-1, np_lst.length);
-					ex5_phi[k] = ex5_phi[k] + currW*value;
-				} else {
-					currW  = compute_W(sp_lst.length, np_lst.length);
-					ex5_phi[k] = ex5_phi[k] - currW*value;
-				}
-			}
+	if (currnode6["name"].includes("Leaf")) {
+		var value = currnode6["value"];
+		if (sp_lst6.length == 0) {
+			pos_dict6[nodename] = 0;
+		} else {
+			currW  = compute_W(sp_lst6.length-1, np_lst6.length);
+			pos_dict6[nodename] = currW*value;
 		}
-		ex5_update_phi();
+		if (sp_lst6.length == np_lst6.length) {
+			neg_dict6[nodename] = 0;
+		} else {
+			currW  = compute_W(sp_lst6.length, np_lst6.length);
+			neg_dict6[nodename] = -currW*value;
+		}
+		add_pn_text(nodename,pos_dict6[nodename],true);
+		add_pn_text(nodename,neg_dict6[nodename],false);
 		return(1);
 	}
 
 	// Case 2-4: Internal node
 	// Color both children of node
-	n_thres = Number(currnode["threshold"]);
-	n_var   = Number(currnode["variable"][1])-1;
+	n_thres = Number(currnode6["threshold"]);
+	n_var   = Number(currnode6["variable"][1])-1;
 	fxval   = foregroundx[n_var];
 	bxval   = backgroundx[n_var];
 
 	// Determine where foreground/background goes
-	var lchild = currnode["children"][0];
-	var rchild = currnode["children"][1];
+	var lchild = currnode6["children"][0];
+	var rchild = currnode6["children"][1];
+
     var fleft = false;
     var bleft = false;
 
@@ -1976,73 +1832,116 @@ function naiveStep() {
 	var s_t_pairs = [];
 	var colors = [];
 
-	if (np_lst.includes(currnode.variable)) {
-		ex5_update_str('<strong>Case 2</strong>: Previously seen feature');
-		if (sp_lst.includes(n_var)) {
-			s_t_pairs.push([currnode,fchild]);
+	if (np_lst6.includes(currnode6.variable)) {
+		ex6_update_str('<strong>Case 2</strong>: Previously seen feature');
+		if (sp_lst6.includes(n_var)) {
+			s_t_pairs.push([currnode6,fchild]);
 			colors.push("#b3de69");
-			if (!nodesseen.includes(currnode)) {
-				nextnodes.push(fchild);
-				np_dict[bchild.name] = np_lst;
-				sp_dict[bchild.name] = sp_lst;
-				h_dict[bchild.name]  = h;
+			if (!nodesseen6.includes(currnode6)) {
+				nextnodes6.push(currnode6);
+				nextnodes6.push(fchild);
+				np_dict6[bchild.name] = np_lst6;
+				sp_dict6[bchild.name] = sp_lst6;
+				h_dict6[bchild.name]  = h6;
+			}
+			// Update pos/neg
+			if ((fchild.name in pos_dict6) & (fchild.name in neg_dict6)) {
+				pos_dict6[nodename] = pos_dict6[fchild.name];
+				neg_dict6[nodename] = neg_dict6[fchild.name];
+				add_pn_text(nodename,pos_dict6[nodename],true);
+				add_pn_text(nodename,neg_dict6[nodename],false);
 			}
 		} else {
-			s_t_pairs.push([currnode,bchild]);
+			s_t_pairs.push([currnode6,bchild]);
 			colors.push("#fb8072");
-			if (!nodesseen.includes(currnode)) {
-				nextnodes.push(bchild);
-				np_dict[bchild.name] = np_lst;
-				sp_dict[bchild.name] = sp_lst;
-				h_dict[bchild.name]  = h;
+			if (!nodesseen6.includes(currnode6)) {
+				nextnodes6.push(currnode6);
+				nextnodes6.push(bchild);
+				np_dict6[bchild.name] = np_lst6;
+				sp_dict6[bchild.name] = sp_lst6;
+				h_dict6[bchild.name]  = h6;
+			}
+			// Update pos/neg
+			if ((bchild.name in pos_dict6) & (bchild.name in neg_dict6)) {
+				pos_dict6[nodename] = pos_dict6[bchild.name];
+				neg_dict6[nodename] = neg_dict6[bchild.name];
+				add_pn_text(nodename,pos_dict6[nodename],true);
+				add_pn_text(nodename,neg_dict6[nodename],false);				
 			}
 		}
 	} else if (fchild == bchild) {
-		ex5_update_str('<strong>Case 3</strong>: Foreground and background match');
-		s_t_pairs.push([currnode,fchild]);
+		ex6_update_str('<strong>Case 3</strong>: Foreground and background match');
+		s_t_pairs.push([currnode6,fchild]);
 		colors.push("#80b1d3");
-		
-		if (!nodesseen.includes(currnode)) {
-			np_dict[bchild.name] = np_lst;
-			sp_dict[bchild.name] = sp_lst;
-			h_dict[bchild.name]  = h;
-			nextnodes.push(fchild);
+		// Update np/sp
+		if (!nodesseen6.includes(currnode6)) {
+			np_dict6[bchild.name] = np_lst6;
+			sp_dict6[bchild.name] = sp_lst6;
+			h_dict6[bchild.name]  = h6;
+			nextnodes6.push(currnode6);
+			nextnodes6.push(fchild);
+		}
+		// Update pos/neg
+		if ((bchild.name in pos_dict6) & (bchild.name in neg_dict6)) {
+			pos_dict6[nodename] = pos_dict6[bchild.name];
+			neg_dict6[nodename] = neg_dict6[bchild.name];
+			add_pn_text(nodename,pos_dict6[nodename],true);
+			add_pn_text(nodename,neg_dict6[nodename],false);
 		}
 	} else {
-		ex5_update_str('<strong>Case 4</strong>: Foreground and background differ');
-		s_t_pairs.push([currnode,fchild]);
+		ex6_update_str('<strong>Case 4</strong>: Foreground and background differ');
+		s_t_pairs.push([currnode6,fchild]);
 		colors.push("#b3de69");
 
-		s_t_pairs.push([currnode,bchild]);
+		s_t_pairs.push([currnode6,bchild]);
 		colors.push("#fb8072");
 
-		if (!nodesseen.includes(currnode)) {
-			np_dict[fchild.name] = np_lst.concat([currnode.variable]);
-			sp_dict[fchild.name] = sp_lst.concat([currnode.variable]);
+		if (!nodesseen6.includes(currnode6)) {
+			np_dict6[fchild.name] = np_lst6.concat([currnode6.variable]);
+			sp_dict6[fchild.name] = sp_lst6.concat([currnode6.variable]);
 
-			var h2 = h.slice();
+			var h2 = h6.slice();
 			h2[n_var] = foregroundx[n_var];
-			h_dict[fchild.name]  = h2;
+			h_dict6[fchild.name]  = h2;
 
-			np_dict[bchild.name] = np_lst.concat([currnode.variable]);
-			sp_dict[bchild.name] = sp_lst;
+			np_dict6[bchild.name] = np_lst6.concat([currnode6.variable]);
+			sp_dict6[bchild.name] = sp_lst6;
 
-			var h3 = h.slice();
+			var h3 = h6.slice();
 			h3[n_var] = backgroundx[n_var];
-			h_dict[bchild.name]  = h3;
+			h_dict6[bchild.name]  = h3;
 
-			nextnodes.push(rchild);
-			nextnodes.push(currnode);
-			nextnodes.push(lchild);
+			nextnodes6.push(currnode6);
+			nextnodes6.push(rchild);
+			nextnodes6.push(lchild);
+		}
+
+		// Update phi
+		if ((lchild.name in pos_dict6) & (lchild.name in neg_dict6) &
+			(rchild.name in pos_dict6) & (rchild.name in neg_dict6)) {
+			ex6_phi[n_var] = ex6_phi[n_var] + pos_dict6[fchild.name] + neg_dict6[bchild.name];
+			pos_dict6[nodename] = pos_dict6[lchild.name] + pos_dict6[rchild.name];
+			neg_dict6[nodename] = neg_dict6[lchild.name] + neg_dict6[rchild.name];
+			add_pn_text(nodename,pos_dict6[nodename],true);
+			add_pn_text(nodename,neg_dict6[nodename],false);
+			ex6_update_phi();
 		}
 	}
-	ex5_color_tree(s_t_pairs, colors);
-	prevnode = currnode;
-	nodesseen.push(currnode);
+
+	ex6_color_tree(s_t_pairs, colors);
+	nodesseen6.push(currnode6);
 }
+</script>
 
-
-
+<script>
+function hideshow(type) {
+    var x = document.getElementById(type);
+    if (x.style.display === 'none') {
+        x.style.display = 'block';
+    } else {
+        x.style.display = 'none';
+    }
+}
 </script>
 
 
