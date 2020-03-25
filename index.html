@@ -1,56 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-<title>Interventional Tree Explainer</title>
+<title>A fast and exact game-theoretic algorithm to explain trees</title>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="stylesheet" type="text/css" href="index.css">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
-
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
     onload="renderMathInElement(document.body);"></script>
-<script language="JavaScript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.2.1/math.js"></script>
 
+<script language="JavaScript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.2.1/math.js"></script>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>d3v4 = d3;</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+
 
 <style>
 hover a {
     color: "Olive";
 }
-
-.sidenav {
-  height: 100%;
-  width: 300px;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  background-color: #111;
-  overflow-x: hidden;
-  padding-top: 20px;
-}
-
-.sidenav a {
-  padding: 6px 8px 6px 16px;
-  text-decoration: none;
-  font-size: 25px;
-  color: #818181;
-  display: block;
-}
-
-.sidenav a:hover {
-  color: #f1f1f1;
-}
-
-body {font-family: "Lato", sans-serif}
-p {font-size: 20px}
-ul {font-size: 20px}
-caption {font-size: 18px}
-figcaption {font-size: 18px}
 
 .no-margin {
 	margin:0px;
@@ -63,7 +32,6 @@ figcaption {font-size: 18px}
 	height: auto;
 }
 
-/*Figure 1*/
 .bar {
     fill: #4DAF51;
 }
@@ -73,7 +41,7 @@ figcaption {font-size: 18px}
 }
 
 .axis {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .axis path,
@@ -85,10 +53,9 @@ figcaption {font-size: 18px}
 
 .label {
 	color: #4DAF51;
-    font-size: 16px;
+    font-size: 14px;
 }
 
-/* Creates a small triangle extender for the tooltip */
 .d3-tip:after {
   box-sizing: border-box;
   display: inline;
@@ -101,7 +68,6 @@ figcaption {font-size: 18px}
   text-align: center;
 }
 
-/* Style northward tooltips differently */
 .d3-tip.n:after {
   margin: -1px 0 0 0;
   top: 100%;
@@ -109,11 +75,10 @@ figcaption {font-size: 18px}
 }
 
 #table_container {
-	margin: 0 auto;
+	/*margin: 0 auto;*/
 	background-color : #F4F6F6;
 }
 
-/* Slider code */
 .slidecontainer {
   width: 100%;
 }
@@ -151,9 +116,7 @@ figcaption {font-size: 18px}
   background: #4CAF50;
   cursor: pointer;
 }
-/* End slider code */
 
-/* D3 Trees*/
 .node circle {
 	fill: #fff;
 	stroke: #ccc;
@@ -164,7 +127,6 @@ figcaption {font-size: 18px}
 
 .link {
 	fill: none;
-	/*stroke: #ccc;*/
 	stroke-width: 3px;
 }
 
@@ -174,93 +136,177 @@ div.tooltip {
 
 .container {
 	width: 760px;
-	/*margin: auto;*/
 }
 
 .first {
 	width: 380px;
 	float: left;
 	height: 630px;
-	/*background-color: blue;*/
 }
 
 .second {
 	width: 380px;
 	float: left;
 	height: 630px;
-	/*background-color: green;*/
 }
 
+figcaption,
+.figcaption {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 12px;
+  line-height: 1.5em;
+}
+
+@media(min-width: 1024px) {
+figcaption,
+.figcaption {
+    font-size: 13px;
+  }
+}
+
+figure.external img {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+figcaption a {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+figcaption b,
+figcaption strong, {
+  font-weight: 600;
+  color: rgba(0, 0, 0, 1.0);
+}
+
+a.figure-number,
+a.section-number {
+    border-bottom-color: hsla(206, 90%, 20%, 0.3);
+    text-transform: uppercase;
+    font-size: .85em;
+    color: hsla(206, 90%, 20%, 0.7);
+}
+a.figure-number::before {
+    content: "Figure ";
+}
+a.figure-number:hover,
+a.section-number:hover {
+    border-bottom-color: hsla(206, 90%, 20%, 0.6);
+}
+
+.svg-container {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%; /* aspect ratio */
+  vertical-align: top;
+  overflow: hidden;
+}
+.svg-content-responsive {
+  display: inline-block;
+  position: absolute;
+  top: 10px;
+  left: 0;
+}
+
+svg .rect {
+  fill: gold;
+  stroke: steelblue;
+  stroke-width: 5px;
+}
 </style>
+
 <body>
 
+  <d-front-matter>
+    <code style="display: none;" type="text/json"
+      >{ "title": "A fast and exact game-theoretic algorithm to explain trees", "description": "Shapley values have recently been adapted to explain machine learning algorithms; however, calculating them is NP-hard.  By restricting our machine learning model class to trees, we can calculate them exactly in linear time.",
+      "authors": [
+        { "author": "Hugh Chen", "authorURL": "http://hughchen.github.io/", "affiliation": "Paul G. Allen School of CSE", "affiliationURL": "https://www.cs.washington.edu/"  },
+        { "author": "Scott Lundberg", "authorURL": "https://scottlundberg.com/", "affiliation": "Microsoft Research", "affiliationURL": "https://www.microsoft.com/en-us/research/"  },
+        { "author": "Su-In Lee", "authorURL": "https://suinlee.cs.washington.edu/", "affiliation": "Paul G. Allen School of CSE", "affiliationURL": "https://www.cs.washington.edu/"  }
+      ] }</code>
+  </d-front-matter>
 
-<div class="sidenav">
-	<a href="#" class="w3-justify w3-button"><h3>Top</h3></a>
-	<a href="#introduction" class="w3-justify w3-button"><h3>Introduction</h3></a>
-		<a href="#motivation" class="w3-justify w3-button" style="margin-left:20px"><h5>Motivation</h5></a>
-	<a href="#background" class="w3-justify w3-button"><h3>1. Background</h3></a>
-		<a href="#shapley_values" class="w3-justify w3-button" style="margin-left:20px"><h5>1.1 Shapley values</h5></a>
-		<a href="#shap_values" class="w3-justify w3-button" style="margin-left:20px"><h5>1.2 SHAP values</h5></a>
-		<a href="#background_distribution" class="w3-justify w3-button" style="margin-left:20px"><h5>1.3 SHAP values with a <br>Background Distribution</h5></a>
-	<a href="#algorithm" class="w3-justify w3-button"><h3>2. Algorithm</h3></a>
-	  	<a href="#brute_force" class="w3-justify w3-button" style="margin-left:20px"><h5>2.1 Brute force <br>implementation</h5></a>
-		<!-- <a href="#an_example" class="w3-justify w3-button" style="margin-left:20px"><h5>2.2 An example</h5></a> -->
-		<a href="#naive_implementation" class="w3-justify w3-button" style="margin-left:20px"><h5>2.2 Naive implementation</h5></a>
-		<a href="#dynamic_programming_implementation" class="w3-justify w3-button" style="margin-left:20px"><h5>2.3 Dynamic programming <br> implementation</h5></a>
-		<a href="#comparison_of_methods" class="w3-justify w3-button" style="margin-left:20px"><h5>2.4 Comparison of SHAP <br> Methods</h5></a>
-	<a href="#references" class="w3-justify w3-button"><h3>References</h3></a>
-</div>
+  <d-title>
+    <h1>A fast and exact game-theoretic algorithm to explain trees</h1>
+      <p style="font-size: 150%;">Shapley values have recently been adapted to explain machine learning algorithms; however, calculating them is NP-hard.  By restricting our machine learning model class to trees, we can calculate them exactly in linear time.</p>
+      <img
+        src="./images/trees.jpg"
+        style='grid-column: text; width: 100%; padding-top: 20px; padding-bottom:20px;' />
+  </d-title>
+  <d-byline></d-byline>
+  <d-article>
 
-<!-- Page content -->
-<div class="w3-content" style="max-width:2000px;margin-left:300px">
-  <div class="w3-display-container w3-center">
-    <img src="images/trees.jpg" style="width:100%">
-    <div class="w3-display-bottommiddle w3-container w3-text-white w3-hide-small">
-      <h2><strong>A fast and exact game-theoretic algorithm to explain trees</strong></h2>
-      <!-- <h2>Exact game-theoretic explanations of trees in linear time</h2> -->
-      <h2>Hugh Chen</h2>
-    </div>
-  </div>
+    <d-contents>
+      <nav class="l-text toc figcaption">
+        <h3>Top</h3>
+        <!--<div><a href="#introduction">Introduction</a></div>-->
+        <div><a href="#introduction">Introduction</a></div>
+        <div><a href="#background">What's in a SHAP Value?</a></div>
+        <ul>
+          <li><a href="#shapley_values">1: Back to basics with Shapley values</a></li>
+          <li><a href="#shap_values">2: Adapting Shapley values to machine learning</a></li>
+          <li><a href="#">3: Masking missing features</a></li>
+          <li><a href="#">4: Imputing missing features by conditioning</a></li>
+          <li><a href="#background_distribution">5: Interventional conditional expectation SHAP values with a background distribution</a></li>
+        </ul>
+        <div><a href="#claim-2">Explaining trees quickly and exactly</a></div>
+        <ul>
+          <li><a href="#brute_force">1: The brute force algorithm</a></li>
+          <li><a href="#naive_implementation">2: The naive algorithm</a></li>
+          <li><a href="#dynamic_programming_implementation">3: The dynamic algorithm</a></li>
+        </ul>
+        <div><a href="#comparison_of_methods">A comparison of Shapley value attribution methods</a></div>
+        <div><a href="#references">References</a></div>
+      </nav>
+    </d-contents>
 
   <!-- Introduction -->
-  <div class="w3-container w3-content w3-center w3-padding-16" style="max-width:800px" id="abstract">
-    <h2 class="w3-justify" id="introduction">Introduction</h2>
-    <p class="w3-opacity w3-justify">
-      Nowadays, machine learning (ML) is widespread.  In this field, one of the most prolific class ML models are trees.  As evidence, a recent survey of data scientists and researchers found that tree models were both the second and third most popular class of method, beaten only by Logistic Regression (Figure 1).  Although small tree models can be interpretable (<a href="#rudin2019">Rudin 2019</a>), most tree models are generally large and hard for humans to interpret.  
+  <div style="max-width:800px" id="abstract">
+    <h2 id="introduction">Introduction</h2>
+    <p>
+      Nowadays, machine learning (ML) is widespread.  In this field, one of the most popular machine learning model type is tree-based models.  As evidence, a recent survey of data scientists and researchers found that tree models were both the second and third most popular class of method, beaten only by Logistic Regression (Figure 1).  Although small tree models can be interpretable <d-cite bibtex-key="rudin2019stop"></d-cite>, most tree models are generally large and hard for humans to interpret.  
     </p>
 
-	<div id="table_container" style="overflow-x:auto;align:center;">
-    <p class="w3-opacity" style="font-size:20px;margin:20px 20px 0px 20px"><strong>Figure 1</strong>: The most popular data science methods according to a <a href="https://www.kaggle.com/surveys/2017">2017 Kaggle survey</a> (based on a total of 7,301 responses).</p>
+  <!-- Figure 1 -->
+  <figure class="l-body-outset">
     <div id="fig1"></div>
-	</div>
+    <figcaption>
+      <a href="#fig1" class="figure-number">1</a>: The most popular data science methods according to a <a href="https://www.kaggle.com/surveys/2017">2017 Kaggle survey</a> (based on a total of 7,301 responses).
+    </figcaption>
+  </figure>
 
-    <p class="w3-opacity w3-justify">
+    <p>
     In order to explain these models, we use Shapley values - a unique game-theoretic solution for spreading credit between features.  First, we discuss SHAP values, an extension of Shapley values to machine learning models (<a href="#background">Section 1</a>).  However, exactly computing SHAP values for an arbitrary model is NP-hard (<a href="#matsui2001NP">Matsui et. al. 2001</a>), but by focusing on explaining tree models, it is possible to compute them exactly in linear time (<a href="#algorithm">Section 2</a>).
     </p>
 
-    <!-- <h3 class="w3-justify" id="motivation">Motivation</h3> -->
-    <p class="w3-opacity w3-justify">
+    <!-- <h3 id="motivation">Motivation</h3> -->
+    <p>
     <i>What is the goal of this article?</i> 
 
-    <p class="w3-opacity w3-justify">
+    <p>
     Given that there is a long history of model explanations going awry when users do not understand what an explanation means (e.g., p-values for linear models (<a href="#schervish1996">Schervish 1996</a>)), it is critical to have a broadly accessible explanation of SHAP values and how they are obtained for tree models to ensure that they are not misused.  To this end, we aim to provide an easily accessible answer to two questions: 1.) What are SHAP values?  2.) How can we obtain SHAP values for trees?  In particular, we focus on explaining an algorithm that was empirically evaluated in <a href="#lundberg2020fromlocal">Lundberg (2020)</a>.
   </p>
   </div>
 
+  <hr>
 
   <!-- The Background Section -->
-  <div class="w3-container w3-content w3-center w3-padding-16" style="max-width:800px">
-    <h2 class="w3-justify" id="background">1. Background</h2>
+  <div style="max-width:800px">
+    <h2 id="background">1. What's in a SHAP value?</h2>
     
-    <p class="w3-opacity w3-justify">
+    <p>
  	   In this section, we describe Shapley values and a few versions that have been used to explain machine learning models.  Then, we use a linear model example to justify a specific extension of the Shapley values.  With this formulation, we show how obtaining the SHAP values reduces to a average over so-called single reference SHAP values that can be thought of as explanations with respect to a single foreground sample (explicand) and a single background sample (reference).
 	</p>
 
 
     <!-- What are Shapley Values? -->
-    <h3 class="w3-justify" id="shapley_values">1.1 Shapley values</h3>
-	<p class="w3-opacity w3-justify">
+    <h3 id="shapley_values">1.1 Back to basics: Shapley values</h3>
+	<p>
     	Shapley values are a method to spread credit among players in a "coalitional game".  We can define the players to be a set \(N=\{1,\cdots,d\}\).  Then, the coalitional game is a function that maps subsets of the players to a scalar value:
 
     	$$
@@ -268,101 +314,113 @@ div.tooltip {
     	$$
     </p>
 
-    <p class="w3-opacity w3-justify">
+    <p>
     	To make these concepts more concrete, we can imagine a company that makes a profit \(v(S)\) that is determined by what combination of individuals they employ \(S\).  Furthermore, let's assume we know \(v(S)\) for all possible combinations of employees.  Then, the Shapley values assign credit to an individual \(i\) by taking a weighted average of how much the profit increases when \(i\) works with a group \(S\) versus when he does not work with \(S\).  Repeating this for all possible subsets \(S\) gives us the Shapley Values:
     	<!-- (include a simple graphic here?) -->
     	$$
     	\overbrace{\phi_i(v)}^{\text{Shapley value of }i}=\sum_{S\subseteq N\setminus\{i\}}\underbrace{\frac{|S|!(|N|-|S|-1)!}{|N|!}}_{\text{Weight }W(|S|,|N|)}(\overbrace{v(S\cup\{i\})-v(S)}^{\text{Profit individual }i\text{ adds}})
     	$$
-    	<a href="#example1">Example 1</a> computes this summation for an arbitrary coalitional game with three players.
+      <a href="#shapley_value_ex">Figure 2</a> computes this summation for an arbitrary coalitional game with three players.
     </p>
 
-	<div id="table_container" style="overflow-x:auto;align:center;">
-		<p id="example1" class="w3-opacity w3-left" align="left" style="margin:20px"><strong>Example 1</strong>: Shapley values for a company that makes a profit \(v(S)\) based on it's three prospective employees \(Ava\), \(Ben\), and \(Cat\).</p>
-	  <table class="w3-opacity w3-center" style="width:300px;display:inline;margin-right:25px;font-size:18px;">
-	  	<caption align="top" style="font-size:20px;"><strong>Coalitional game</strong></caption>
-	  	<col width="200px"/>
-    	<col width="150px"/>
-    	<col width="50px"/>
-		<tr>
-			<th>Subset \(S\)</th>
-			<th>Profit \(v(S)\)</th>
-			<th></th>
-		</tr>
-		<tr>
-			<td>\(\{\}\)</td>
-			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_n" onchange="calcSV()"></td>
-			<td><span id="s_n_out"></span></td>
-		</tr>
-		<tr>
-			<td>\(\{Ava\}\)</td>
-			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_a" onchange="calcSV()"></td>
-			<td><span id="s_a_out"></span></td>
-		</tr>
-		<tr>
-			<td>\(\{Ben\}\)</td>
-			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_b" onchange="calcSV()"></td>
-			<td><span id="s_b_out"></span></td>
-		</tr>
-		<tr>
-			<td>\(\{Cat\}\)</td>
-			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_c" onchange="calcSV()"></td>
-			<td><span id="s_c_out"></span></td>
-		</tr>
-		<tr>
-			<td>\(\{Ava,Ben\}\)</td>
-			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_ab" onchange="calcSV()"></td>
-			<td><span id="s_ab_out"></span></td>
-		</tr>
-		<tr>
-			<td>\(\{Ava,Cat\}\)</td>
-			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_ac" onchange="calcSV()"></td>
-			<td><span id="s_ac_out"></span></td>
-		</tr>
-		<tr>
-			<td>\(\{Ben,Cat\}\)</td>
-			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_bc" onchange="calcSV()"></td>
-			<td><span id="s_bc_out"></span></td>
-		</tr>
-		<tr>
-			<td>\(\{Ava,Ben,Cat\}\)</td>
-			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_abc" onchange="calcSV()"></td>
-			<td><span id="s_abc_out"></span></td>
-		</tr>
-	  </table>
+  <!-- Figure 2 -->
+	<figure id="shapley_value_ex">
+  
+    <div>
+  	  <table align="center" style="width:500px;border:none;">
+  	  	<col width="200px"/>
+      	<col width="250px"/>
+      	<col width="50px"/>
+        <tr align="center">
+          <td style="border:none;" colspan="3">Coalitional game</td>
+        </tr>
+    		<tr>
+    			<td>Subset \(S\)</td>
+    			<td>Profit \(v(S)\)</td>
+    			<td></td>
+    		</tr>
+    		<tr>
+    			<td>\(\{\}\)</td>
+    			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_n" onchange="calcSV()"></td>
+    			<td><span id="s_n_out"></span></td>
+    		</tr>
+    		<tr>
+    			<td>\(\{Ava\}\)</td>
+    			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_a" onchange="calcSV()"></td>
+    			<td><span id="s_a_out"></span></td>
+    		</tr>
+    		<tr>
+    			<td>\(\{Ben\}\)</td>
+    			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_b" onchange="calcSV()"></td>
+    			<td><span id="s_b_out"></span></td>
+    		</tr>
+    		<tr>
+    			<td>\(\{Cat\}\)</td>
+    			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_c" onchange="calcSV()"></td>
+    			<td><span id="s_c_out"></span></td>
+    		</tr>
+    		<tr>
+    			<td>\(\{Ava,Ben\}\)</td>
+    			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_ab" onchange="calcSV()"></td>
+    			<td><span id="s_ab_out"></span></td>
+    		</tr>
+    		<tr>
+    			<td>\(\{Ava,Cat\}\)</td>
+    			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_ac" onchange="calcSV()"></td>
+    			<td><span id="s_ac_out"></span></td>
+    		</tr>
+    		<tr>
+    			<td>\(\{Ben,Cat\}\)</td>
+    			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_bc" onchange="calcSV()"></td>
+    			<td><span id="s_bc_out"></span></td>
+    		</tr>
+    		<tr>
+    			<td>\(\{Ava,Ben,Cat\}\)</td>
+    			<td><input type="range" min="-15" max="15" value="0" class="slider" id="s_abc" onchange="calcSV()"></td>
+    			<td><span id="s_abc_out"></span></td>
+    		</tr>
+  	  </table>
+    </div>
 
-	  <table class="w3-opacity w3-center fixed" style="width:200px;display:inline;margin-left:25px;font-size:20px;">
-	  	<caption align="top" style="font-size:20px;"><strong>Shapley values</strong></caption>
-		<col width="100px"/>
-    	<col width="100px"/>
-		<tr>
-			<td>\(\phi_{Ava}(v)\)</td>
-			<td id="phi_a">0</td>
-		</tr>
-		<tr>
-			<td>\(\phi_{Ben}(v)\)</td>
-			<td id="phi_b">0</td>
-		</tr>
-		<tr>
-			<td>\(\phi_{Cat}(v)\)</td>
-			<td id="phi_c">0</td>
-		</tr>
-	  </table>
+    <div style="margin-bottom:0px">
+  	  <table align="center" style="width:200px;border:none;">
+    		<col width="100px"/>
+      	<col width="100px"/>
+        <tr align="center">
+          <td style="border:none;" colspan="2">Shapley values</td>
+        </tr>
+    		<tr>
+    			<td align=center>\(\phi_{Ava}(v)\)</td>
+    			<td align=center id="phi_a">0</td>
+    		</tr>
+    		<tr>
+    			<td align=center>\(\phi_{Ben}(v)\)</td>
+    			<td align=center id="phi_b">0</td>
+    		</tr>
+    		<tr>
+    			<td align=center>\(\phi_{Cat}(v)\)</td>
+    			<td align=center id="phi_c">0</td>
+    		</tr>
+  	  </table>
+    </div>
 
-	  <br><br>
-	  <input type="button" value="Preset A" class="w3-button w3-teal" id="ex1_presetA" style="font-size:20px;" onclick="ex1_presetA()"> 
-	  <input type="button" value="Preset B" class="w3-button w3-green" id="ex1_presetB" style="font-size:20px;" onclick="ex1_presetB()"> 
-	  <input type="button" value="Preset C" class="w3-button w3-green" id="ex1_presetC" style="font-size:20px;" onclick="ex1_presetC()"> 
-	  <input type="button" value="Preset D" class="w3-button w3-green" id="ex1_presetD" style="font-size:20px;" onclick="ex1_presetD()"> 
-	  <br>
+    <div align="center" style="margin-bottom: 10px">
+  	  <input type="button" value="Preset A" class="w3-button w3-teal" id="ex1_presetA" onclick="ex1_presetA()"> 
+  	  <input type="button" value="Preset B" class="w3-button w3-green" id="ex1_presetB" onclick="ex1_presetB()"> 
+  	  <input type="button" value="Preset C" class="w3-button w3-green" id="ex1_presetC" onclick="ex1_presetC()"> 
+  	  <input type="button" value="Preset D" class="w3-button w3-green" id="ex1_presetD" onclick="ex1_presetD()"> 
+    </div>
 
-	  <p class="w3-opacity w3-center" align="center" id="ex1_preset_text" style="margin:20px">No credit.</p>
+	  <p align="center" style="font-size:13px" id="ex1_preset_text">No credit.</p>
 
-	</div>
+    <figcaption>
+      <a href="#shapley_value_ex" class="figure-number">2</a>: Shapley values for a company that makes a profit \(v(S)\) based on it's three prospective employees \(Ava\), \(Ben\), and \(Cat\).
+    </figcaption>
+	</figure>
 
-	<p class="w3-opacity w3-justify">
-    	The Shapley values consider how much an individual increases profit when they work together with all other possible teams.  Furthermore, they are a unique solution to spreading credit as defined by several desirable properties (<a href="#young_uniquesol">Young 1985</a>):
-    	<ul class="w3-opacity w3-justify">
+	<p>
+    	The Shapley values consider how much an individual increases profit when they work together with all other possible teams.  Furthermore, they are a unique solution to spreading credit as defined by several desirable properties (<a href="#young_uniquesol">Young 1985</a>) (all of which hold for any coalitional game, as can be seen in <a href="#shapley_value_ex">Figure 2</a>):
+    	<ul>
     		<li>Local Accuracy/Efficiency: The sum of Shapley values for all employees adds up to the profit with all employees minus the profit with no employees:</li>
 	    		$$
 	    			\sum_{i\in N} \phi_i(v)=v(N)-v(\{\})
@@ -378,22 +436,22 @@ div.tooltip {
     	</ul>
     </p>
 
-	<p class="w3-opacity w3-justify">
+	<p>
     	<a href="#lundberg_unified">Lundberg and Lee (2017)</a> extend Shapley values to explain ML models (<a href="#shap_values">Section 1.2</a>).
     </p>
 
 
     <!-- What are SHAP Values? -->
-    <h3 class="w3-justify" id="shap_values">1.2 SHAP values</h3>
-	<p class="w3-opacity w3-justify">
+    <h3 id="shap_values">1.2 SHAP values</h3>
+	<p>
     	SHAP values are a variant of Shapley values to explain ML models.  For SHAP values, the game \(v(S)\) is now related to a machine learning model \(f(x)\) and the set of players is now a feature vector \(x:=\{x_1,\cdots,x_d\}\in\mathbb{R}^d\).  
     </p>
 
-    <p class="w3-opacity w3-justify">
+    <p>
     	In contrast, Shapley values define a game's output \(v(S)\) to be the value of the game with some players "present" and the remaining players "missing".  Here, "missing" is naturally defined: whether or not a player \(i\) is present in the set \(S\) (or, as in our example, whether an employee was working for the company).
     </p>
 
-    <p class="w3-opacity w3-justify">
+    <p>
     	In comparison, ML models generally require a fixed length input with continuous values which makes setting features to be "missing" or "present" less straightforward.  One simple approach is to impute the "missing" features by masking them by a fixed background sample \(x^b \in \mathbb{R}^d\).
     	$$
 		v(S)=f(h^S)\text{, where } h^S_i = x_i\text{ if }i\in S\text{, }h^S_i = x^b_i\text{ otherwise}
@@ -401,14 +459,14 @@ div.tooltip {
     	For instance, if we want to set the feature <i>Height</i> to "missing", we could replace it with a specific <i>background value</i>.  One natural option of <i>background value</i> is zero.  However, this is unsatisfying because a <i>Height</i> of zero is impossible.  Another option of <i>background value</i> could be the average human height.  This is arguably a better choice, however it means that explanations for people who are exactly average height will be biased to give no weight to height.  In fact, masking with any single background sample will introduce bias to SHAP values.  Alternatively, instead of using a single background sample, we can use an entire background distribution to define missingness.
     </p>
 
-	<p class="w3-opacity w3-justify">
+	<p>
     	Then, a very natural approach to impute features is with conditional expectation.  Instead of simply replacing "missing" features with a fixed value, we condition on the set of features that are "present" as if we know them and use those to guess at the "missing" features.  If we define \(D\) to be the background (underlying) distribution our samples are drawn from, the value of the game is:
     	$$
 		v(S)=\mathbb{E}_D[f(x)|x_{S}]
     	$$
     </p>
 
-	<p class="w3-opacity w3-justify">
+	<p>
     	One caveat is that getting this conditional expectation for actual data is very difficult.  Furthermore, even if you do manage to do so, the resulting explanations can end up having undesirable characteristics (more on this later).  Because our goal is to focus on explaining the model itself, an arguably more natural approach is to use causal inference's <i>interventional conditional expectation</i>:
     	$$
     	v(S)=\mathbb{E}_D[f(x)|\text{do}(x_{S})]
@@ -416,124 +474,113 @@ div.tooltip {
     	The <i>do</i> notation is Judea Pearl's <i>do</i>-operator (<a href="pearl_2000_causality">Pearl 2000</a>).  In words, we break the dependence between the features in \(S\) and the remaining features, which is analogous to <i>intervening</i> on the remaining features (more on this in <a href="#background_distribution">Section 1.3</a>).  The motivation behind this decision comes from <a href="#janzing2019feature">Janzing et. al. (2019)</a> which is also very close to Random Baseline Shapley in <a href="#sundararajan2019many">Sundararajan et. al. (2019)</a>).  Additionally, this is exactly the assumption made by <a href="https://shap.readthedocs.io/en/latest/#shap.KernelExplainer">Kernel Explainer</a> and <a href="https://shap.readthedocs.io/en/latest/#shap.SamplingExplainer">Sampling Explainer</a> from the SHAP package.
     </p>
 
-	<p class="w3-opacity w3-justify">
-		In <a href="#example2">Example 2</a> we highlight tradeoffs between the conditional expectation and the interventional conditional expectation by devising a simple example with a linear function and a multivariate normally distributed background distribution.  In general, computing the conditional expectation SHAP value is difficult; however, because we choose a multivariate normal distribution the conditional expectation is well defined.  In addition, we choose a linear function because the conditional expectation of the function equals the function applied to the conditional expectation.
-	</p>
+    <!-- Figure 3 -->
+    <figure id="linear_shap_ex">
+      <div align=center style="margin-bottom: 20px">
 
-    <div id="table_container" style="overflow-x:auto;align:center;">
-		<p id="example2" class="w3-opacity w3-left" align="left" style="margin:20px">
-			<strong>Example 2</strong>: Comparing choices of set function for SHAP values: conditional expectation (CE) and interventional conditional expectation (ICE).  We make two simplifying assumptions:
-		</p>
-		<ul class="w3-opacity" align="left" style="margin:20px">
-			<li>The function is linear (\(f=\beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \beta_4 x_4\))</li>
-			<li>The data-generating distribution is multivariate normal (\(D\sim \mathcal{N}_4(0,C)\))</li>
-		</ul>
+    		<table style="width:110px;display:inline;margin-right:25px;border:none;">
+  	      <col width="50px">
+  	      <col width="65px">
+  	      <tr align="center">
+  	      	<td style="border:none;" colspan="2">Linear</td>
+  	  	  </tr>
+  	      <tr align="center">
+  	      	<td colspan="2">Model</td>
+  	  	  </tr>
+    		  <tr align="center">
+    		    <td>\(\beta_1\)</td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_b1" value="1"></td>
+    		  </tr>
+    		  <tr align="center">
+    		    <td>\(\beta_2\)</td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_b2" value="2"></td>
+    		  </tr>
+    		  <tr align="center">
+    		    <td>\(\beta_3\)</td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_b3" value="3"></td>
+    		  </tr>
+    		  <tr align="center">
+    		    <td>\(\beta_4\)</td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_b4" value="4"></td>
+    		  </tr>
+    		</table>
 
-		<table class="w3-opacity" style="width:300px;display:inline;margin-right:25px;font-size:20px;">
-	      <col width="60px">
-	      <col width="60px">
-	      <tr align="center">
-	      	<td colspan="2"><strong>Linear</strong></td>
-	  	  </tr>
-	      <tr align="center">
-	      	<td colspan="2"><strong>Model</strong></td>
-	  	  </tr>
-		  <tr align="center">
-		    <td>\(\beta_1\)</td>
-		    <td><input class="w3-input" type="text" id="ex2_b1" value="1"></td>
-		  </tr>
-		  <tr align="center">
-		    <td>\(\beta_2\)</td>
-		    <td><input class="w3-input" type="text" id="ex2_b2" value="2"></td>
-		  </tr>
-		  <tr align="center">
-		    <td>\(\beta_3\)</td>
-		    <td><input class="w3-input" type="text" id="ex2_b3" value="3"></td>
-		  </tr>
-		  <tr align="center">
-		    <td>\(\beta_4\)</td>
-		    <td><input class="w3-input" type="text" id="ex2_b4" value="4"></td>
-		  </tr>
-		</table>
+    		<table style="width:300px;display:inline;margin-right:25px;border:none;">
+  	      <col width="50px">
+  	      <col width="65px">
+  	      <col width="65px">
+  	      <col width="65px">
+  	      <col width="65px">
+  	      <tr align="center">
+  	      	<td colspan="5">Covariance \(C\)</td>
+  	      </tr>
+  	      <tr align="center">
+    		    <td></td>
+    		    <td>\(x_1\)</td>
+    		    <td>\(x_2\)</td>
+    		    <td>\(x_3\)</td>
+    		    <td>\(x_4\)</td>
+    		  </tr>
+    		  <tr align="center">
+    		    <td>\(x_1\)</td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_cor11" value="1"></td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_cor12" value="0"></td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_cor13" value="0"></td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_cor14" value="0"></td>
+    		  </tr>
+    		  <tr align="center">
+    		    <td>\(x_2\)</td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_cor21" value="0"></td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_cor22" value="1"></td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_cor23" value="0"></td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_cor24" value="0"></td>
+    		  </tr>
+    		  <tr align="center">
+    		    <td>\(x_3\)</td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_cor31" value="0"></td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_cor32" value="0"></td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_cor33" value="1"></td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_cor34" value="0"></td>
+    		  </tr>
+    		  <tr align="center">
+    		    <td>\(x_4\)</td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_cor41" value="0"></td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_cor42" value="0"></td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_cor43" value="0"></td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_cor44" value="1"></td>
+    		  </tr>
+    		</table>
 
+    		<table style="width:110px;display:inline;margin-right:25px;border:none;">
+  	      <col width="50px">
+  	      <col width="65px">
+  	      <tr align="center">
+  	      	<td colspan="2" style="border:none;">Foreground</td>
+  	  	  </tr>
+  	      <tr align="center">
+  	      	<td colspan="2">Sample</td>
+  	  	  </tr>
+    		  <tr align="center">
+    		    <td>\(x_1\)</td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_x1" value="1"></td>
+    		  </tr>
+    		  <tr align="center">
+    		    <td>\(x_2\)</td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_x2" value="1"></td>
+    		  </tr>
+    		  <tr align="center">
+    		    <td>\(x_3\)</td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_x3" value="1"></td>
+    		  </tr>
+    		  <tr align="center">
+    		    <td>\(x_4\)</td>
+    		    <td style="font-size:12px;"><input class="w3-input w3-border w3-round" type="text" id="ex2_x4" value="1"></td>
+    		  </tr>
+    		</table>
+      </div>
 
-		<table class="w3-opacity" style="width:300px;display:inline;margin-right:25px;font-size:20px;">
-	      <col width="50px">
-	      <col width="60px">
-	      <col width="60px">
-	      <col width="60px">
-	      <col width="60px">
-	      <tr align="center">
-	      	<td colspan="5"><strong>Covariance \(C\)</strong></td>
-	      </tr>
-	      <tr align="center">
-		    <th></th>
-		    <th>\(x_1\)</th>
-		    <th>\(x_2\)</th>
-		    <th>\(x_3\)</th>
-		    <th>\(x_4\)</th>
-		  </tr>
-		  <tr align="center">
-		    <td>\(x_1\)</td>
-		    <td><input class="w3-input" type="text" id="ex2_cor11" value="1"></td>
-		    <td><input class="w3-input" type="text" id="ex2_cor12" value="0"></td>
-		    <td><input class="w3-input" type="text" id="ex2_cor13" value="0"></td>
-		    <td><input class="w3-input" type="text" id="ex2_cor14" value="0"></td>
-		  </tr>
-		  <tr align="center">
-		    <td>\(x_2\)</td>
-		    <td><input class="w3-input" type="text" id="ex2_cor21" value="0"></td>
-		    <td><input class="w3-input" type="text" id="ex2_cor22" value="1"></td>
-		    <td><input class="w3-input" type="text" id="ex2_cor23" value="0"></td>
-		    <td><input class="w3-input" type="text" id="ex2_cor24" value="0"></td>
-		  </tr>
-		  <tr align="center">
-		    <td>\(x_3\)</td>
-		    <td><input class="w3-input" type="text" id="ex2_cor31" value="0"></td>
-		    <td><input class="w3-input" type="text" id="ex2_cor32" value="0"></td>
-		    <td><input class="w3-input" type="text" id="ex2_cor33" value="1"></td>
-		    <td><input class="w3-input" type="text" id="ex2_cor34" value="0"></td>
-		  </tr>
-		  <tr align="center">
-		    <td>\(x_4\)</td>
-		    <td><input class="w3-input" type="text" id="ex2_cor41" value="0"></td>
-		    <td><input class="w3-input" type="text" id="ex2_cor42" value="0"></td>
-		    <td><input class="w3-input" type="text" id="ex2_cor43" value="0"></td>
-		    <td><input class="w3-input" type="text" id="ex2_cor44" value="1"></td>
-		  </tr>
-		</table>
-
-
-		<table class="w3-opacity" style="width:300px;display:inline;margin-right:25px;font-size:20px;">
-	      <col width="60px">
-	      <col width="60px">
-	      <tr align="center">
-	      	<td colspan="2"><strong>Explicand</strong></td>
-	  	  </tr>
-	      <tr align="center">
-	      	<td colspan="2"><strong>Sample</strong></td>
-	  	  </tr>
-		  <tr align="center">
-		    <td>\(x_1\)</td>
-		    <td><input class="w3-input" type="text" id="ex2_x1" value="1"></td>
-		  </tr>
-		  <tr align="center">
-		    <td>\(x_2\)</td>
-		    <td><input class="w3-input" type="text" id="ex2_x2" value="1"></td>
-		  </tr>
-		  <tr align="center">
-		    <td>\(x_3\)</td>
-		    <td><input class="w3-input" type="text" id="ex2_x3" value="1"></td>
-		  </tr>
-		  <tr align="center">
-		    <td>\(x_4\)</td>
-		    <td><input class="w3-input" type="text" id="ex2_x4" value="1"></td>
-		  </tr>
-		</table>
-
-		<br><br>
-
-	  	<table class="w3-opacity" style="width:300px;display:inline;margin-right:25px;font-size:20px;">
+      <div align=center style="margin-bottom:20px">
+  	  	<table style="width:300px;display:inline;margin-right:25px;border:none;">
 	      <col width="180px">
 	      <col width="80px">
 	      <col width="80px">
@@ -546,85 +593,96 @@ div.tooltip {
 	      	<td>\(\phi_3\)</td>
 	      	<td>\(\phi_4\)</td>
 	  	  </tr>
-		  <tr align="center">
-		    <td><strong>CE Shapley Values</strong></td>
-		    <td id="ex2_CE_phi1">1</td>
-		    <td id="ex2_CE_phi2">2</td>
-		    <td id="ex2_CE_phi3">3</td>
-		    <td id="ex2_CE_phi4">4</td>
-		  </tr>
-		  <tr align="center">
-		  	<td><strong>ICE Shapley Values</strong></td>
-		    <td id="ex2_ICE_phi1">1</td>
-		    <td id="ex2_ICE_phi2">2</td>
-		    <td id="ex2_ICE_phi3">3</td>
-		    <td id="ex2_ICE_phi4">4</td>
-		  </tr>
-		</table>
+  		  <tr align="center">
+  		    <td>SHAP Values (CE)</td>
+  		    <td id="ex2_CE_phi1">1</td>
+  		    <td id="ex2_CE_phi2">2</td>
+  		    <td id="ex2_CE_phi3">3</td>
+  		    <td id="ex2_CE_phi4">4</td>
+  		  </tr>
+  		  <tr align="center">
+  		  	<td>SHAP Values (ICE)</td>
+  		    <td id="ex2_ICE_phi1">1</td>
+  		    <td id="ex2_ICE_phi2">2</td>
+  		    <td id="ex2_ICE_phi3">3</td>
+  		    <td id="ex2_ICE_phi4">4</td>
+  		  </tr>
+  		</table>
+    </div>
 
-		<br><br>
+  <div align=center style="margin-bottom: 10px">
 
-		<input type="button" value="Preset A" class="w3-button w3-teal" style="font-size:20px;" id="ex2_presetA" onclick="ex2_presetA()">
-	  	<input type="button" value="Preset B" class="w3-button w3-green" style="font-size:20px;" id="ex2_presetB" onclick="ex2_presetB()">
-	  	<input type="button" value="Preset C" class="w3-button w3-green" style="font-size:20px;" id="ex2_presetC" onclick="ex2_presetC()">
-	  	<input type="button" value="Preset D" class="w3-button w3-green" style="font-size:20px;" id="ex2_presetD" onclick="ex2_presetD()">
+		<input type="button" value="Preset A" class="w3-button w3-teal" id="ex2_presetA" onclick="ex2_presetA()">
+  	<input type="button" value="Preset B" class="w3-button w3-green" id="ex2_presetB" onclick="ex2_presetB()">
+  	<input type="button" value="Preset C" class="w3-button w3-green" id="ex2_presetC" onclick="ex2_presetC()">
+  	<input type="button" value="Preset D" class="w3-button w3-green" id="ex2_presetD" onclick="ex2_presetD()">
 
-		<p class="w3-opacity w3-center" align="center" id="ex2_preset_text" style="margin:20px">Independent variables.</p>
-	</div>
+  </div>
+
+	<p align="center" id="ex2_preset_text" style="font-size:13px">Independent variables.</p>
+
+  <figcaption>
+    <a href="#linear_shap_ex" class="figure-number">3</a>: Comparing two versions of SHAP values: conditional expectation (CE) and interventional conditional expectation (ICE).  We make two simplifying assumptions:
+
+    <ul align="left" style="margin:20px">
+      <li>The function is linear (\(f=\beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \beta_4 x_4\))</li>
+      <li>The data-generating distribution is multivariate normal (\(D\sim \mathcal{N}_4(0,C)\))</li>
+    </ul>
+  </figcaption>
+  </figure>
+
+
+  <p>
+    In <a href="#example2">Example 2</a> we highlight tradeoffs between the conditional expectation and the interventional conditional expectation by devising a simple example with a linear function and a multivariate normally distributed background distribution.  In general, computing the conditional expectation SHAP value is difficult; however, because we choose a multivariate normal distribution the conditional expectation is well defined.  In addition, we choose a linear function because the conditional expectation of the function equals the function applied to the conditional expectation.
+  </p>
 
 
 	<!-- Proof -->
-	<div style="background-color:aliceblue;">
+	<div">
+		<p><a onclick="hideshow('proof_linearmodel')"><strong>+ Technical details</strong></a></p>
 
-		<div style="padding-left:10px;padding-right:10px">
+		<div id="proof_linearmodel", style="display:none">
+	    <p>
+	    	Computing SHAP values for a linear model is much easier than for other model classes.  This is how we compute them for <a href="#example2">Example 2</a>.
+	    </p>
 
-			<p class="w3-justify"><a onclick="hideshow('proof_linearmodel')"><strong>Computing CE and ICE SHAP values Proof (Click)</strong></a></p>
+	    <p>
+	    	First, to compute Interventional Conditional Expectation (ICE) SHAP values for a linear model, we can start with:
+  			$$
+  			\begin{aligned}
+  			\phi_i(f,x)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(x)|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[f(x)|do(x_{S})])\\
+  			&=\sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[\beta x|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[\beta x|do(x_{S})])\\
+  			&=\sum_{S\in C } W(|S|,|N|) \beta (\mathbb{E}_{D}[x|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[x|do(x_{S})])\\
+  			&=\sum_{S\in C } W(|S|,|N|) \beta (h^{S\cup \{i\}} {-} h^S)\\ 
+  			&=\sum_{S\in C } W(|S|,|N|) \beta_i x^f_i\\ 
+  			&= \beta_i x^f_i\\ 
+  			\end{aligned}
+        $$
+		</p>
 
-			<div id="proof_linearmodel", style="display:none">
-
-			    <p class="w3-opacity w3-justify">
-			    	Computing SHAP values for a linear model is much easier than for other model classes.  This is how we compute them for <a href="#example2">Example 2</a>.
-			    </p>
-
-			    <p class="w3-opacity w3-justify">
-			    	First, to compute Interventional Conditional Expectation (ICE) SHAP values for a linear model, we can start with:
-					$$
-					\begin{aligned}
-					\phi_i(f,x)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(x)|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[f(x)|do(x_{S})])\\
-					&=\sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[\beta x|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[\beta x|do(x_{S})])\\
-					&=\sum_{S\in C } W(|S|,|N|) \beta (\mathbb{E}_{D}[x|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[x|do(x_{S})])\\
-					&=\sum_{S\in C } W(|S|,|N|) \beta (h^{S\cup \{i\}} {-} h^S)\\ 
-					&=\sum_{S\in C } W(|S|,|N|) \beta_i x^f_i\\ 
-					&= \beta_i x^f_i\\ 
-					\end{aligned}
-					$$
-				</p>
-
-			    <p class="w3-opacity w3-justify">
-			    	Second, to compute Conditional Expectation (CE) SHAP values for a linear model, we assume the background distribution \(D\) is multivariate normal with zero mean and covariance \(C\), we can start with:
-					$$
-					\begin{aligned}
-					\phi_i(f,x)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(x)|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[f(x)|x_{S}])\\
-					&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[\beta x|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[\beta x|x_{S}])\\
-					&= \sum_{S\in C } W(|S|,|N|)\beta (\mathbb{E}_{D}[x|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[x|x_{S}])\\
-					\end{aligned}
-					$$
-					Here, we know that \(\mathbb{E}_{D}[x|x_{S}])=C_{N\setminus S,S} C_{S,S}^{-1} x_{S}\).
-				</p>
-
-			</div>
-		</div>
+	    <p>
+	    	Second, to compute Conditional Expectation (CE) SHAP values for a linear model, we assume the background distribution \(D\) is multivariate normal with zero mean and covariance \(C\), we can start with:
+  			$$
+  			\begin{aligned}
+  			\phi_i(f,x)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(x)|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[f(x)|x_{S}])\\
+  			&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[\beta x|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[\beta x|x_{S}])\\
+  			&= \sum_{S\in C } W(|S|,|N|)\beta (\mathbb{E}_{D}[x|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[x|x_{S}])\\
+  			\end{aligned}
+  			$$
+  			Here, we know that \(\mathbb{E}_{D}[x|x_{S}])=C_{N\setminus S,S} C_{S,S}^{-1} x_{S}\).
+		  </p>
+    </div>
 
 	</div>
 
     <!-- Background distribution -->
-    <h3 class="w3-justify" id="background_distribution">1.3 Single reference SHAP values</h3>
+    <h3 id="background_distribution">1.3 Single reference SHAP values</h3>
 
-	<p class="w3-opacity w3-justify">
+	<p>
 		As we saw earlier, to compute \(\phi_i(f,x^f)\) we evaluate the interventional conditional expectation.  However, this depends on a <i>background distribution</i> \(D\) that the sample we are explaining, otherwise known as the foreground sample \(x^f\), will be compared to.  
 	</p>
 
-	<p class="w3-opacity w3-justify">
+	<p>
 		One natural definition of the background distribution is a uniform distribution over a population sample.  For instance, in machine learning, you could assign equal probability to every sample in your training set.  With this background distribution, we can re-write the SHAP value as an average of <i>single reference SHAP values</i> (<a href="#chen2019explaining">Chen et. al. 2019</a>):
 		$$
 		\phi_i(f,x^f)=\frac{1}{|D|}\sum_{x^b\in D}\phi_i(f,x^f,x^b)
@@ -634,116 +692,112 @@ div.tooltip {
 		\mathbb{E}_{D_{x^b}}[f(x^f)|\text{do}(x_{S})]=h^S
 		$$
 		Where \(h^S\in\mathbb{R}^d\) with \(h^S_i=x^f_i\) if \(i\in S\) otherwise \(h^S_i=x^b_i\).  In words, the interventional conditional expectation of \(x^f\) given a set of features \(S\) and \(x^b\) is a hybrid sample where the features in \(S\) are from \(x^f\) and the remaining features are from \(x^b\).  This is as if <i>we intervene on features in the foreground sample with features from the background sample</i>. 
-<!-- 		$$
-		\mathbb{E}_\mathcal{D_{x^b}}[f(x)|\text{do}(x_{S})]=\mathcal{X}(x^f,x^b,S)
-		$$
-		Where \(\mathcal{X}(x,x^b,S)\) to return a hybrid sample \(h\) where the features in \(S\) are from \(x\) and the remaining features are from \(x^b\).  In words, the interventional conditional expectation of \(x\) given a set of features \(S\), is a hybrid sample where the features in \(S\) are from \(x\) and the remaining features are from \(x^b\).  This is as if <i>we intervene on features in the foreground sample with features from the background sample</i>.  -->
 	</p>  
 
-		<!-- Proof -->
-	<div style="background-color:aliceblue;">
+	<!-- Background Distribution Proof -->
+	<div">
+		<p><a onclick="hideshow('proof_backgrounddist')"><strong>+ Technical details</strong></a></p>
 
-		<div style="padding-left:10px;padding-right:10px">
+		<div id="proof_backgrounddist", style="display:none">
 
-			<p class="w3-justify"><a onclick="hideshow('proof_backgrounddist')"><strong>Single reference SHAP values Proof (Click)</strong></a></p>
+		    <p>
+			    Define \(C\) to be all combinations of the set \(N \setminus \{i\}\) and \(P\) to be all permutations of \(N \setminus \{i\}\).  Starting with the definition of SHAP values: 
+				$$
+				\begin{aligned}
+				\phi_i(f,x^f)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(x^f)|\text{do}(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[f(x^f)|\text{do}(x_{S})])\\
+				&=\frac{1}{|P|}\sum_{S\subseteq P} \mathbb{E}_D[f(x^f)|\text{do}(x_{S \cup \{i\}})] {-} \mathbb{E}_D[f(x^f)|\text{do}(x_{S})]\\
+				&= \frac{1}{|P|}\sum_{S\subseteq P}\frac{1}{|D|}\sum_{x^b\in D} f(h^{S\cup \{i\}}) {-} f(h^{S})\\
+				&= \frac{1}{|D|}\sum_{x^b\in D} \frac{1}{|P|}\sum_{S\subseteq P} f(h^{S\cup \{i\}}) {-} f(h^{S})\\
+				&= \frac{1}{|D|}\sum_{x^b\in D} \underbrace{\sum_{S\subseteq C} W(|S|,|N|)f(h^{S\cup \{i\}}) {-} f(h^{S})}_{\text{Single reference SHAP value}}\\
+				&=\frac{1}{|D|}\sum_{x^b\in D}\phi_i(f,x^f,x^b)
+				\end{aligned}
+				$$
+			</p>
 
-			<div id="proof_backgrounddist", style="display:none">
-
-			    <p class="w3-opacity w3-justify">
-				    Define \(C\) to be all combinations of the set \(N \setminus \{i\}\) and \(P\) to be all permutations of \(N \setminus \{i\}\).  Starting with the definition of SHAP values: 
-					$$
-					\begin{aligned}
-					\phi_i(f,x^f)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(x^f)|\text{do}(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[f(x^f)|\text{do}(x_{S})])\\
-					&=\frac{1}{|P|}\sum_{S\subseteq P} \mathbb{E}_D[f(x^f)|\text{do}(x_{S \cup \{i\}})] {-} \mathbb{E}_D[f(x^f)|\text{do}(x_{S})]\\
-					&= \frac{1}{|P|}\sum_{S\subseteq P}\frac{1}{|D|}\sum_{x^b\in D} f(h^{S\cup \{i\}}) {-} f(h^{S})\\
-					&= \frac{1}{|D|}\sum_{x^b\in D} \frac{1}{|P|}\sum_{S\subseteq P} f(h^{S\cup \{i\}}) {-} f(h^{S})\\
-					&= \frac{1}{|D|}\sum_{x^b\in D} \underbrace{\sum_{S\subseteq C} W(|S|,|N|)f(h^{S\cup \{i\}}) {-} f(h^{S})}_{\text{Single reference SHAP value}}\\
-					&=\frac{1}{|D|}\sum_{x^b\in D}\phi_i(f,x^f,x^b)
-					\end{aligned}
-					$$
-				</p>
-
-			</div>
 		</div>
-
 	</div>
 
-	<p class="w3-opacity w3-justify">
+	<p>
 		In summary, we reduce the problem of obtaining \(\phi_i(f,x^f)\) to an average of simpler problems \(\phi_i(f,x^f,x^b)\) where our foreground sample \(x^f\) is compared to a distribution with only one background sample \(x^b\).  This new problem formulation will prove to be an easy problem to tackle for tree models.
 	</p>
 
   </div>
 
+  <hr>
+
 
   <!-- The Algorithm Section -->
-  <div class="w3-container w3-content w3-center w3-padding-16" style="max-width:800px">
-    <h2 class="w3-justify" id="algorithm">2. Algorithm</h2>
+  <div style="max-width:800px">
+    <h2 id="algorithm">2. Algorithm</h2>
     
-    <p class="w3-opacity w3-justify">
+    <p>
     Now our goal is to tackle the simpler problem of obtaining single reference SHAP values \(\phi_i(f,x^f,x^b)\) that are attributions for a single foreground (sample being explained) and background sample (sample being compared to).  In this section, we consider a specific foreground sample, background sample, and tree as specified in <a href="#example3">Example 3</a>.
 	</p>
 
-	<div id="table_container" style="overflow-x:auto;align:center;">
-		<p id="example3" class="w3-opacity w3-left" align="left" style="margin:20px">
-			<strong>Example 3</strong>: Choose \(x^f\), \(x^b\), and tree parameters for the remainder of this section.
-		</p>
-
-    	<table class="w3-center" style="width:300px;display:inline;margin-right:25px;font-size:18px;">
+	<figure>
+    <div align=center style="margin-bottom: 10px;">
+    	<table style="width:300px;display:inline;margin-right:25px;border:none;">
 	      <col width="100px"/>
 	      <col width="150px"/>
 	      <col width="50px"/>
 	      <col width="150px"/>
 	      <col width="50px"/>
 	      <col width="50px"/>
-	    <tr class="w3-opacity">
-	      <th>Variable</th>
-	      <th colspan="2">Foreground Sample \(x^f\)</th>
-	      <th colspan="2">Background Sample \(x^b\)</th>
-	      <th></th>
-	    </tr>
-	    <tr>
-	      <td class="w3-opacity">\(x_1\)</td>
-	      <td><input type="range" min="-15" max="15" value="0" class="slider" id="fx1"></td>
-	      <td class="w3-opacity" align="left" id="fx1_out"></td>
-	      <td><input type="range" min="-15" max="15" value="10" class="slider" id="bx1"></td>
-	      <td class="w3-opacity" align="left" id="bx1_out"></td>
-	      <td></td>
-	    </tr>
-	    <tr>
-	      <td class="w3-opacity">\(x_2\)</td>
-	      <td><input type="range" min="-15" max="15" value="0" class="slider" id="fx2"></td>
-	      <td class="w3-opacity" align="left" id="fx2_out"></td>
-	      <td><input type="range" min="-15" max="15" value="10" class="slider" id="bx2"></td>
-	      <td class="w3-opacity" align="left" id="bx2_out"></td>
-	      <td><input type="button" value="Reset" class="w3-button w3-green" style="font-size:20px;" onclick="ex3_reset()"> </td>
-	    </tr>
-	    <tr>
-	      <td class="w3-opacity">\(x_3\)</td>
-	      <td><input type="range" min="-15" max="15" value="10" class="slider" id="fx3"></td>
-	      <td class="w3-opacity" align="left" id="fx3_out"></td>
-	      <td><input type="range" min="-15" max="15" value="0" class="slider" id="bx3"></td>
-	      <td class="w3-opacity" align="left" id="bx3_out"></td>
-	      <td></td>
-	    </tr>
-	  </table>
+  	    <tr>
+  	      <td>Variable</td>
+  	      <td colspan="2">Foreground Sample \(x^f\)</td>
+  	      <td colspan="2">Background Sample \(x^b\)</td>
+  	      <td style="border:none;"></td>
+  	    </tr>
+  	    <tr>
+  	      <td>\(x_1\)</td>
+  	      <td><input type="range" min="-15" max="15" value="0" class="slider" id="fx1"></td>
+  	      <td align="left" id="fx1_out"></td>
+  	      <td><input type="range" min="-15" max="15" value="10" class="slider" id="bx1"></td>
+  	      <td align="left" id="bx1_out"></td>
+  	      <td style="border:none;"></td>
+  	    </tr>
+  	    <tr>
+  	      <td>\(x_2\)</td>
+  	      <td><input type="range" min="-15" max="15" value="0" class="slider" id="fx2"></td>
+  	      <td align="left" id="fx2_out"></td>
+  	      <td><input type="range" min="-15" max="15" value="10" class="slider" id="bx2"></td>
+  	      <td align="left" id="bx2_out"></td>
+  	      <td style="border:none;"><input type="button" value="Reset" class="w3-button w3-green" onclick="ex3_reset()"> </td>
+  	    </tr>
+  	    <tr>
+  	      <td>\(x_3\)</td>
+  	      <td><input type="range" min="-15" max="15" value="10" class="slider" id="fx3"></td>
+  	      <td align="left" id="fx3_out"></td>
+  	      <td><input type="range" min="-15" max="15" value="0" class="slider" id="bx3"></td>
+  	      <td align="left" id="bx3_out"></td>
+  	      <td style="border:none;"></td>
+  	    </tr>
+      </table>
+    </div>
 
-	  <br><br>
-
-		<p class="w3-opacity w3-center" style="line-height:0;font-size:18px">
-			<strong>Tree Parameters* (Click nodes)</strong> <br>
+		<p align=center style="font-size:15px;">
+			Tree Parameters* (Click nodes)</strong> <br>
 		</p>
 
-	  <div id="graphic"></div> 
-	  <div class="tooltip" id="tooltip"></div>
-		<p class="w3-opacity w3-center" style="margin:-30px 0px 30px 0px;font-size:18px">
+    <div align=center>
+  	  <div id="graphic"></div> 
+  	  <div class="tooltip" id="tooltip"></div>
+    </div>
+		<p style="margin:-30px 0px 30px 0px;font-size:12px;">
 			*Green links indicate the foreground sample goes down a particular split, red indicates the background sample does, and blue indicates both samples do.
 		</p>
-	</div>
+
+    <figcaption>
+      <a href="#shapley_value_ex" class="figure-number">4</a>: Choose foreground sample \(x^f\), background sample \(x^b\), and tree parameters for the remainder of <a href="#algorithm">Section 2</a>.
+    </figcaption>
+
+	</figure>
 
     <!-- Brute force -->
-    <h3 class="w3-justify" id="brute_force">2.1 Brute force</h3>
+    <h3 id="brute_force">2.1 Brute force</h3>
 
-    <p class="w3-opacity w3-justify">
+    <p>
     	Based on the proof in <a href="#background_distribution">Section 1.3</a>, the brute force approach would be to compute the following:
 
     	$$
@@ -751,17 +805,17 @@ div.tooltip {
     	$$
     </p>
 
-    <p class="w3-opacity w3-justify">
+    <p>
     	If we assume the computational cost of computing the weight \(W\) is constant, then the complexity of the brute force method is the number of terms in the summation multiplied by the cost of making a prediction (on the order of the depth of the tree \((D)\)).  Then, the computational complexity of the brute force approach is \(O(D\times2^{d})\).
     </p>
 
-    <p class="w3-opacity w3-justify">
+    <p>
     	In order to compute \(\phi_i(f,x^f,x^b)\) for all features, we have to re-run the entire algorithm \(d\) times, giving us a complexity of \(O(d\times D\times 2^{d})\).
 	</p>
 
 
-    <div id="table_container" style="overflow-x:auto;align:center;font-size:18px">
-    	<p class="w3-opacity w3-left" align="left" style="margin:20px">
+    <div id="table_container" style="overflow-x:auto;align:center;">
+    	<p align="left" style="margin:20px">
 			<strong>Example 4</strong>: Brute force algorithm for the tree and samples specified in Example 3.
 		</p>
 	</div>
@@ -770,14 +824,14 @@ div.tooltip {
 	  <div class="container">
 
 	    <div class="first" style="width:460px;height:300px">
-	    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 20px;font-size:18px;"><strong>Tree Parameters</strong></p>
+	    	<p style="margin: 0px 0px 0px 20px;"><strong>Tree Parameters</strong></p>
 	    	<div id="ex4_divtree" style="margin-top:10px;"></div>
 	    </div>
 
 
 	    <div class="second" style="width:300px;height:300px">
-	    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px -100px;font-size:18px;"><strong>Foreground & background sample</strong></p>
-			<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px -10px">
+	    	<p style="margin: 0px 0px 0px -100px;"><strong>Foreground & background sample</strong></p>
+			<table cellpadding="10" style="margin: 10px 0px 0px -10px">
 				<col width="40px"/>
 				<col width="50px"/>
 				<col width="50px"/>
@@ -817,8 +871,8 @@ div.tooltip {
 	    <div class="clear"></div>
 	    <div class="container">
 	    	<div class="first" style="width:460px;height:280px">
-			<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 20px;font-size:18px;"><strong>Brute Force Values</strong></p>
-      		<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px 90px">
+			<p style="margin: 0px 0px 0px 20px;"><strong>Brute Force Values</strong></p>
+      		<table cellpadding="10" style="margin: 10px 0px 0px 90px">
 		      <col width="40px"/>
 		      <col width="50px"/>
 		      <col width="50px"/>
@@ -867,9 +921,9 @@ div.tooltip {
 	    	</div>
 
 	    	<div class="second" style="width:300px;height:280px">
-	    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px -110px;font-size:18px;"><strong>Attribution Values</strong></p>
+	    	<p style="margin: 0px 0px 0px -110px;"><strong>Attribution Values</strong></p>
 
-			<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px -10px">
+			<table cellpadding="10" style="margin: 10px 0px 0px -10px">
 		      <col width="60px"/>
 		      <col width="80px"/>
 				<thead>
@@ -890,16 +944,16 @@ div.tooltip {
 			</table>
 	    	</div>
 	    </div>
-	    <input style="font-size:20px;" type="button" class="w3-button w3-green" value="<<" onclick="ex4_reset()">
-	    <input style="font-size:20px;" type="button" class="w3-button w3-green" value=">" onclick="bruteForceStep()">
-	    <input style="font-size:20px;" type="button" class="w3-button w3-green" value=">>" onclick="bruteForceRunAll()">
+	    <input type="button" class="w3-button w3-green" value="<<" onclick="ex4_reset()">
+	    <input type="button" class="w3-button w3-green" value=">" onclick="bruteForceStep()">
+	    <input type="button" class="w3-button w3-green" value=">>" onclick="bruteForceRunAll()">
 	    <br><br>
 	    <div class="clear"></div>
 	  </div>
     </div>
 
 
-	<p class="w3-opacity w3-justify">
+	<p>
 	    However, if we <i>constrain \(f(x)\) to be a tree-based model</i> (e.g., XGBoost, decision trees, random forests, etc.), then we can come up with a polynomial time algorithm to compute \(\phi_i(f,x^f,x^b)\) exactly.  Why is this the case?  Well, looking at Example 4, we can see that even for explaining a single feature, the brute force algorithm may consider a particular path multiple times.  However, to compute the SHAP value for a single feature, it turns out that we only need to consider each path once.  This insight leads us to the naive algorithm in <a href="#naive_implementation">Section 2.2</a>.
 	</p>
 
@@ -908,13 +962,13 @@ div.tooltip {
     <!-- Naive Implementation -->
     <!--                      -->
 
-    <h3 class="w3-justify" id="naive_implementation">2.2 Naive Implementation</h3>
+    <h3 id="naive_implementation">2.2 Naive Implementation</h3>
 
-	<p class="w3-opacity w3-justify">
+	<p>
 		Before we get into the algorithm, we first describe a theorem that is the basis for this naive implementation.
 	</p>    
 
-	<p class="w3-opacity w3-justify">
+	<p>
     	<strong>Theorem 1: To calculate \(\phi_i(f,x,x^b)\), we can calculate attributions for each path from the root to each leaf.</strong>  For a given path \(P\), we define \(N_P\) to be the "unique" features encountered and \(S_P\) to be the "unique" features that came from \(x\).  Finally, define \(v\) to be the value of the path's leaf.  Then, the attribution of the path is:
 
     	$$
@@ -933,11 +987,11 @@ div.tooltip {
 
 		<div style="padding-left:10px;padding-right:10px">
 
-			<p class="w3-justify"><a onclick="hideshow('proof')"><strong>Theorem 1 Sketch of Proof (Click)</strong></a></p>
+			<p><a onclick="hideshow('proof')"><strong>Theorem 1 Sketch of Proof (Click)</strong></a></p>
 
 			<div id="proof", style="display:none">
 
-				<p class="w3-opacity w3-justify">
+				<p>
 					If we treat each path in the tree from the root to the leaf as a separate model \(f'(x)\) that returns the value of the leaf if that path is traversed by \(x\) or zero otherwise, then we have \(L\) models that operate on disjoint parts of the input space.  Then, \(f(x)=\sum f'(x)\) and by the additivity of SHAP values, \(\phi_i(f,x,x^b)=\sum_f\phi_i(f',x,x^b)\).  Then, we can simply calculate \(\phi_i\) for each path model.  Since the path model is zero everywhere except for the associated path, it is easy to arrive to the solution in Theorem 1.
 				</p>
 
@@ -946,21 +1000,21 @@ div.tooltip {
 
 	</div>
 
-	<p class="w3-opacity w3-justify">
+	<p>
 		Then the goal of the algorithm is to obtain \(N_P\) and \(S_P\) for each path by recursively traversing the tree.  We will start by explaining the algorithm via an example:
 	</p>
 
 	<div id="table_container" style="overflow-x:auto;">
 		<figure>
-			<figcaption class="w3-opacity">Figure 3: Green paths are associated with \(\textcolor{green}{x^f}\), red paths are \(\textcolor{red}{x^b}\), and blue paths are associated with both.</figcaption>
+			<figcaption>Figure 3: Green paths are associated with \(\textcolor{green}{x^f}\), red paths are \(\textcolor{red}{x^b}\), and blue paths are associated with both.</figcaption>
       <br>
-			<img src="images/tree_example3.png" alt="Tree Example 3" width="360">
+			<img src="images/tree_example3.png" alt="Tree Example 3" style="width: 360px;">
 		</figure>
 	</div>
 
-	<p class="w3-opacity w3-justify">
+	<p>
 		In the naive algorithm, we maintain lists \(N_P\) and \(S_P\) as we traverse the tree.  At each internal node (Cases 2-4) we update the lists and then pass them to the node's children.  At the leaf nodes (Case 1), we calculate the attribution for each path.  In Figure 3, we see four possible cases:
-		<ul class="w3-opacity w3-justify">
+		<ul>
 			<li>Case 1: \(n\) is a leaf</li>
 			<ul>
 				<li>Return the attribution in Theorem 1 based on \(N_P\) and \(S_P\)</li>
@@ -986,14 +1040,14 @@ div.tooltip {
 	</p>
 
 
-    <div id="table_container" style="overflow-x:auto;align:center;font-size:18px">
-    	<p class="w3-opacity w3-left" align="left" style="margin:20px">
+    <div id="table_container" style="overflow-x:auto;align:center;">
+    	<p align="left" style="margin:20px">
 			<strong>Example 5</strong>: Naive algorithm for the tree and samples from Example 3.
 		</p>
 	</div>
 
     <div id="table_container" style="overflow-x:auto;align:center">
-    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 20px;font-size:18px;"><strong>Tree Parameters</strong></p>
+    	<p style="margin: 0px 0px 0px 20px;"><strong>Tree Parameters</strong></p>
     	<div id="ex5_divtree" style="margin-top:10px;"></div>
     </div>
 
@@ -1001,8 +1055,8 @@ div.tooltip {
     	<div class="container">
 
     	<div class="first" style="width:300px;height:220px">
-			<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 30px;font-size:18px;"><strong>Foreground & background sample</strong></p>
-			<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px 60px">
+			<p style="margin: 0px 0px 0px 30px;"><strong>Foreground & background sample</strong></p>
+			<table cellpadding="10" style="margin: 10px 0px 0px 60px">
 			<col width="40px"/>
 			<col width="50px"/>
 			<col width="50px"/>
@@ -1034,8 +1088,8 @@ div.tooltip {
 		</div>
 
     	<div class="first" style="width:250px;height:220px">
-	    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 30px;font-size:18px;"><strong>Algorithm state</strong></p>
-			<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px 80px">
+	    	<p style="margin: 0px 0px 0px 30px;"><strong>Algorithm state</strong></p>
+			<table cellpadding="10" style="margin: 10px 0px 0px 80px">
 				<col width="40px"/>
 				<col width="80px"/>
 				<tr>
@@ -1051,9 +1105,9 @@ div.tooltip {
 
 
     	<div class="first" style="width:210px;height:220px">
-	    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 10px;font-size:18px;"><strong>Attribution Values</strong></p>
+	    	<p style="margin: 0px 0px 0px 10px;"><strong>Attribution Values</strong></p>
 
-			<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px 10px">
+			<table cellpadding="10" style="margin: 10px 0px 0px 10px">
 		      <col width="60px"/>
 		      <col width="80px"/>
 				<thead>
@@ -1078,13 +1132,13 @@ div.tooltip {
 		</div>
 
 
-    	<input style="font-size:20px;" type="button" class="w3-button w3-green" value="<<" onclick="ex5_reset()">
-    	<input style="font-size:20px;" type="button" class="w3-button w3-green" value=">" onclick="naiveStep()">
-    	<input style="font-size:20px;" type="button" class="w3-button w3-green" value=">>" onclick="naiveRunAll()">
+    	<input type="button" class="w3-button w3-green" value="<<" onclick="ex5_reset()">
+    	<input type="button" class="w3-button w3-green" value=">" onclick="naiveStep()">
+    	<input type="button" class="w3-button w3-green" value=">>" onclick="naiveRunAll()">
 
     	<br><br>
 
-		<p class="w3-opacity w3-center" style="margin: 0px 0px 20px 0px;font-size:18px;" id="ex5_naive_step">Naive algorithm</p>
+		<p style="margin: 0px 0px 20px 0px;" id="ex5_naive_step">Naive algorithm</p>
 
 	</div>
 
@@ -1094,14 +1148,14 @@ div.tooltip {
 
 		<div style="padding-left:10px;padding-right:10px">
 
-			<p class="w3-justify"><a onclick="hideshow('pseudocode_naive')"><strong>Naive Pseudocode (Click)</strong></a></a></p>
+			<p><a onclick="hideshow('pseudocode_naive')"><strong>Naive Pseudocode (Click)</strong></a></a></p>
 
 			<div id="pseudocode_naive" style="display:none">
-			<p class="no-margin w3-opacity w3-justify" style="font-family:courier;font-size:16px">
+			<p class="no-margin" style="font-family:courier;font-size:16px">
 				ITE_N(array \(x^f\), array \(x^b\), tree \(T\)):
 			</p>
 
-			<ul class="no-margin w3-opacity w3-justify" style="font-family:courier;font-size:16px">
+			<ul class="no-margin" style="font-family:courier;font-size:16px">
 				RECURSE(node \(n\), list \(S_P\), list \(N_P\), array \(x^f\), array \(x^b\)):
 				<ul style="font-size:16px">
 					<font color="#8E44AD">// Case 1: At a leaf</font><br>
@@ -1144,36 +1198,36 @@ div.tooltip {
 
 	</div>
 
-    <p class="w3-opacity w3-justify">
+    <p>
 		The computational complexity to compute the single reference SHAP value using the naive algorithm is \(O(T_{numnodes}\times T_{depth})\) where \(T_{numnodes}\) is the number of nodes in the tree and \(T_{depth}\) is the depth of the tree.  This is because in the worst case, each internal node needs to check the lists \(S_P\) and \(N_P\) which are of length \(O(T_{depth})\).  Furthermore, each leaf node needs to check if \(i\) is in \(S_P\) which is also \(O(T_{depth})\) cost.  Note that we can actually get rid of the multiplicative \(T_{depth}\) factor by representing \(S_P\) and \(N_P\) as arrays and keeping track of the sizes of \(|S|\) and \(|N|\).
 	</p>
 
-	<p class="w3-opacity w3-justify">
+	<p>
 		Finally, getting the attributions for all features means that we will have to repeat the above algorithm \(|N|\) times.  In the next section we present a dynamic programming approach that allows us to compute the attributions for all features simultaneously.
 	</p>
 
     <!-- Dynamic Programming -->
-    <h3 class="w3-justify" id="dynamic_programming_implementation">2.3 Dynamic Programming Implementation</h3>
+    <h3 id="dynamic_programming_implementation">2.3 Dynamic Programming Implementation</h3>
 
-    <p class="w3-opacity w3-justify">
+    <p>
 	    For the dynamic programming version of the algorithm, we can compute the attributions for all features simultaneously as we traverse the tree by passing \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) attributions to parent nodes.  Before describing the algorithm in more detail, we first present an figure that illustrates why passing up the attributions is sufficient.
 	</p>
 
 	<div id="table_container" style="overflow-x:auto;">
 
 		<figure style="float:left">
-			<figcaption class="w3-opacity">Figure 4: Example to illustrate collapsibility for features.  Green paths are associated with \(\textcolor{green}{x}\) and red paths are \(\textcolor{red}{x^b}\)</figcaption>
+			<figcaption>Figure 4: Example to illustrate collapsibility for features.  Green paths are associated with \(\textcolor{green}{x}\) and red paths are \(\textcolor{red}{x^b}\)</figcaption>
       <br>
-			<img src="images/tree_example4.png" alt="Tree Example 3" width="220">
+			<img src="images/tree_example4.png" alt="Tree Example 3" style="width: 220px;">
 		</figure>
 
 		<table cellpadding="10" align="center">
 			<tr bgcolor="#F8F8F8">
-				<td align="left" class="w3-opacity">\(\phi_1(f,x^f,x^b)\)</td>
+				<td align="left">\(\phi_1(f,x^f,x^b)\)</td>
 				<td align="left">\(\textcolor{green}{\text{Pos}_1}+\textcolor{green}{\text{Pos}_2}+\textcolor{red}{\text{Neg}_3}+\textcolor{red}{\text{Neg}_4}\)</td>
 			</tr>
 			<tr bgcolor="#F8F8F8">
-				<td align="left" class="w3-opacity">\(\phi_2(f,x^f,x^b)\)</td>
+				<td align="left">\(\phi_2(f,x^f,x^b)\)</td>
 				<td align="left">\(\textcolor{red}{\text{Neg}_1}+\textcolor{green}{\text{Pos}_2}+\textcolor{green}{\text{Pos}_3}+\textcolor{red}{\text{Neg}_4}\)</td>
 			</tr>
 		</table>
@@ -1181,11 +1235,11 @@ div.tooltip {
 
 
 
-	<p class="w3-opacity w3-justify">
+	<p>
 		In Figure 4, we can first observe that for each leaf, according to Theorem 1, there are only two possible values needed to compute the SHAP values (\(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\)).  Based on the attributions for \(x_1\) we see that these \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) terms can be grouped by the left and right subtrees below \(x_1\).  To generalize this example, we make the following observation:
 	</p>
 
-	<p class="w3-opacity w3-justify">
+	<p>
 		<strong>Observation:  In order to compute the attribution for any feature \(i\) it is sufficient to consider the paths that correspond to each Case 4 node's children.</strong>  First, focusing on a specific Case 4 node \(n\), we know that one child is associated with \(x^f\) child and one child is associated with \(x^b\).  Then, the attribution to \(n\)'s feature is:
 		$$
 		\sum_{\text{paths }P\text{ under }x\text{ child}}\textcolor{green}{\text{Pos}_P} + \sum_{\text{paths }P\text{ under }x^b\text{ child}}\textcolor{red}{\text{Neg}_P}
@@ -1194,22 +1248,22 @@ div.tooltip {
 		Then, doing this for all nodes is equivalent to explaining all features (because SHAP values are additive).
 	</p>
 
-	<p class="w3-opacity w3-justify">
+	<p>
 		Furthermore, this observation suggests that we can always add the \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) terms at a given node and pass them up to the parent.  This information is sufficient to calculate the attributions for each upstream feature.  This aggregation of the \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) terms is the dynamic programming observation that allows each upstream node to only need a constant number of operations to compute its feature's attribution.
 	</p>
 
-	<p class="w3-opacity w3-justify">
+	<p>
 		Using this observation, we devise an algorithm that computes the attributions for all features simultaneously:
 	</p>
 
-    <div id="table_container" style="overflow-x:auto;align:center;font-size:18px">
-    	<p id="example6" class="w3-opacity w3-left" align="left" style="margin:20px">
+    <div id="table_container" style="overflow-x:auto;align:center;">
+    	<p id="example6" align="left" style="margin:20px">
 			<strong>Example 6</strong>: DP algorithm for the tree and samples from Example 3.
 		</p>
 	</div>
 
     <div id="table_container" style="overflow-x:auto;align:center">
-    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 20px;font-size:18px;"><strong>Tree Parameters</strong></p>
+    	<p style="margin: 0px 0px 0px 20px;"><strong>Tree Parameters</strong></p>
     	<div id="ex6_divtree" style="margin-top:10px;"></div>
     </div>
 
@@ -1217,8 +1271,8 @@ div.tooltip {
     	<div class="container">
 
     	<div class="first" style="width:300px;height:220px">
-			<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 30px;font-size:18px;"><strong>Foreground & background sample</strong></p>
-			<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px 60px">
+			<p style="margin: 0px 0px 0px 30px;"><strong>Foreground & background sample</strong></p>
+			<table cellpadding="10" style="margin: 10px 0px 0px 60px">
 			<col width="40px"/>
 			<col width="50px"/>
 			<col width="50px"/>
@@ -1250,8 +1304,8 @@ div.tooltip {
 		</div>
 
     	<div class="first" style="width:250px;height:220px">
-	    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 30px;font-size:18px;"><strong>Algorithm state</strong></p>
-			<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px 80px">
+	    	<p style="margin: 0px 0px 0px 30px;"><strong>Algorithm state</strong></p>
+			<table cellpadding="10" style="margin: 10px 0px 0px 80px">
 				<col width="40px"/>
 				<col width="80px"/>
 				<tr>
@@ -1267,9 +1321,9 @@ div.tooltip {
 
 
     	<div class="first" style="width:210px;height:220px">
-	    	<p class="w3-opacity w3-center" style="margin: 0px 0px 0px 10px;font-size:18px;"><strong>Attribution Values</strong></p>
+	    	<p style="margin: 0px 0px 0px 10px;"><strong>Attribution Values</strong></p>
 
-			<table class="w3-opacity" cellpadding="10" style="margin: 10px 0px 0px 10px">
+			<table cellpadding="10" style="margin: 10px 0px 0px 10px">
 		      <col width="60px"/>
 		      <col width="80px"/>
 				<thead>
@@ -1294,13 +1348,13 @@ div.tooltip {
 		</div>
 
 
-    	<input style="font-size:20px;" type="button" class="w3-button w3-green" value="<<" onclick="ex6_reset()">
-    	<input style="font-size:20px;" type="button" class="w3-button w3-green" value=">" onclick="dynamicStep()">
-    	<input style="font-size:20px;" type="button" class="w3-button w3-green" value=">>" onclick="dynamicRunAll()">
+    	<input type="button" class="w3-button w3-green" value="<<" onclick="ex6_reset()">
+    	<input type="button" class="w3-button w3-green" value=">" onclick="dynamicStep()">
+    	<input type="button" class="w3-button w3-green" value=">>" onclick="dynamicRunAll()">
 
     	<br><br>
 
-		<p class="w3-opacity w3-center" style="margin: 0px 0px 20px 0px;font-size:18px;" id="ex6_dynamic_step">Dynamic algorithm</p>
+		<p style="margin: 0px 0px 20px 0px;" id="ex6_dynamic_step">Dynamic algorithm</p>
 
 	</div>
 
@@ -1310,14 +1364,14 @@ div.tooltip {
 
 		<div style="padding-left:10px;padding-right:10px">
 
-			<p class="w3-justify"><a onclick="hideshow('pseudocode_dynamic')"><strong>DP Pseudocode (Click)</strong></a></a></p>
+			<p><a onclick="hideshow('pseudocode_dynamic')"><strong>DP Pseudocode (Click)</strong></a></a></p>
 
 			<!-- <div id="pseudocode_dynamic", style="display:none"> -->
 			<div id="pseudocode_dynamic" style="display:none">
-			<p class="no-margin w3-opacity w3-justify">
+			<p class="no-margin">
 				ITE_D(tree \(t\), array \(x^f\), array \(x^b\)):
 			</p>
-			<ul class="no-margin w3-opacity w3-justify">
+			<ul class="no-margin">
 				\(\phi=\) [0]*\(len(x)\) <br>
 
 				RECURSE(node \(n\), int \(S^c\), int \(N^c\), array \(x^f_a\), array \(x^b_a\)):
@@ -1363,22 +1417,25 @@ div.tooltip {
 		</div>
 	</div>
 
-    <p class="w3-opacity w3-justify">
+    <p>
 		The computational complexity to compute \(\phi_i(f,x,x^b)\) using the dynamic programming algorithm for all features is now just \(O(T_{numnodes})\) where \(T_{numnodes}\) is the number of nodes in the tree.  In <a href="#example6">Example 6</a> it is easy to see that each node now only requires a constant amount of work.  
 	</p>
 
-    <p class="w3-opacity w3-justify">
+    <p>
 		Finally, our original goal was to compute \(\phi_i(f,x)\).  We simply need to compute \(\phi_i(f,x,x^b)\) for many references, resulting in a run time of \(O(|D|T_{numnodes})\) where \(|D|\) is the number of samples in the background distribution.  In practice, using a fixed number of about 100 to 1000 references works well.
 	</p>
 
-    <h3 class="w3-justify" id="comparison_of_methods">2.4 Comparison of SHAP Methods</h3>
 
-    <p class="w3-opacity w3-justify">
+  <hr>
+
+    <h2 id="comparison_of_methods">Comparison of SHAP Methods</h3>
+
+    <p>
     	It should be noted that there are a number of alternative methods that aim to approximate SHAP values: Path Dependent Tree Explainer, Kernel Explainer, and Sampling Explainer.  If you are explaining tree-based models, it may not be clear which one you should use.  In this article we briefly overview the methods and compare them to ITE:
 	</p>
 
-    <p class="w3-opacity w3-justify">
-    	<ul class="w3-opacity w3-justify">
+    <p>
+    	<ul>
     		<li>Path Dependent Tree Explainer (PDTE): </li>
     		<ul>
     			<li>Like ITE, PDTE is also meant to obtain SHAP values for tree models.</li> 
@@ -1400,12 +1457,12 @@ div.tooltip {
     	</ul>
 	</p>
 
-    <p class="w3-opacity w3-justify">
+    <p>
 		For an in-depth empirical comparison of these methods, please refer to <a href="https://www.nature.com/articles/s42256-019-0138-9.epdf?shared_access_token=RCYPTVkiECUmc0CccSMgXtRgN0jAjWel9jnR3ZoTv0O81kV8DqPb2VXSseRmof0Pl8YSOZy4FHz5vMc3xsxcX6uT10EzEoWo7B-nZQAHJJvBYhQJTT1LnJmpsa48nlgUWrMkThFrEIvZstjQ7Xdc5g%3D%3D">our paper</a> (<a href="#lundberg2020fromlocal">Lundberg 2020</a>).
 	</p>	
 
 
-    <h2 class="w3-justify" id="references">References</h2>
+    <h2 id="references">References</h2>
     <ol class="w3-justify w3-opacity">
     	 <li id="rudin2019">Rudin, Cynthia. "Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead." Nature Machine Intelligence 1.5 (2019): 206-215.</li>
 
@@ -1432,9 +1489,9 @@ div.tooltip {
     	<li id="ribeiro2016lime">Ribeiro, Marco Tulio, Sameer Singh, and Carlos Guestrin. "'Why should i trust you?' Explaining the predictions of any classifier." Proceedings of the 22nd ACM SIGKDD international conference on knowledge discovery and data mining. 2016.</li>
     </ol>
 
-    <h2 class="w3-justify" id="references">Acknowledgements</h2>
+    <h2 id="references">Acknowledgements</h2>
 
-    <p class="w3-opacity w3-justify">This material is based upon work supported by the National Science Foundation Graduate Research Fellowship under Grant No. DGE-1762114.  Any opinion, findings, and conclusions or recommendations expressed in this material are those of the authors(s) and do not necessarily reflect the views of the National Science Foundation.</p>
+    <p>This material is based upon work supported by the National Science Foundation Graduate Research Fellowship under Grant No. DGE-1762114.  Any opinion, findings, and conclusions or recommendations expressed in this material are those of the authors(s) and do not necessarily reflect the views of the National Science Foundation.</p>
 
 	</div>
 
@@ -1442,10 +1499,6 @@ div.tooltip {
 
 </div>
 
-<!-- Footer -->
-<footer class="w3-container w3-padding-64 w3-center w3-opacity w3-light-grey w3-xlarge" style="margin-left:300px">
-  <i class="fa fa-linkedin w3-hover-opacity"></i>
-</footer>
 
 <!-- Figure 1 - Kaggle methods d3 bar plot -->
 <script src="kaggleMethods.js"></script>
@@ -1468,527 +1521,8 @@ div.tooltip {
 <!-- Example 5 - Naive tree algorithm -->
 <script src="naive_ex.js"></script>
 
-<!-- Example 6 - Naive tree algorithm -->
-<script>
-/////////////////////////////////////
-////// Example 6 Tree Diagram ///////
-/////////////////////////////////////
-var margin6 = {top: 0, right: 0, bottom: 0, left: 0},
-  width6 = 700 - margin6.right - margin6.left,
-  height6 = 350 - margin6.top - margin6.bottom;
-
-var tree6 = d3.layout.tree()
-  .size([height6, width6]);
-
-var diagonal6 = d3.svg.diagonal()
-  .projection(function(d) { return [d.x, d.y]; });
-
-var svg6 = d3.select("#ex6_divtree").append("svg")
-  .attr("width", width6 + margin6.right + margin6.left)
-  .attr("height", height6 + margin6.top + margin6.bottom)
-  .append("g")
-  .attr("transform", "translate(" + margin6.left + "," + margin6.top + ")");
-
-update6(treeData[0]);
-
-function update6(source) {
-	/* @desc Update tree SVG (doesn't seem to update text for some reason) */
-
-	// Compute the new tree layout.
-	var nodes = tree6.nodes(source).reverse(),
-	links = tree6.links(nodes);
-
-	// Normalize for fixed-depth.
-	nodes.forEach(function(d) { d.y = d.depth * 80 + 30; });
-	nodes.forEach(function(d) { d.x = d.x * 1.95; });
-
-	// Declare the nodes…
-	var node = svg6.selectAll("g.node")
-		.data(nodes, function(d) { return d.id || (d.id = ++i); });
-
-	// Enter the nodes.
-	var nodeEnter = node.enter().append("g")
-		.attr("class", "node")
-		.attr("transform", function(d) { 
-		  return "translate(" + d.x + "," + d.y + ")"; })
-
-	nodeEnter.append("circle")
-		.attr("r", 10)
-		.style("fill", "#fff")
-
-	nodeEnter.append("text")
-		.attr("y", function(d) { 
-		  return d.children || d._children ? 0 : 20; })
-		.attr("x", function(d) { 
-		  return d.children || d._children ? 15 : 0; })
-		.attr("dy", ".35em")
-		.attr("text-anchor", function(d) {
-			if (d.name.startsWith("Leaf")) {
-				return "middle"
-			}
-		})
-	.text(function(d) { 
-		if (d.name.startsWith("Leaf")) {
-			return d.value;
-		} else {
-			return d.variable + ">" + d.threshold;   
-		}
-	})
-	.style("font-family", "courier")
-	.style("font-size", "16px")
-	.style("fill-opacity", 1);
-
-	// Declare the links…
-	var link = svg6.selectAll("path.link")
-	.data(links, function(d) { return d.target.id; });
-
-	// Enter the links.
-	link.enter().insert("path", "g")
-	.attr("class", "link")
-	.attr("d", diagonal);
-}
-
-/////////////////////////////////////////
-////// Example 6 dynamic tree algo //////
-/////////////////////////////////////////
-function add_pn_text(n_name,txt,is_pos) {
-	var node = svg6.selectAll("g.node");
-
-	node.append("text")
-		.attr("y", function(d) { 
-			if (d.name.includes("Leaf")) {
-				if (is_pos) {
-					return(-10);
-				} else {
-					return(10);
-				}
-			} else {
-				if (is_pos) {
-					return(-10);
-				} else {
-					return(10);
-				}
-			}})
-		.attr("x", function(d) { 
-			if (d.name.includes("Leaf")) {
-				if ([1,3,5,7].includes(Number(d.name[4]))) {
-					return(-18);
-				} else {
-					return(18);
-				}
-			} else {
-				return(-18);
-			}})
-		.attr("dy", ".35em")
-		.attr("text-anchor", function(d) {
-			if (d.name.startsWith("Leaf")) {
-				if ([1,3,5,7].includes(Number(d.name[4]))) {
-					return "end"
-				} else {
-					return "start"
-				}
-			} else {
-				return "end"
-			}
-		})
-		.text(function(d) { 
-			if (d.name == n_name) {
-				return round(txt,2);
-			}
-		})
-		.style("font-family", "courier")
-		.style("font-size", "16px")
-		.style("fill", function(d) {
-			if (is_pos) {
-				return("green");
-			} else {
-				return("red");
-			}
-		})
-		.style("fill-opacity", 1);
-}
-
-function ex6_reset_tree() {
-	var nodes = tree6.nodes(treeData[0]).reverse(), links = tree6.links(nodes);
-	var link = svg6.selectAll("path.link").data(links, 
-		function(d) { return d.target.id; });
-
-	// Update colors
-	link[0].forEach(function(d) {
-		var stroke = document.createAttribute("stroke");
-		d.attributes.setNamedItem(stroke);
-	});
-}
-
-function ex6_color_tree(s_t_pairs, colors) {
-	var nodes = tree6.nodes(treeData[0]).reverse(), links = tree6.links(nodes);
-	var link = svg6.selectAll("path.link").data(links, 
-		function(d) { return d.target.id; });
-
-	// Color the appropriate pairs
-	for (var j=0; j<s_t_pairs.length; j++) {
-		s_t_pair = s_t_pairs[j];
-		color    = colors[j]
-
-		// Update colors
-		link[0].forEach(function(d) {
-			var d2 = d.__data__;
-			is_source = (d2.source.name == s_t_pair[0].name)
-			is_target = (d2.target.name == s_t_pair[1].name)
-			if (is_source & is_target) {
-				var stroke = document.createAttribute("stroke");
-				stroke.value = color;
-				d.attributes.setNamedItem(stroke);				
-			}
-		});
-	}
-}
-
-var newColor = "rgb(210, 180, 222)";
-
-function ex6_reset_all_node_colors() {
-	var nodes = svg6.selectAll("g.node");
-	nodes[0].forEach(function (d) {
-		oldHTML = d.innerHTML;
-		if (oldHTML.includes(newColor)) {
-			splitHTML = oldHTML.split(newColor);
-			prefix = splitHTML[0];
-			suffix = splitHTML[1];
-			newHTML = prefix + "rgb(255, 255, 255)" + suffix;
-			d.innerHTML = newHTML;			
-		}
-	})
-}
-
-function ex6_reset_node_color(node_name) {
-	var nodes = svg6.selectAll("g.node");
-	nodes[0].forEach(function (d) {
-		if (d.__data__["name"] == node_name) {
-			oldHTML = d.innerHTML;
-			if (oldHTML.includes(newColor)) {
-				splitHTML = oldHTML.split(newColor);
-				prefix = splitHTML[0];
-				suffix = splitHTML[1];
-				newHTML = prefix + "rgb(255, 255, 255)" + suffix;
-				d.innerHTML = newHTML;
-			}
-		}
-	})
-}
-
-function ex6_change_node_color(node_name) {
-	var nodes = svg6.selectAll("g.node");
-	nodes[0].forEach(function (d) {
-		if (d.__data__["name"] == node_name) {
-			oldHTML = d.innerHTML;
-			if (oldHTML.includes("rgb(255, 255, 255)")) {
-				splitHTML = oldHTML.split("rgb(255, 255, 255)");
-				prefix = splitHTML[0];
-				suffix = splitHTML[1];
-				newHTML = prefix + newColor + suffix;
-				d.innerHTML = newHTML;
-			}
-		}
-	})
-}
-
-function ex6_update_str(str) {
-	document.getElementById("ex6_dynamic_step").innerHTML = str;
-}
-
-function ex6_update_nc_sc() {
-	document.getElementById("ex6_sc").innerHTML = sp_lst6.length;
-	document.getElementById("ex6_nc").innerHTML = np_lst6.length;
-}
-
-function ex6_update_phi() {
-	for (var i = 0; i < ex6_phi.length; i++) {
-		document.getElementById("ex6_phi"+(i+1)+"_val").innerHTML = round(ex6_phi[i],3);
-	}
-}
-
-function ex6_update_h() {
-	for (var i = 0; i < h6.length; i++) {
-		if (h6[i] == "none") {
-			document.getElementById("ex6_h"+(i+1)).innerHTML = "";
-		} else {
-			document.getElementById("ex6_h"+(i+1)).innerHTML = h6[i];
-		}
-	}
-}
-
-function fact6(x) {
-	if (x == 0) {
-		return(1);
-	} else if (x == 1) {
-		return(1);
-	} else if (x == 2) {
-		return(2);
-	} else if (x == 3) {
-		return(6);
-	} else if (x == 4) {
-		return(24);
-	}
-}
-
-function compute_W(s_len, n_len) {
-	var num = fact6(s_len) * fact6(n_len-s_len-1);
-	var den = fact6(n_len);
-	return(num/den);
-}
-
-function ex6_reset() {
-	// Reset variables
-	ex6_is_initialize = true;
-	ex6_phi = [0,0,0];
-	nextnodes6 = [];
-	nodesseen6 = [];
-	np_lst6 = [];
-	sp_lst6 = [];
-	h6 = ["none", "none", "none"];
-	h_dict6 = {};
-	h_dict6[treeData[0].name] = h6;
-	np_dict6 = {};
-	sp_dict6 = {};
-	np_dict6[treeData[0].name] = [];
-	sp_dict6[treeData[0].name] = [];
-	nc6 = 0;
-	sc6 = 0;
-	nc_dict6 = {};
-	sc_dict6 = {};
-	nc_dict6[treeData[0].name] = 0;
-	sc_dict6[treeData[0].name] = 0;
-	pos_dict6 = {};
-	neg_dict6 = {};
-
-	ex6_update_str("Dynamic Algorithm");
-	ex6_update_nc_sc();
-	ex6_update_phi();
-	ex6_update_h();
-
-	// Reset tree
-	ex6_reset_all_node_colors();
-	ex6_reset_tree();
-
-	// Update text
-	svg6.selectAll("g.node").remove();
-	update6(treeData[0]);
-}
-
-var ex6_is_initialize = true;
-var ex6_phi = [0,0,0];
-var currnode6;
-var nextnodes6 = [];
-var nodesseen6 = [];
-var h6 = ["none", "none", "none"];
-var h_dict6 = {};
-h_dict6[treeData[0].name] = h6;
-var np_lst6 = [];
-var sp_lst6 = [];
-var np_dict6 = {};
-var sp_dict6 = {};
-np_dict6[treeData[0].name] = [];
-sp_dict6[treeData[0].name] = [];
-var nc6 = 0;
-var sc6 = 0;
-var nc_dict6 = {};
-var sc_dict6 = {};
-nc_dict6[treeData[0].name] = 0;
-sc_dict6[treeData[0].name] = 0;
-var pos_dict6 = {};
-var neg_dict6 = {};
-
-ex6_update_nc_sc();
-ex6_update_phi();
-nextnodes6.push(treeData[0]);
-
-function dynamicRunAll() {
-	for (var i = 0; i < 20; i++) {
-		dynamicStep();
-	}
-}
-
-function dynamicStep() {
-	// if (ex6_is_initialize) {
-	// 	ex6_update_str('<strong>Case 0</strong>: Initialize');
-	// 	ex6_update_nc_sc();
-	// 	ex6_update_phi();
-
-	// 	ex6_is_initialize = false;
-	// 	nextnodes6.push(treeData[0]);
-	// 	return(1);
-	// }
-
-	if (nextnodes6.length == 0) {
-		return(1);
-	}
-
-	if (currnode6) {
-		ex6_reset_node_color(currnode6["name"]);
-	}
-	currnode6 = nextnodes6.pop();
-	var nodename = currnode6["name"];
-	ex6_change_node_color(nodename);
-
-	np_lst6 = np_dict6[nodename];
-	sp_lst6 = sp_dict6[nodename];
-	h6 = h_dict6[nodename];
-
-	ex6_update_nc_sc();
-	ex6_update_h();
-
-	// Case 1: at a leaf
-	if (currnode6["name"].includes("Leaf")) {
-		var value = currnode6["value"];
-		if (sp_lst6.length == 0) {
-			pos_dict6[nodename] = 0;
-		} else {
-			currW  = compute_W(sp_lst6.length-1, np_lst6.length);
-			pos_dict6[nodename] = currW*value;
-		}
-		if (sp_lst6.length == np_lst6.length) {
-			neg_dict6[nodename] = 0;
-		} else {
-			currW  = compute_W(sp_lst6.length, np_lst6.length);
-			neg_dict6[nodename] = -currW*value;
-		}
-		add_pn_text(nodename,pos_dict6[nodename],true);
-		add_pn_text(nodename,neg_dict6[nodename],false);
-		return(1);
-	}
-
-	// Case 2-4: Internal node
-	// Color both children of node
-	n_thres = Number(currnode6["threshold"]);
-	n_var   = Number(currnode6["variable"][1])-1;
-	fxval   = foregroundx[n_var];
-	bxval   = backgroundx[n_var];
-
-	// Determine where foreground/background goes
-	var lchild = currnode6["children"][0];
-	var rchild = currnode6["children"][1];
-
-    var fleft = false;
-    var bleft = false;
-
-	if (fxval <= n_thres) {
-		fleft  = true;
-		fchild = lchild;
-	} else {
-		fchild = rchild;
-	}
-
-	if (bxval <= n_thres) {
-		bleft  = true;
-		bchild = lchild;
-	} else {
-		bchild = rchild;
-	}
-
-	// Color the children of the current node
-	var s_t_pairs = [];
-	var colors = [];
-
-	if (np_lst6.includes(currnode6.variable)) {
-		ex6_update_str('<strong>Case 2</strong>: Previously seen feature');
-		if (sp_lst6.includes(n_var)) {
-			s_t_pairs.push([currnode6,fchild]);
-			colors.push("#b3de69");
-			if (!nodesseen6.includes(currnode6)) {
-				nextnodes6.push(currnode6);
-				nextnodes6.push(fchild);
-				np_dict6[bchild.name] = np_lst6;
-				sp_dict6[bchild.name] = sp_lst6;
-				h_dict6[bchild.name]  = h6;
-			}
-			// Update pos/neg
-			if ((fchild.name in pos_dict6) & (fchild.name in neg_dict6)) {
-				pos_dict6[nodename] = pos_dict6[fchild.name];
-				neg_dict6[nodename] = neg_dict6[fchild.name];
-				add_pn_text(nodename,pos_dict6[nodename],true);
-				add_pn_text(nodename,neg_dict6[nodename],false);
-			}
-		} else {
-			s_t_pairs.push([currnode6,bchild]);
-			colors.push("#fb8072");
-			if (!nodesseen6.includes(currnode6)) {
-				nextnodes6.push(currnode6);
-				nextnodes6.push(bchild);
-				np_dict6[bchild.name] = np_lst6;
-				sp_dict6[bchild.name] = sp_lst6;
-				h_dict6[bchild.name]  = h6;
-			}
-			// Update pos/neg
-			if ((bchild.name in pos_dict6) & (bchild.name in neg_dict6)) {
-				pos_dict6[nodename] = pos_dict6[bchild.name];
-				neg_dict6[nodename] = neg_dict6[bchild.name];
-				add_pn_text(nodename,pos_dict6[nodename],true);
-				add_pn_text(nodename,neg_dict6[nodename],false);				
-			}
-		}
-	} else if (fchild == bchild) {
-		ex6_update_str('<strong>Case 3</strong>: Foreground and background match');
-		s_t_pairs.push([currnode6,fchild]);
-		colors.push("#80b1d3");
-		// Update np/sp
-		if (!nodesseen6.includes(currnode6)) {
-			np_dict6[bchild.name] = np_lst6;
-			sp_dict6[bchild.name] = sp_lst6;
-			h_dict6[bchild.name]  = h6;
-			nextnodes6.push(currnode6);
-			nextnodes6.push(fchild);
-		}
-		// Update pos/neg
-		if ((bchild.name in pos_dict6) & (bchild.name in neg_dict6)) {
-			pos_dict6[nodename] = pos_dict6[bchild.name];
-			neg_dict6[nodename] = neg_dict6[bchild.name];
-			add_pn_text(nodename,pos_dict6[nodename],true);
-			add_pn_text(nodename,neg_dict6[nodename],false);
-		}
-	} else {
-		ex6_update_str('<strong>Case 4</strong>: Foreground and background differ');
-		s_t_pairs.push([currnode6,fchild]);
-		colors.push("#b3de69");
-
-		s_t_pairs.push([currnode6,bchild]);
-		colors.push("#fb8072");
-
-		if (!nodesseen6.includes(currnode6)) {
-			np_dict6[fchild.name] = np_lst6.concat([currnode6.variable]);
-			sp_dict6[fchild.name] = sp_lst6.concat([currnode6.variable]);
-
-			var h2 = h6.slice();
-			h2[n_var] = foregroundx[n_var];
-			h_dict6[fchild.name]  = h2;
-
-			np_dict6[bchild.name] = np_lst6.concat([currnode6.variable]);
-			sp_dict6[bchild.name] = sp_lst6;
-
-			var h3 = h6.slice();
-			h3[n_var] = backgroundx[n_var];
-			h_dict6[bchild.name]  = h3;
-
-			nextnodes6.push(currnode6);
-			nextnodes6.push(rchild);
-			nextnodes6.push(lchild);
-		}
-
-		// Update phi
-		if ((lchild.name in pos_dict6) & (lchild.name in neg_dict6) &
-			(rchild.name in pos_dict6) & (rchild.name in neg_dict6)) {
-			ex6_phi[n_var] = ex6_phi[n_var] + pos_dict6[fchild.name] + neg_dict6[bchild.name];
-			pos_dict6[nodename] = pos_dict6[lchild.name] + pos_dict6[rchild.name];
-			neg_dict6[nodename] = neg_dict6[lchild.name] + neg_dict6[rchild.name];
-			add_pn_text(nodename,pos_dict6[nodename],true);
-			add_pn_text(nodename,neg_dict6[nodename],false);
-			ex6_update_phi();
-		}
-	}
-
-	ex6_color_tree(s_t_pairs, colors);
-	nodesseen6.push(currnode6);
-}
-</script>
+<!-- Example 6 - DP tree algorithm -->
+<script src="dp_ex.js"></script>
 
 <script>
 function hideshow(type) {
@@ -2001,6 +1535,15 @@ function hideshow(type) {
 }
 </script>
 
+<d-appendix>
+  <d-footnote-list></d-footnote-list>
+  <d-citation-list></d-citation-list>
+</d-appendix>
+
+<d-bibliography src="bibliography.bib"></d-bibliography>
+
+
+<script src="https://distill.pub/template.v2.js"></script>
 
 </body>
 </html>
