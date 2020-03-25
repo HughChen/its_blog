@@ -73,7 +73,7 @@ var treeData = JSON.parse(JSON.stringify(treeData0));
 
 //// Generate the tree diagram ////
 var margin = {top: 0, right: 10, bottom: 10, left: 10},
-  width = 680 - margin.right - margin.left,
+  width = 400 - margin.right - margin.left,
   height = 350 - margin.top - margin.bottom;
 
 var tree = d3.layout.tree()
@@ -310,7 +310,7 @@ function update(source) {
 
   // Normalize for fixed-depth.
   nodes.forEach(function(d) { d.y = d.depth * 80 + 20; });
-  nodes.forEach(function(d) { d.x = d.x*1.3 + 100; });
+  nodes.forEach(function(d) { d.x = d.x*1.2 - 25; });
 
   // Declare the nodes…
   var i = 0;
@@ -329,14 +329,14 @@ function update(source) {
         d3.select(this).style("cursor", "default"); });
 
   nodeEnter.append("circle")
-    .attr("r", 15)
+    .attr("r", 12)
     .style("fill", "#fff");
 
   nodeEnter.append("text")
     .attr("y", function(d) { 
-      return d.children || d._children ? 0 : 30; })
+      return d.children || d._children ? 0 : 25; })
     .attr("x", function(d) { 
-      return d.children || d._children ? 20 : 0; })
+      return d.children || d._children ? 18 : 0; })
     .attr("dy", ".35em")
     .attr("text-anchor", function(d) {
       if (d.name.startsWith("Leaf")) {
@@ -351,7 +351,7 @@ function update(source) {
       }
     })
     .style("font-family", "courier")
-    .style("font-size", "18px")
+    .style("font-size", "14px")
     .style("fill-opacity", 1);
 
   // Declare the links…
@@ -406,6 +406,7 @@ var curr_node;
 
 // Toggle children on click.
 function click(d) {
+  console.log("Click");
   curr_node = d;
   if (d.name.startsWith("Leaf")) {
     update_leaf_tooltip(d.value, true);
