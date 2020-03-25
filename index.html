@@ -281,7 +281,7 @@ svg .rect {
   </figure>
 
     <p>
-    In order to explain these models, we use Shapley values - a unique game-theoretic solution for spreading credit between features.  First, we discuss SHAP values, an extension of Shapley values to machine learning models (<a href="#background">Section 1</a>).  However, exactly computing SHAP values for an arbitrary model is NP-hard (<a href="#matsui2001NP">Matsui et. al. 2001</a>), but by focusing on explaining tree models, it is possible to compute them exactly in linear time (<a href="#algorithm">Section 2</a>).
+    In order to explain these models, we use Shapley values - a unique game-theoretic solution for spreading credit between features.  First, we discuss SHAP values, an extension of Shapley values to machine learning models (<a href="#background">Section 1</a>).  However, exactly computing SHAP values for an arbitrary model is NP-hard <d-cite bibtex-key="matsui2001np"></d-cite>, but by focusing on explaining tree models, it is possible to compute them exactly in linear time (<a href="#algorithm">Section 2</a>).
     </p>
 
     <!-- <h3 id="motivation">Motivation</h3> -->
@@ -289,7 +289,7 @@ svg .rect {
     <i>What is the goal of this article?</i> 
 
     <p>
-    Given that there is a long history of model explanations going awry when users do not understand what an explanation means (e.g., p-values for linear models (<a href="#schervish1996">Schervish 1996</a>)), it is critical to have a broadly accessible explanation of SHAP values and how they are obtained for tree models to ensure that they are not misused.  To this end, we aim to provide an easily accessible answer to two questions: 1.) What are SHAP values?  2.) How can we obtain SHAP values for trees?  In particular, we focus on explaining an algorithm that was empirically evaluated in <a href="#lundberg2020fromlocal">Lundberg (2020)</a>.
+    Given that there is a long history of model explanations going awry when users do not understand what an explanation means (e.g., p-values for linear models <d-cite bibtex-key="schervish1996p"></d-cite>), it is critical to have a broadly accessible explanation of SHAP values and how they are obtained for tree models to ensure that they are not misused.  To this end, we aim to provide an easily accessible answer to two questions: 1.) What are SHAP values?  2.) How can we obtain SHAP values for trees?  In particular, we focus on explaining an algorithm that was empirically evaluated in <d-cite bibtex-key="lundberg2020local"></d-cite>.
   </p>
   </div>
 
@@ -419,7 +419,7 @@ svg .rect {
 	</figure>
 
 	<p>
-    	The Shapley values consider how much an individual increases profit when they work together with all other possible teams.  Furthermore, they are a unique solution to spreading credit as defined by several desirable properties (<a href="#young_uniquesol">Young 1985</a>) (all of which hold for any coalitional game, as can be seen in <a href="#shapley_value_ex">Figure 2</a>):
+    	The Shapley values consider how much an individual increases profit when they work together with all other possible teams.  Furthermore, they are a unique solution to spreading credit as defined by several desirable properties <d-cite bibtex-key="young1985monotonic"></d-cite> (all of which hold for any coalitional game, as can be seen in <a href="#shapley_value_ex">Figure 2</a>):
     	<ul>
     		<li>Local Accuracy/Efficiency: The sum of Shapley values for all employees adds up to the profit with all employees minus the profit with no employees:</li>
 	    		$$
@@ -437,7 +437,7 @@ svg .rect {
     </p>
 
 	<p>
-    	<a href="#lundberg_unified">Lundberg and Lee (2017)</a> extend Shapley values to explain ML models (<a href="#shap_values">Section 1.2</a>).
+    	In <d-cite bibtex-key="lundberg2017unified"></d-cite>, Lundberg and Lee extend Shapley values to explain ML models (<a href="#shap_values">Section 1.2</a>).
     </p>
 
 
@@ -471,7 +471,7 @@ svg .rect {
     	$$
     	v(S)=\mathbb{E}_D[f(x)|\text{do}(x_{S})]
     	$$
-    	The <i>do</i> notation is Judea Pearl's <i>do</i>-operator (<a href="pearl_2000_causality">Pearl 2000</a>).  In words, we break the dependence between the features in \(S\) and the remaining features, which is analogous to <i>intervening</i> on the remaining features (more on this in <a href="#background_distribution">Section 1.3</a>).  The motivation behind this decision comes from <a href="#janzing2019feature">Janzing et. al. (2019)</a> which is also very close to Random Baseline Shapley in <a href="#sundararajan2019many">Sundararajan et. al. (2019)</a>).  Additionally, this is exactly the assumption made by <a href="https://shap.readthedocs.io/en/latest/#shap.KernelExplainer">Kernel Explainer</a> and <a href="https://shap.readthedocs.io/en/latest/#shap.SamplingExplainer">Sampling Explainer</a> from the SHAP package.
+    	The <i>do</i> notation is Judea Pearl's <i>do</i>-operator <d-cite bibtex-key="pearl_2000_causality"></d-cite>.  In words, we break the dependence between the features in \(S\) and the remaining features, which is analogous to <i>intervening</i> on the remaining features (more on this in <a href="#background_distribution">Section 1.3</a>).  The motivation behind this decision comes from <d-cite bibtex-key="janzing2019feature"></d-cite> which is also very close to Random Baseline Shapley in <d-cite bibtex-key="sundararajan2019many"></d-cite>.  Additionally, this is exactly the assumption made by <a href="https://shap.readthedocs.io/en/latest/#shap.KernelExplainer">Kernel Explainer</a> and <a href="https://shap.readthedocs.io/en/latest/#shap.SamplingExplainer">Sampling Explainer</a> from the SHAP package.
     </p>
 
     <!-- Figure 3 -->
@@ -683,7 +683,7 @@ svg .rect {
 	</p>
 
 	<p>
-		One natural definition of the background distribution is a uniform distribution over a population sample.  For instance, in machine learning, you could assign equal probability to every sample in your training set.  With this background distribution, we can re-write the SHAP value as an average of <i>single reference SHAP values</i> (<a href="#chen2019explaining">Chen et. al. 2019</a>):
+		One natural definition of the background distribution is a uniform distribution over a population sample.  For instance, in machine learning, you could assign equal probability to every sample in your training set.  With this background distribution, we can re-write the SHAP value as an average of <i>single reference SHAP values</i> <d-cite bibtex-key="chen2019explaining"></d-cite>:
 		$$
 		\phi_i(f,x^f)=\frac{1}{|D|}\sum_{x^b\in D}\phi_i(f,x^f,x^b)
 		$$
@@ -1445,49 +1445,21 @@ svg .rect {
     		<li>Sampling Explainer:</li>
     		<ul>
     			<li>A model agnostic approach to obtain SHAP values.</li>
-    			<li>An extension of Interactions-based Method for Explanation (IME) (<a href="#Strumbelj2010efficientexplanations">Strumbelj and Kononenko 2010</a>).</li> 
+    			<li>An extension of Interactions-based Method for Explanation (IME) <d-cite bibtex-key="kononenko2010efficient"></d-cite>.</li> 
     			<li>This approach is sampling based and converges to the SHAP values ITE obtains, but in practice is much slower than ITE.</li>
     		</ul>    		
-    		<li>Kernel Explainer (<a href="#lundberg_unified">Lundberg 2019</a>):</li>
+    		<li>Kernel Explainer <d-cite bibtex-key="lundberg2017unified"></d-cite>:</li>
     		<ul>
     			<li>A model agnostic approach to obtain SHAP values.</li>
-    			<li>An extension of Local Interpretable Model-agnostic Explanations (LIME) (<a href="#ribeiro2016lime">Ribeiro et. al. 2016</a>).</li> 
+    			<li>An extension of Local Interpretable Model-agnostic Explanations (LIME) <d-cite bibtex-key="ribeiro2016should"></d-cite>.</li> 
     			<li>This approach is sampling based and converges to the SHAP values ITE obtains, but in practice is much slower than ITE.</li>
     		</ul>
     	</ul>
 	</p>
 
     <p>
-		For an in-depth empirical comparison of these methods, please refer to <a href="https://www.nature.com/articles/s42256-019-0138-9.epdf?shared_access_token=RCYPTVkiECUmc0CccSMgXtRgN0jAjWel9jnR3ZoTv0O81kV8DqPb2VXSseRmof0Pl8YSOZy4FHz5vMc3xsxcX6uT10EzEoWo7B-nZQAHJJvBYhQJTT1LnJmpsa48nlgUWrMkThFrEIvZstjQ7Xdc5g%3D%3D">our paper</a> (<a href="#lundberg2020fromlocal">Lundberg 2020</a>).
+		For an in-depth empirical comparison of some of these methods, please refer to <d-cite bibtex-key="lundberg2020local"></d-cite>.
 	</p>	
-
-
-    <h2 id="references">References</h2>
-    <ol class="w3-justify w3-opacity">
-    	 <li id="rudin2019">Rudin, Cynthia. "Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead." Nature Machine Intelligence 1.5 (2019): 206-215.</li>
-
-      <li id="matsui2001NP">Matsui, Yasuko, and Tomomi Matsui. "NP-completeness for calculating power indices of weighted majority games." Theoretical Computer Science 263.1-2 (2001): 305-310.</li>
-
-      <li id="lundberg2020fromlocal">Lundberg, Scott M., et al. "From local explanations to global understanding with explainable AI for trees." Nature Machine Intelligence (2020)</li>
-
-      <li id="schervish1996">Schervish, Mark J. "P values: what they are and what they are not." The American Statistician 50.3 (1996): 203-206.</li>
-
-    	<li id="young_uniquesol">Young, H. Peyton. "Monotonic solutions of cooperative games." International Journal of Game Theory 14.2 (1985): 65-72.</li>
-
-    	<li id="lundberg_unified">Lundberg, Scott M., and Su-In Lee. "A unified approach to interpreting model predictions." Advances in neural information processing systems. 2017.</li>
-
-    	<li id="pearl_2000_causality">Pearl, Judea. Causality. Cambridge university press, 2009.</li>
-
-    	<li id="janzing2019feature">Janzing, Dominik, Lenon Minorics, and Patrick Blöbaum. "Feature relevance quantification in explainable AI: A causality problem." arXiv preprint arXiv:1910.13413 (2019).</li>
-
-    	<li id="sundararajan2019many">Sundararajan, Mukund, and Amir Najmi. "The many Shapley values for model explanation." arXiv preprint arXiv:1908.08474 (2019).</li>
-
-    	<li id="chen2019explaining">Chen, Hugh, Scott Lundberg, and Su-In Lee. "Explaining Models by Propagating Shapley Values of Local Components." arXiv preprint arXiv:1911.11888 (2019).</li>
-
-    	<li id="Strumbelj2010efficientexplanations">Strumbelj, Erik and Kononenko, Igor. "An efficient explanation of individual classifications using game theory." Journal of Machine Learning Research 11.Jan (2010): 1-18.</li>
-
-    	<li id="ribeiro2016lime">Ribeiro, Marco Tulio, Sameer Singh, and Carlos Guestrin. "'Why should i trust you?' Explaining the predictions of any classifier." Proceedings of the 22nd ACM SIGKDD international conference on knowledge discovery and data mining. 2016.</li>
-    </ol>
 
     <h2 id="references">Acknowledgements</h2>
 
