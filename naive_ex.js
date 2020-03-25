@@ -227,7 +227,7 @@ function ex5_reset() {
 	np_dict[treeData[0].name] = [];
 	sp_dict[treeData[0].name] = [];
 
-	ex5_update_str("Naive Algorithm");
+	ex5_update_str("Naive algorithm");
 	ex5_update_np_sp();
 	ex5_update_phi();
 	ex5_update_h();
@@ -255,6 +255,9 @@ var np_dict = {};
 var sp_dict = {};
 np_dict[treeData[0].name] = [];
 sp_dict[treeData[0].name] = [];
+ex5_update_np_sp();
+ex5_update_phi();
+nextnodes.push(treeData[0]);
 
 function naiveRunAll() {
 	for (var i = 0; i < 20; i++) {
@@ -263,15 +266,6 @@ function naiveRunAll() {
 }
 
 function naiveStep() {
-	if (is_initialize) {
-		ex5_update_str('<strong>Case 0</strong>: Initialize');
-		ex5_update_np_sp();
-		ex5_update_phi();
-
-		is_initialize = false;
-		nextnodes.push(treeData[0]);
-		return(1);
-	}
 
 	if (nextnodes.length == 0) {
 		return(1);
