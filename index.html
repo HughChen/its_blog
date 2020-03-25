@@ -217,7 +217,7 @@ div.tooltip {
   <div class="w3-display-container w3-center">
     <img src="images/trees.jpg" style="width:100%">
     <div class="w3-display-bottommiddle w3-container w3-text-white w3-hide-small">
-      <h2><strong>An Exact Linear Time Algorithm to <br>Compute Shapley values for Trees</strong></h2>
+      <h2><strong>A fast and exact game-theoretic algorithm to explain trees</strong></h2>
       <!-- <h2>Exact game-theoretic explanations of trees in linear time</h2> -->
       <h2>Hugh Chen</h2>
     </div>
@@ -227,7 +227,7 @@ div.tooltip {
   <div class="w3-container w3-content w3-center w3-padding-16" style="max-width:800px" id="abstract">
     <h2 class="w3-justify" id="introduction">Introduction</h2>
     <p class="w3-opacity w3-justify">
-      Nowadays, machine learning (ML) is widespread.  In particular, trees are one of the most popular ML model classes.  In a recent survey of data scientists and researchers, tree models were both the second and third most popular class of method, beaten only by Logistic Regression (Figure 1).  Although small tree models can be interpretable (<a href="#rudin2019">Rudin 2019</a>), most tree models are generally large and hard for humans to interpret.  
+      Nowadays, machine learning (ML) is widespread.  In this field, one of the most prolific class ML models are trees.  As evidence, a recent survey of data scientists and researchers found that tree models were both the second and third most popular class of method, beaten only by Logistic Regression (Figure 1).  Although small tree models can be interpretable (<a href="#rudin2019">Rudin 2019</a>), most tree models are generally large and hard for humans to interpret.  
     </p>
 
 	<div id="table_container" style="overflow-x:auto;align:center;">
@@ -236,16 +236,15 @@ div.tooltip {
 	</div>
 
     <p class="w3-opacity w3-justify">
-    In order to rigorously explain these models, we turn to Shapley values (a unique game-theoretic solution for spreading credit between features).  Then, we discuss an extension of Shapley values to machine learning models (SHAP values) and trade-offs of different versions of SHAP values (Section 1).  Finally, computing SHAP values exactly is NP-hard (<a href="#matsui2001NP">Matsui et. al. 2001</a>), but by focusing on explaining trees, we can devise an exact linear time algorithm for obtaining SHAP values (Section 2).
+    In order to explain these models, we use Shapley values - a unique game-theoretic solution for spreading credit between features.  First, we discuss SHAP values, an extension of Shapley values to machine learning models (<a href="#background">Section 1</a>).  However, exactly computing SHAP values for an arbitrary model is NP-hard (<a href="#matsui2001NP">Matsui et. al. 2001</a>), but by focusing on explaining tree models, it is possible to compute them exactly in linear time (<a href="#algorithm">Section 2</a>).
     </p>
 
-    <h3 class="w3-justify" id="motivation">Motivation</h3>
+    <!-- <h3 class="w3-justify" id="motivation">Motivation</h3> -->
     <p class="w3-opacity w3-justify">
-    The goal of this article is to explain an algorithm we developed called Interventional Tree Explainer (ITE) that is currently the default algorithm for explaining trees in the popular SHAP package. ITE is introduced in <a href="#lundberg2020fromlocal">Lundberg et. al. 2020</a>; however, it is a complicated algorithm we did not have room to fully explain in the paper.  
-  </p>
+    <i>What is the goal of this article?</i> 
 
     <p class="w3-opacity w3-justify">
-    Given that there is a long history of model explanations going awry when users do not understand what an explanation means (e.g., p-values for linear models (<a href="#schervish1996">Schervish 1996</a>)), it is extremely important to have a broadly accessible explanation of SHAP values and how they are obtained for tree models to ensure that people do not misuse them.
+    Given that there is a long history of model explanations going awry when users do not understand what an explanation means (e.g., p-values for linear models (<a href="#schervish1996">Schervish 1996</a>)), it is critical to have a broadly accessible explanation of SHAP values and how they are obtained for tree models to ensure that they are not misused.  To this end, we aim to provide an easily accessible answer to two questions: 1.) What are SHAP values?  2.) How can we obtain SHAP values for trees?  In particular, we focus on explaining an algorithm that was empirically evaluated in <a href="#lundberg2020fromlocal">Lundberg (2020)</a>.
   </p>
   </div>
 
@@ -254,16 +253,15 @@ div.tooltip {
   <div class="w3-container w3-content w3-center w3-padding-16" style="max-width:800px">
     <h2 class="w3-justify" id="background">1. Background</h2>
     
-    <!-- <h3 class="w3-justify" id="trees_popular">1.1 Tree models are popular</h3>
-	<p class="w3-opacity w3-justify">
-    	Why do we even care about explaining trees?
-    </p> -->
+    <p class="w3-opacity w3-justify">
+ 	   In this section, we describe Shapley values and a few versions that have been used to explain machine learning models.  Then, we use a linear model example to justify a specific extension of the Shapley values.  With this formulation, we show how obtaining the SHAP values reduces to a average over so-called single reference SHAP values that can be thought of as explanations with respect to a single foreground sample (explicand) and a single background sample (reference).
+	</p>
 
 
     <!-- What are Shapley Values? -->
     <h3 class="w3-justify" id="shapley_values">1.1 Shapley values</h3>
 	<p class="w3-opacity w3-justify">
-    	Shapley values are a concept from cooperative game theory that spreads credit among players in a coalitional game.  We can define the players to be a set \(N=\{1,\cdots,d\}\).  Then, the game is a function that maps the players (\(N\)) to a scalar value:
+    	Shapley values are a method to spread credit among players in a "coalitional game".  We can define the players to be a set \(N=\{1,\cdots,d\}\).  Then, the coalitional game is a function that maps subsets of the players to a scalar value:
 
     	$$
     	v(S):2^N\to\mathbb{R}^1
@@ -276,11 +274,11 @@ div.tooltip {
     	$$
     	\overbrace{\phi_i(v)}^{\text{Shapley value of }i}=\sum_{S\subseteq N\setminus\{i\}}\underbrace{\frac{|S|!(|N|-|S|-1)!}{|N|!}}_{\text{Weight }W(|S|,|N|)}(\overbrace{v(S\cup\{i\})-v(S)}^{\text{Profit individual }i\text{ adds}})
     	$$
-
+    	<a href="#example1">Example 1</a> computes this summation for an arbitrary coalitional game with three players.
     </p>
 
 	<div id="table_container" style="overflow-x:auto;align:center;">
-		<p class="w3-opacity w3-left" align="left" style="margin:20px"><strong>Example 1</strong>: Shapley values for a company that makes a profit \(v(S)\) based on it's three prospective employees \(Ava\), \(Ben\), and \(Cat\).</p>
+		<p id="example1" class="w3-opacity w3-left" align="left" style="margin:20px"><strong>Example 1</strong>: Shapley values for a company that makes a profit \(v(S)\) based on it's three prospective employees \(Ava\), \(Ben\), and \(Cat\).</p>
 	  <table class="w3-opacity w3-center" style="width:300px;display:inline;margin-right:25px;font-size:18px;">
 	  	<caption align="top" style="font-size:20px;"><strong>Coalitional game</strong></caption>
 	  	<col width="200px"/>
@@ -388,35 +386,47 @@ div.tooltip {
     <!-- What are SHAP Values? -->
     <h3 class="w3-justify" id="shap_values">1.2 SHAP values</h3>
 	<p class="w3-opacity w3-justify">
-    	SHAP values are a variant of Shapley values to explain ML models.  For SHAP values, the game \(v(S)\) is now related to a machine learning model \(f(x)\) and the set of players is now a feature vector \(x\in\mathbb{R}^d\).
+    	SHAP values are a variant of Shapley values to explain ML models.  For SHAP values, the game \(v(S)\) is now related to a machine learning model \(f(x)\) and the set of players is now a feature vector \(x:=\{x_1,\cdots,x_d\}\in\mathbb{R}^d\).  
     </p>
 
     <p class="w3-opacity w3-justify">
-    	Previously, for Shapley values the game's output \(v(S)\) was the value of the game with the players in \(S\) "present" and the remaining players "missing".  For \(v(S)\), "missing" is naturally defined: whether or not a player \(i\) is present in the set \(S\) (or, as in our example, whether an employee was working for the company).  
+    	In contrast, Shapley values define a game's output \(v(S)\) to be the value of the game with some players "present" and the remaining players "missing".  Here, "missing" is naturally defined: whether or not a player \(i\) is present in the set \(S\) (or, as in our example, whether an employee was working for the company).
     </p>
 
     <p class="w3-opacity w3-justify">
-    	In comparison, ML models generally require a fixed length input which makes setting features to be "missing" or "present" less straightforward.  One natural way to do this is with a conditional expectation.  In words, the value of the game is the expected value of the model if we condition on a set of features that are "present".  If we define \(D\) to the background (underlying) distribution \(x\) should be compared to, then:
+    	In comparison, ML models generally require a fixed length input with continuous values which makes setting features to be "missing" or "present" less straightforward.  One simple approach is to impute the "missing" features by masking them by a fixed background sample \(x^b \in \mathbb{R}^d\).
     	$$
-		v(S)=\mathbb{E}_\mathcal{D}[f(x)|x_{S}]
+		v(S)=f(h^S)\text{, where } h^S_i = x_i\text{ if }i\in S\text{, }h^S_i = x^b_i\text{ otherwise}
+    	$$
+    	For instance, if we want to set the feature <i>Height</i> to "missing", we could replace it with a specific <i>background value</i>.  One natural option of <i>background value</i> is zero.  However, this is unsatisfying because a <i>Height</i> of zero is impossible.  Another option of <i>background value</i> could be the average human height.  This is arguably a better choice, however it means that explanations for people who are exactly average height will be biased to give no weight to height.  In fact, masking with any single background sample will introduce bias to SHAP values.  Alternatively, instead of using a single background sample, we can use an entire background distribution to define missingness.
+    </p>
+
+	<p class="w3-opacity w3-justify">
+    	Then, a very natural approach to impute features is with conditional expectation.  Instead of simply replacing "missing" features with a fixed value, we condition on the set of features that are "present" as if we know them and use those to guess at the "missing" features.  If we define \(D\) to be the background (underlying) distribution our samples are drawn from, the value of the game is:
+    	$$
+		v(S)=\mathbb{E}_D[f(x)|x_{S}]
     	$$
     </p>
 
 	<p class="w3-opacity w3-justify">
-    	One caveat is that modelling the conditional expectation is very difficult.  Further, even if you do perfectly obtain the conditional expectation, the correlations you capture may cause you to give weight to features your model does not use as an input.  Although explaining relationships by modelling the conditional expectation may be desirable for some use cases, our goal is to explain the model itself; therefore, an arguably more natural approach is to use causal inference's <i>interventional conditional expectation</i>:
+    	One caveat is that getting this conditional expectation for actual data is very difficult.  Furthermore, even if you do manage to do so, the resulting explanations can end up having undesirable characteristics (more on this later).  Because our goal is to focus on explaining the model itself, an arguably more natural approach is to use causal inference's <i>interventional conditional expectation</i>:
     	$$
-    	v(S)=\mathbb{E}_\mathcal{D}[f(x)|\text{do}(x_{S})]
+    	v(S)=\mathbb{E}_D[f(x)|\text{do}(x_{S})]
     	$$
-    	The <i>do</i> notation is Judea Pearl's <i>do</i>-operator (<a href="pearl_2000_causality">Pearl 2000</a>). The motivation behind this decision comes from <a href="#janzing2019feature">Janzing et. al. (2019)</a> which is also very close to Random Baseline Shapley in <a href="#sundararajan2019many">Sundararajan et. al. (2019)</a>).  Additionally, this is exactly the assumption made by <a href="https://shap.readthedocs.io/en/latest/#shap.KernelExplainer">Kernel Explainer</a> and <a href="https://shap.readthedocs.io/en/latest/#shap.SamplingExplainer">Sampling Explainer</a> from the SHAP package.
+    	The <i>do</i> notation is Judea Pearl's <i>do</i>-operator (<a href="pearl_2000_causality">Pearl 2000</a>).  In words, we break the dependence between the features in \(S\) and the remaining features, which is analogous to <i>intervening</i> on the remaining features (more on this in <a href="#background_distribution">Section 1.3</a>).  The motivation behind this decision comes from <a href="#janzing2019feature">Janzing et. al. (2019)</a> which is also very close to Random Baseline Shapley in <a href="#sundararajan2019many">Sundararajan et. al. (2019)</a>).  Additionally, this is exactly the assumption made by <a href="https://shap.readthedocs.io/en/latest/#shap.KernelExplainer">Kernel Explainer</a> and <a href="https://shap.readthedocs.io/en/latest/#shap.SamplingExplainer">Sampling Explainer</a> from the SHAP package.
     </p>
 
+	<p class="w3-opacity w3-justify">
+		In <a href="#example2">Example 2</a> we highlight tradeoffs between the conditional expectation and the interventional conditional expectation by devising a simple example with a linear function and a multivariate normally distributed background distribution.  In general, computing the conditional expectation SHAP value is difficult; however, because we choose a multivariate normal distribution the conditional expectation is well defined.  In addition, we choose a linear function because the conditional expectation of the function equals the function applied to the conditional expectation.
+	</p>
+
     <div id="table_container" style="overflow-x:auto;align:center;">
-		<p class="w3-opacity w3-left" align="left" style="margin:20px">
-			<strong>Example 2</strong>: Comparing choices of set function for Shapley values: conditional expectation (CE) and interventional conditional expectation (ICE).  We make two simplifying assumptions:
+		<p id="example2" class="w3-opacity w3-left" align="left" style="margin:20px">
+			<strong>Example 2</strong>: Comparing choices of set function for SHAP values: conditional expectation (CE) and interventional conditional expectation (ICE).  We make two simplifying assumptions:
 		</p>
 		<ul class="w3-opacity" align="left" style="margin:20px">
 			<li>The function is linear (\(f=\beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \beta_4 x_4\))</li>
-			<li>The data-generating distribution is multivariate normal (\(D\sim \mathcal{N}_4(0,\Sigma)\))</li>
+			<li>The data-generating distribution is multivariate normal (\(D\sim \mathcal{N}_4(0,C)\))</li>
 		</ul>
 
 		<table class="w3-opacity" style="width:300px;display:inline;margin-right:25px;font-size:20px;">
@@ -454,7 +464,7 @@ div.tooltip {
 	      <col width="60px">
 	      <col width="60px">
 	      <tr align="center">
-	      	<td colspan="5"><strong>Covariance \(\Sigma\)</strong></td>
+	      	<td colspan="5"><strong>Covariance \(C\)</strong></td>
 	      </tr>
 	      <tr align="center">
 		    <th></th>
@@ -562,23 +572,72 @@ div.tooltip {
 		<p class="w3-opacity w3-center" align="center" id="ex2_preset_text" style="margin:20px">Independent variables.</p>
 	</div>
 
+
+	<!-- Proof -->
+	<div style="background-color:aliceblue;">
+
+		<div style="padding-left:10px;padding-right:10px">
+
+			<p class="w3-justify"><a onclick="hideshow('proof_linearmodel')"><strong>Computing CE and ICE SHAP values Proof (Click)</strong></a></p>
+
+			<div id="proof_linearmodel", style="display:none">
+
+			    <p class="w3-opacity w3-justify">
+			    	Computing SHAP values for a linear model is much easier than for other model classes.  This is how we compute them for <a href="#example2">Example 2</a>.
+			    </p>
+
+			    <p class="w3-opacity w3-justify">
+			    	First, to compute Interventional Conditional Expectation (ICE) SHAP values for a linear model, we can start with:
+					$$
+					\begin{aligned}
+					\phi_i(f,x)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(x)|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[f(x)|do(x_{S})])\\
+					&=\sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[\beta x|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[\beta x|do(x_{S})])\\
+					&=\sum_{S\in C } W(|S|,|N|) \beta (\mathbb{E}_{D}[x|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[x|do(x_{S})])\\
+					&=\sum_{S\in C } W(|S|,|N|) \beta (h^{S\cup \{i\}} {-} h^S)\\ 
+					&=\sum_{S\in C } W(|S|,|N|) \beta_i x^f_i\\ 
+					&= \beta_i x^f_i\\ 
+					\end{aligned}
+					$$
+				</p>
+
+			    <p class="w3-opacity w3-justify">
+			    	Second, to compute Conditional Expectation (CE) SHAP values for a linear model, we assume the background distribution \(D\) is multivariate normal with zero mean and covariance \(C\), we can start with:
+					$$
+					\begin{aligned}
+					\phi_i(f,x)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(x)|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[f(x)|x_{S}])\\
+					&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[\beta x|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[\beta x|x_{S}])\\
+					&= \sum_{S\in C } W(|S|,|N|)\beta (\mathbb{E}_{D}[x|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[x|x_{S}])\\
+					\end{aligned}
+					$$
+					Here, we know that \(\mathbb{E}_{D}[x|x_{S}])=C_{N\setminus S,S} C_{S,S}^{-1} x_{S}\).
+				</p>
+
+			</div>
+		</div>
+
+	</div>
+
     <!-- Background distribution -->
-    <h3 class="w3-justify" id="background_distribution">1.3 SHAP values with a background distribution</h3>
+    <h3 class="w3-justify" id="background_distribution">1.3 Single reference SHAP values</h3>
 
 	<p class="w3-opacity w3-justify">
-		As we saw earlier, to compute \(\phi_i(f,x)\) we need to evaluate the interventional conditional expectation.  This conditional expectation depends on a <i>background distribution</i> \(D\) that the foreground sample \(x\) is compared against.  
+		As we saw earlier, to compute \(\phi_i(f,x^f)\) we evaluate the interventional conditional expectation.  However, this depends on a <i>background distribution</i> \(D\) that the sample we are explaining, otherwise known as the foreground sample \(x^f\), will be compared to.  
 	</p>
 
 	<p class="w3-opacity w3-justify">
 		One natural definition of the background distribution is a uniform distribution over a population sample.  For instance, in machine learning, you could assign equal probability to every sample in your training set.  With this background distribution, we can re-write the SHAP value as an average of <i>single reference SHAP values</i> (<a href="#chen2019explaining">Chen et. al. 2019</a>):
 		$$
-		\phi_i(f,x)=\frac{1}{|D|}\sum_{\hat{x}\in D}\phi_i(f,x,\hat{x})
+		\phi_i(f,x^f)=\frac{1}{|D|}\sum_{x^b\in D}\phi_i(f,x^f,x^b)
 		$$
-		This is in part because the interventional conditional expectation has a very natural definition when the background distribution is a single sample \(\hat{x}\) (\(D_{\hat{x}}\)):
+		This is in part because the interventional conditional expectation has a very natural definition when the background distribution is a single sample \(x^b\) (\(D_{x^b}\)):
 		$$
-		\mathbb{E}_\mathcal{D_{\hat{x}}}[f(x)|\text{do}(x_{S})]=\mathcal{X}(x,\hat{x},S)
+		\mathbb{E}_{D_{x^b}}[f(x^f)|\text{do}(x_{S})]=h^S
 		$$
-		Where \(\mathcal{X}(x,\hat{x},S)\) to return a hybrid sample \(h\) where the features in \(S\) are from \(x\) and the remaining features are from \(\hat{x}\).  In words, the interventional conditional expectation of \(x\) given a set of features \(S\), is a hybrid sample where the features in \(S\) are from \(x\) and the remaining features are from \(\hat{x}\).  This is as if <i>we intervene on features in the foreground sample with features from the background sample</i>. 
+		Where \(h^S\in\mathbb{R}^d\) with \(h^S_i=x^f_i\) if \(i\in S\) otherwise \(h^S_i=x^b_i\).  In words, the interventional conditional expectation of \(x^f\) given a set of features \(S\) and \(x^b\) is a hybrid sample where the features in \(S\) are from \(x^f\) and the remaining features are from \(x^b\).  This is as if <i>we intervene on features in the foreground sample with features from the background sample</i>. 
+<!-- 		$$
+		\mathbb{E}_\mathcal{D_{x^b}}[f(x)|\text{do}(x_{S})]=\mathcal{X}(x^f,x^b,S)
+		$$
+		Where \(\mathcal{X}(x,x^b,S)\) to return a hybrid sample \(h\) where the features in \(S\) are from \(x\) and the remaining features are from \(x^b\).  In words, the interventional conditional expectation of \(x\) given a set of features \(S\), is a hybrid sample where the features in \(S\) are from \(x\) and the remaining features are from \(x^b\).  This is as if <i>we intervene on features in the foreground sample with features from the background sample</i>.  -->
 	</p>  
 
 		<!-- Proof -->
@@ -594,12 +653,12 @@ div.tooltip {
 				    Define \(C\) to be all combinations of the set \(N \setminus \{i\}\) and \(P\) to be all permutations of \(N \setminus \{i\}\).  Starting with the definition of SHAP values: 
 					$$
 					\begin{aligned}
-					\phi_i(f,x)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(X)|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[f(X)|x_{S}])\\
-					&=\frac{1}{|P|}\sum_{S\subseteq P} \mathbb{E}_\mathcal{D}[f(x)|\text{do}(x_{S \cup \{i\}})] {-} \mathbb{E}_\mathcal{D}[\text{do}(f(x)|x_{S})]\\
-					&= \frac{1}{|P|}\sum_{S\subseteq P}\frac{1}{|D|}\sum_{\hat{x}\in D} f(\mathcal{X}(x,\hat{x},S\cup \{i\})) {-} f(\mathcal{X}(x,\hat{x},S))\\
-					&= \frac{1}{|D|}\sum_{\hat{x}\in D} \frac{1}{|P|}\sum_{S\subseteq P} f(\mathcal{X}(x,\hat{x},S\cup \{i\})) {-} f(\mathcal{X}(x,\hat{x},S)) \\
-					&= \frac{1}{|D|}\sum_{\hat{x}\in D} \underbrace{\sum_{S\subseteq C} W(|S|,|N|)f(\mathcal{X}(x,\hat{x},S\cup \{i\})) {-} f(\mathcal{X}(x,\hat{x},S))}_{\text{Single reference SHAP value}}\\
-					&=\frac{1}{|D|}\sum_{\hat{x}\in D}\phi_i(f,x,\hat{x})
+					\phi_i(f,x^f)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(x^f)|\text{do}(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[f(x^f)|\text{do}(x_{S})])\\
+					&=\frac{1}{|P|}\sum_{S\subseteq P} \mathbb{E}_D[f(x^f)|\text{do}(x_{S \cup \{i\}})] {-} \mathbb{E}_D[f(x^f)|\text{do}(x_{S})]\\
+					&= \frac{1}{|P|}\sum_{S\subseteq P}\frac{1}{|D|}\sum_{x^b\in D} f(h^{S\cup \{i\}}) {-} f(h^{S})\\
+					&= \frac{1}{|D|}\sum_{x^b\in D} \frac{1}{|P|}\sum_{S\subseteq P} f(h^{S\cup \{i\}}) {-} f(h^{S})\\
+					&= \frac{1}{|D|}\sum_{x^b\in D} \underbrace{\sum_{S\subseteq C} W(|S|,|N|)f(h^{S\cup \{i\}}) {-} f(h^{S})}_{\text{Single reference SHAP value}}\\
+					&=\frac{1}{|D|}\sum_{x^b\in D}\phi_i(f,x^f,x^b)
 					\end{aligned}
 					$$
 				</p>
@@ -610,7 +669,7 @@ div.tooltip {
 	</div>
 
 	<p class="w3-opacity w3-justify">
-		In summary, we reduce the problem of obtaining \(\phi_i(f,x)\) to an average of simpler problems \(\phi_i(f,x,\hat{x})\) where our foreground sample \(x\) is compared to a distribution with only one background sample \(\hat{x}\).
+		In summary, we reduce the problem of obtaining \(\phi_i(f,x^f)\) to an average of simpler problems \(\phi_i(f,x^f,x^b)\) where our foreground sample \(x^f\) is compared to a distribution with only one background sample \(x^b\).  This new problem formulation will prove to be an easy problem to tackle for tree models.
 	</p>
 
   </div>
@@ -621,11 +680,11 @@ div.tooltip {
     <h2 class="w3-justify" id="algorithm">2. Algorithm</h2>
     
     <p class="w3-opacity w3-justify">
-    Now our goal is to tackle the simpler problem of obtaining single reference SHAP values \(\phi_i(f,x,\hat{x})\).  In this section, we consider a specific foreground sample (sample being explained), background sample (sample being compared to), and tree (specified in Example 3).
+    Now our goal is to tackle the simpler problem of obtaining single reference SHAP values \(\phi_i(f,x^f,x^b)\) that are attributions for a single foreground (sample being explained) and background sample (sample being compared to).  In this section, we consider a specific foreground sample, background sample, and tree as specified in <a href="#example3">Example 3</a>.
 	</p>
 
 	<div id="table_container" style="overflow-x:auto;align:center;">
-		<p class="w3-opacity w3-left" align="left" style="margin:20px">
+		<p id="example3" class="w3-opacity w3-left" align="left" style="margin:20px">
 			<strong>Example 3</strong>: Choose \(x^f\), \(x^b\), and tree parameters for the remainder of this section.
 		</p>
 
@@ -688,13 +747,16 @@ div.tooltip {
     	Based on the proof in <a href="#background_distribution">Section 1.3</a>, the brute force approach would be to compute the following:
 
     	$$
-    	\phi_i(f,x,\hat{x})=\sum_{S\subseteq N\setminus\{i\}} \underbrace{W(|S|,|N|)}_{W}\underbrace{f(\mathcal{X}(x,\hat{x},S\cup \{i\}))}_{\text{\textcolor{green}{Pos} term}} {-} \underbrace{f(\mathcal{X}(x,\hat{x},S)}_{\text{\textcolor{red}{Neg} term}})
+    	\phi_i(f,x^f,x^b)=\sum_{S\subseteq N\setminus\{i\}} \underbrace{W(|S|,|N|)}_{W}\underbrace{f(h^{S\cup \{i\}})}_{\text{\textcolor{green}{Pos} term}} {-} \underbrace{f(h^S)}_{\text{\textcolor{red}{Neg} term}})
     	$$
+    </p>
 
-    	Note that \(\mathcal{X}(x,\hat{x},S)\) returns a hybrid sample \(h\) where the features in \(S\) are from \(x\) and the remaining features are from \(\hat{x}\).  If the cost of computing the weight \(W\) is constant, then the computational complexity of the brute force method is the number of terms in the summation times the cost of making a prediction \(f(x)\) (likely on the order of the depth of the tree \(O(D)\)).  Since we consider two terms (\(\text{\textcolor{green}{Pos}}\) and \(\text{\textcolor{red}{Neg}}\)) for all possible combinations of the full set of features (without \(i\)), the computational complexity is \(O(D\times2^{d})\).
+    <p class="w3-opacity w3-justify">
+    	If we assume the computational cost of computing the weight \(W\) is constant, then the complexity of the brute force method is the number of terms in the summation multiplied by the cost of making a prediction (on the order of the depth of the tree \((D)\)).  Then, the computational complexity of the brute force approach is \(O(D\times2^{d})\).
+    </p>
 
-    	Finally, the computational complexity to compute \(\phi_i(f,x,\hat{x})\) for all features is \(O(|N|\times D\times 2^{d})\).
-
+    <p class="w3-opacity w3-justify">
+    	In order to compute \(\phi_i(f,x^f,x^b)\) for all features, we have to re-run the entire algorithm \(d\) times, giving us a complexity of \(O(d\times D\times 2^{d})\).
 	</p>
 
 
@@ -738,13 +800,13 @@ div.tooltip {
 					<td id="ex4_bx3">0</td>
 				</tr>
 				<tr id="ex4_hS">
-					<td>\(h_S\)</td>
+					<td>\(h^S\)</td>
 					<td id="ex4_hs1"></td>
 					<td id="ex4_hs2"></td>
 					<td id="ex4_hs3"></td>
 				</tr>
 				<tr id="ex4_hSi">
-					<td>\(h_{S\cup i}\)</td>
+					<td>\(h^{S\cup i}\)</td>
 					<td id="ex4_hsi1"></td>
 					<td id="ex4_hsi2"></td>
 					<td id="ex4_hsi3"></td>
@@ -838,7 +900,7 @@ div.tooltip {
 
 
 	<p class="w3-opacity w3-justify">
-	    However, if we <i>constrain \(f(x)\) to be a tree-based model</i> (e.g., XGBoost, decision trees, random forests, etc.), then we can come up with a polynomial time algorithm to compute \(\phi_i(f,x,\hat{x})\) exactly.  Why is this the case?  Well, looking at example 4, it turns out a single path may be considered multiple times in the brute force algorithm.  However, to compute the SHAP value for a single feature, it is sufficient to consider each path a single time.  This insight leads us to the naive algorithm in <a href="#naive_implementation">Section 2.2</a>.
+	    However, if we <i>constrain \(f(x)\) to be a tree-based model</i> (e.g., XGBoost, decision trees, random forests, etc.), then we can come up with a polynomial time algorithm to compute \(\phi_i(f,x^f,x^b)\) exactly.  Why is this the case?  Well, looking at Example 4, we can see that even for explaining a single feature, the brute force algorithm may consider a particular path multiple times.  However, to compute the SHAP value for a single feature, it turns out that we only need to consider each path once.  This insight leads us to the naive algorithm in <a href="#naive_implementation">Section 2.2</a>.
 	</p>
 
 
@@ -853,10 +915,10 @@ div.tooltip {
 	</p>    
 
 	<p class="w3-opacity w3-justify">
-    	<strong>Theorem 1: To calculate \(\phi_i(f,x,\hat{x})\), we can calculate attributions for each path from the root to each leaf.</strong>  For a given path \(P\), we define \(N_P\) to be the "unique" features encountered and \(S_P\) to be the "unique" features that came from \(x\).  Finally, define \(v\) to be the value of the path's leaf.  Then, the attribution of the path is:
+    	<strong>Theorem 1: To calculate \(\phi_i(f,x,x^b)\), we can calculate attributions for each path from the root to each leaf.</strong>  For a given path \(P\), we define \(N_P\) to be the "unique" features encountered and \(S_P\) to be the "unique" features that came from \(x\).  Finally, define \(v\) to be the value of the path's leaf.  Then, the attribution of the path is:
 
     	$$
-		\phi_i^P(f,x,\hat{x})=
+		\phi_i^P(f,x,x^b)=
 	    \begin{cases}
 	    	0 & \text{if}\ i\notin N_P \\
 	    	\textcolor{green}{W(|S_P|-1,|N_P|)\times v} & \text{if}\ i\in S_P \\
@@ -876,7 +938,7 @@ div.tooltip {
 			<div id="proof", style="display:none">
 
 				<p class="w3-opacity w3-justify">
-					If we treat each path in the tree from the root to the leaf as a separate model \(f'(x)\) that returns the value of the leaf if that path is traversed by \(x\) or zero otherwise, then we have \(L\) models that operate on disjoint parts of the input space.  Then, \(f(x)=\sum f'(x)\) and by the additivity of SHAP values, \(\phi_i(f,x,\hat{x})=\sum_f\phi_i(f',x,\hat{x})\).  Then, we can simply calculate \(\phi_i\) for each path model.  Since the path model is zero everywhere except for the associated path, it is easy to arrive to the solution in Theorem 1.
+					If we treat each path in the tree from the root to the leaf as a separate model \(f'(x)\) that returns the value of the leaf if that path is traversed by \(x\) or zero otherwise, then we have \(L\) models that operate on disjoint parts of the input space.  Then, \(f(x)=\sum f'(x)\) and by the additivity of SHAP values, \(\phi_i(f,x,x^b)=\sum_f\phi_i(f',x,x^b)\).  Then, we can simply calculate \(\phi_i\) for each path model.  Since the path model is zero everywhere except for the associated path, it is easy to arrive to the solution in Theorem 1.
 				</p>
 
 			</div>
@@ -888,11 +950,12 @@ div.tooltip {
 		Then the goal of the algorithm is to obtain \(N_P\) and \(S_P\) for each path by recursively traversing the tree.  We will start by explaining the algorithm via an example:
 	</p>
 
-	<div>
-	<figure>
-		<figcaption class="w3-opacity">Figure 3: Green paths are associated with \(\textcolor{green}{x^f}\) and red paths are \(\textcolor{red}{x^b}\).</figcaption>
-		<img src="images/tree_example3.png" alt="Tree Example 3" width="400">
-	</figure>
+	<div id="table_container" style="overflow-x:auto;">
+		<figure>
+			<figcaption class="w3-opacity">Figure 3: Green paths are associated with \(\textcolor{green}{x^f}\), red paths are \(\textcolor{red}{x^b}\), and blue paths are associated with both.</figcaption>
+      <br>
+			<img src="images/tree_example3.png" alt="Tree Example 3" width="360">
+		</figure>
 	</div>
 
 	<p class="w3-opacity w3-justify">
@@ -905,20 +968,19 @@ div.tooltip {
 
 			<li>Case 2: The feature has been encountered already (\(n_{feature}\in N_P\))</li>
 			<ul>
-				<li>We already split on the current feature based on \(x\) or \(\hat{x}\)</li>
-				<li>Depending on which we used, we compare either \(x_{n_{feature}}\) or \(\hat{x}_{n_{feature}}\) to \(n_{threshold}\) and go down the appropriate child</li>
+				<li>Depending on if we split on \(x^f\) or \(x^b\), we compare either \(x^f_{n_{feature}}\) or \(x^b_{n_{feature}}\) to \(n_{threshold}\) and go down the appropriate child</li>
 				<li>Pass down \(N_P\) and \(S_P\) without modifications because we did not add a new feature</li>
 			</ul>
 
-			<li>Case 3: Both \(x\) and \(\hat{x}\) are on the same side of \(n\)'s split</li>
+			<li>Case 3: Both \(x\) and \(x^b\) are on the same side of \(n\)'s split</li>
 			<ul>
-				<li>Pass down \(N_P\) and \(S_P\) without modifications because relative to \(x\) and \(\hat{x}\) it's as if this node doesn't exist</li>
+				<li>Pass down \(N_P\) and \(S_P\) without modifications because relative to \(x\) and \(x^b\) it's as if this node doesn't exist</li>
 			</ul>
 
-			<li>Case 4: \(x\) and \(\hat{x}\) go to different children</li>
+			<li>Case 4: \(x\) and \(x^b\) go to different children</li>
 			<ul>
 				<li>Add \(n_{feature}\) to both \(N_P\) and \(S_P\) and pass both lists to the \(x\) child</li>
-				<li>Only add \(n_{feature}\) to \(N_P\) and pass both lists to the \(\hat{x}\) child</li>
+				<li>Only add \(n_{feature}\) to \(N_P\) and pass both lists to the \(x^b\) child</li>
 			</ul>
 		</ul>
 	</p>
@@ -926,7 +988,7 @@ div.tooltip {
 
     <div id="table_container" style="overflow-x:auto;align:center;font-size:18px">
     	<p class="w3-opacity w3-left" align="left" style="margin:20px">
-			<strong>Example 5</strong>: Naive algorithm algorithm for the tree and samples from Example 3.
+			<strong>Example 5</strong>: Naive algorithm for the tree and samples from Example 3.
 		</p>
 	</div>
 
@@ -1036,45 +1098,45 @@ div.tooltip {
 
 			<div id="pseudocode_naive" style="display:none">
 			<p class="no-margin w3-opacity w3-justify" style="font-family:courier;font-size:16px">
-				ITE_N(array \(x\), array \(\hat{x}\), tree \(T\)):
+				ITE_N(array \(x^f\), array \(x^b\), tree \(T\)):
 			</p>
 
 			<ul class="no-margin w3-opacity w3-justify" style="font-family:courier;font-size:16px">
-				RECURSE(node \(n\), list \(S_P\), list \(N_P\), array \(x\), array \(\hat{x}\)):
+				RECURSE(node \(n\), list \(S_P\), list \(N_P\), array \(x^f\), array \(x^b\)):
 				<ul style="font-size:16px">
 					<font color="#8E44AD">// Case 1: At a leaf</font><br>
 					if n is a leaf:
 					<ul style="font-size:16px">
-						return \(\phi_i^P(f,x,\hat{x})\) based on \(S_P\) and \(N_P\) (Theorem 1)
+						return \(\phi_i^P(f,x^f,x^b)\) based on \(S_P\) and \(N_P\) (Theorem 1)
 					</ul>
-					<font color="#8E44AD">// Find children associated with \(x\) and \(\hat{x}\)</font><br>
-					\(x_{child} =\) \(n_{leftchild}\) if \(x[n_{feature}] < n_{threshold}\) else \(x_{child}\) = \(n_{rightchild}\) <br>
-					\(\hat{x}_{child} =\) \(n_{leftchild}\) if \(\hat{x}[n_{feature}] < n_{threshold}\) else \(\hat{x}_{child}\) = \(n_{rightchild}\) <br>
+					<font color="#8E44AD">// Find children associated with \(x\) and \(x^b\)</font><br>
+					\(x^f_{child} =\) \(n_{leftchild}\) if \(x^f[n_{feature}] < n_{threshold}\) else \(x^f_{child}\) = \(n_{rightchild}\) <br>
+					\(x^b_{child} =\) \(n_{leftchild}\) if \(x^b[n_{feature}] < n_{threshold}\) else \(x^b_{child}\) = \(n_{rightchild}\) <br>
 					<font color="#8E44AD">// Case 2: Feature was encountered previously</font><br>
 					if \(n_{feature}\in N_P\):
 					<ul style="font-size:16px">
 						if \(n_{feature}\in S_P\):
 						<ul style="font-size:16px">
-							return ITE_N(\(x_{child}\),\(S_P\),\(N_P\),\(x\),\(\hat{x}\))
+							return ITE_N(\(x^f_{child}\),\(S_P\),\(N_P\),\(x^f\),\(x^b\))
 						</ul>
 						else: 
 						<ul style="font-size:16px">
-							return ITE_N(\(\hat{x}_{child}\),\(S_P\),\(N_P\),\(x\),\(\hat{x}\))
+							return ITE_N(\(x^b_{child}\),\(S_P\),\(N_P\),\(x^f\),\(x^b\))
 						</ul>
 					</ul>
 
-					<font color="#8E44AD">// Case 3: \(x\) and \(\hat{x}\) go to same children</font><br>
-					if \(x_{child}==\hat{x}_{child}\):
+					<font color="#8E44AD">// Case 3: \(x^f\) and \(x^b\) go to same children</font><br>
+					if \(x^f_{child}==x^b_{child}\):
 					<ul style="font-size:16px">
-						return ITE_N(\(x_{child}\),\(S_P\),\(N_P\),\(x\),\(\hat{x}\))
+						return ITE_N(\(x^f_{child}\),\(S_P\),\(N_P\),\(x\),\(x^b\))
 					</ul>
-					<font color="#8E44AD">// Case 4: \(x\) and \(\hat{x}\) go to different children</font><br>
-					if not \(x_{child}==\hat{x}_{child}\):
+					<font color="#8E44AD">// Case 4: \(x^f\) and \(x^b\) go to different children</font><br>
+					if not \(x^f_{child}==x^b_{child}\):
 					<ul style="font-size:16px">
-						return ITE_N(\(\hat{x}_{child}\),\(S_P\),\(N_P+[n_{feature}]\),\(x\),\(\hat{x}\)) + <br> ITE_N(\(x_{child}\),\(S_P+[n_{feature}]\),\(N_P+[n_{feature}]\),\(x\),\(\hat{x}\))
+						return ITE_N(\(x^b_{child}\),\(S_P\),\(N_P+[n_{feature}]\),\(x^f\),\(x^b\)) + <br> ITE_N(\(x^f_{child}\),\(S_P+[n_{feature}]\),\(N_P+[n_{feature}]\),\(x^f\),\(x^b\))
 					</ul>
 				</ul>
-				return RECURSE(\(T_{rootnode}\), \(S_P=[\ ]\), \(N_P=[\ ]\), \(x\), \(\hat{x}\))
+				return RECURSE(\(T_{rootnode}\), \(S_P=[\ ]\), \(N_P=[\ ]\), \(x^f\), \(x^b\))
 			</ul>
 			</div>
 
@@ -1083,7 +1145,7 @@ div.tooltip {
 	</div>
 
     <p class="w3-opacity w3-justify">
-		The computational complexity to compute \(\phi_i(f,x,\hat{x})\) using <font style="font-family:courier">ITE_N()</font> is \(O(T_{numnodes}\times T_{depth})\) where \(T_{numnodes}\) is the number of nodes in the tree and \(T_{depth}\) is the depth of the tree.  This is because in the worst case, each internal node needs to check the lists \(S_P\) and \(N_P\) which are of length \(O(T_{depth})\).  Furthermore, each leaf node needs to check if \(i\) is in \(S_P\) which is also \(O(T_{depth})\) cost.   Note that we can actually get rid of the multiplicative \(T_{depth}\) factor by representing \(S_P\) and \(N_P\) as arrays and keeping track of the sizes of \(|S|\) and \(|N|\).
+		The computational complexity to compute the single reference SHAP value using the naive algorithm is \(O(T_{numnodes}\times T_{depth})\) where \(T_{numnodes}\) is the number of nodes in the tree and \(T_{depth}\) is the depth of the tree.  This is because in the worst case, each internal node needs to check the lists \(S_P\) and \(N_P\) which are of length \(O(T_{depth})\).  Furthermore, each leaf node needs to check if \(i\) is in \(S_P\) which is also \(O(T_{depth})\) cost.  Note that we can actually get rid of the multiplicative \(T_{depth}\) factor by representing \(S_P\) and \(N_P\) as arrays and keeping track of the sizes of \(|S|\) and \(|N|\).
 	</p>
 
 	<p class="w3-opacity w3-justify">
@@ -1094,48 +1156,39 @@ div.tooltip {
     <h3 class="w3-justify" id="dynamic_programming_implementation">2.3 Dynamic Programming Implementation</h3>
 
     <p class="w3-opacity w3-justify">
-	    We can compute the attributions for all features simultaneously as we traverse the tree.  In this algorithm algorithm we pass \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) attributions to the parent.  Before describing the algorithm in more detail, we first present an example that illustrates why passing up the attributions is sufficient.
+	    For the dynamic programming version of the algorithm, we can compute the attributions for all features simultaneously as we traverse the tree by passing \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) attributions to parent nodes.  Before describing the algorithm in more detail, we first present an figure that illustrates why passing up the attributions is sufficient.
 	</p>
 
-	<div style="overflow-x:auto;">
+	<div id="table_container" style="overflow-x:auto;">
 
 		<figure style="float:left">
-			<figcaption class="w3-opacity">Figure 4: Example to illustrate collapsibility for features.  Green paths are associated with \(\textcolor{green}{x}\) and red paths are \(\textcolor{red}{\hat{x}}\)</figcaption>
-			<img src="images/tree_example4.png" alt="Tree Example 3" width="300">
+			<figcaption class="w3-opacity">Figure 4: Example to illustrate collapsibility for features.  Green paths are associated with \(\textcolor{green}{x}\) and red paths are \(\textcolor{red}{x^b}\)</figcaption>
+      <br>
+			<img src="images/tree_example4.png" alt="Tree Example 3" width="220">
 		</figure>
 
 		<table cellpadding="10" align="center">
-			<br>
-			<!-- <caption class="w3-opacity">Attributions.</caption> -->
-			<thead class="w3-opacity">
-				<tr>
-					<th>Feature</th>
-					<th>\(\phi_i(f,x,\hat{x})\)</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr bgcolor="#F8F8F8">
-					<td align="left">\(x_1\)</td>
-					<td align="left">\(\textcolor{green}{\text{Pos}_1}+\textcolor{green}{\text{Pos}_2}+\textcolor{red}{\text{Neg}_3}+\textcolor{red}{\text{Neg}_4}\)</td>
-				</tr>
-				<tr bgcolor="#F8F8F8">
-					<td align="left">\(x_2\)</td>
-					<td align="left">\(\textcolor{red}{\text{Neg}_1}+\textcolor{green}{\text{Pos}_2}+\textcolor{green}{\text{Pos}_3}+\textcolor{red}{\text{Neg}_4}\)</td>
-				</tr>
-			</tbody>
+			<tr bgcolor="#F8F8F8">
+				<td align="left" class="w3-opacity">\(\phi_1(f,x^f,x^b)\)</td>
+				<td align="left">\(\textcolor{green}{\text{Pos}_1}+\textcolor{green}{\text{Pos}_2}+\textcolor{red}{\text{Neg}_3}+\textcolor{red}{\text{Neg}_4}\)</td>
+			</tr>
+			<tr bgcolor="#F8F8F8">
+				<td align="left" class="w3-opacity">\(\phi_2(f,x^f,x^b)\)</td>
+				<td align="left">\(\textcolor{red}{\text{Neg}_1}+\textcolor{green}{\text{Pos}_2}+\textcolor{green}{\text{Pos}_3}+\textcolor{red}{\text{Neg}_4}\)</td>
+			</tr>
 		</table>
 	</div>
 
 
 
 	<p class="w3-opacity w3-justify">
-		In Figure 4, we can first observe that for each leaf, according to Theorem 1, there are only two possible values to compute (what we have been calling \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\)).  Based on the attributions for \(x_1\) we see that these \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) terms can be grouped by the left and right subtrees below \(x_1\).  To generalize this example, we make the following observation:
+		In Figure 4, we can first observe that for each leaf, according to Theorem 1, there are only two possible values needed to compute the SHAP values (\(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\)).  Based on the attributions for \(x_1\) we see that these \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) terms can be grouped by the left and right subtrees below \(x_1\).  To generalize this example, we make the following observation:
 	</p>
 
 	<p class="w3-opacity w3-justify">
-		<strong>Observation:  In order to compute the attribution for any feature \(i\) it is sufficient to consider the paths that correspond to each Case 4 node's children.</strong>  First, focusing on a specific Case 4 node \(n\), we know that one child is associated with \(x\) child and one child is associated with \(\hat{x}\).  Then, the attribution to \(n_{feature}\) is:
+		<strong>Observation:  In order to compute the attribution for any feature \(i\) it is sufficient to consider the paths that correspond to each Case 4 node's children.</strong>  First, focusing on a specific Case 4 node \(n\), we know that one child is associated with \(x^f\) child and one child is associated with \(x^b\).  Then, the attribution to \(n\)'s feature is:
 		$$
-		\sum_{\text{paths }P\text{ under }x\text{ child}}\textcolor{green}{\text{Pos}_P} + \sum_{\text{paths }P\text{ under }\hat{x}\text{ child}}\textcolor{red}{\text{Neg}_P}
+		\sum_{\text{paths }P\text{ under }x\text{ child}}\textcolor{green}{\text{Pos}_P} + \sum_{\text{paths }P\text{ under }x^b\text{ child}}\textcolor{red}{\text{Neg}_P}
 		$$
 
 		Then, doing this for all nodes is equivalent to explaining all features (because SHAP values are additive).
@@ -1150,7 +1203,7 @@ div.tooltip {
 	</p>
 
     <div id="table_container" style="overflow-x:auto;align:center;font-size:18px">
-    	<p class="w3-opacity w3-left" align="left" style="margin:20px">
+    	<p id="example6" class="w3-opacity w3-left" align="left" style="margin:20px">
 			<strong>Example 6</strong>: DP algorithm for the tree and samples from Example 3.
 		</p>
 	</div>
@@ -1247,7 +1300,7 @@ div.tooltip {
 
     	<br><br>
 
-		<p class="w3-opacity w3-center" style="margin: 0px 0px 20px 0px;font-size:18px;" id="ex6_dynamic_step">dynamic algorithm</p>
+		<p class="w3-opacity w3-center" style="margin: 0px 0px 20px 0px;font-size:18px;" id="ex6_dynamic_step">Dynamic algorithm</p>
 
 	</div>
 
@@ -1262,12 +1315,12 @@ div.tooltip {
 			<!-- <div id="pseudocode_dynamic", style="display:none"> -->
 			<div id="pseudocode_dynamic" style="display:none">
 			<p class="no-margin w3-opacity w3-justify">
-				ITE_D(tree \(t\), array \(x\), array \(\hat{x}\)):
+				ITE_D(tree \(t\), array \(x^f\), array \(x^b\)):
 			</p>
 			<ul class="no-margin w3-opacity w3-justify">
 				\(\phi=\) [0]*\(len(x)\) <br>
 
-				RECURSE(node \(n\), int \(S^c\), int \(N^c\), array \(x_a\), array \(\hat{x}_a\)):
+				RECURSE(node \(n\), int \(S^c\), int \(N^c\), array \(x^f_a\), array \(x^b_a\)):
 				<ul style="font-family:courier;font-size:16px">
 					<font color="#8E44AD">// Case 1: At a leaf</font><br>
 					if \(n\) is a leaf:
@@ -1275,33 +1328,33 @@ div.tooltip {
 						if \(U==0\): return (0,0)<br>
 						else: return (\(W(S^c,N-1)\times n_{value}\),\(-W(S^c,N^c)\times n_{value}\))
 					</ul>
-					<font color="#8E44AD">// Find children associated with \(x\) and \(\hat{x}\)</font><br>
-					\(x_{child} =\) \(n_{leftchild}\) if \(x[n_{feature}] < n_{threshold}\) else \(x_{child}\) = \(n_{rightchild}\) <br>
-					\(\hat{x}_{child} =\) \(n_{leftchild}\) if \(\hat{x}[n_{feature}] < n_{threshold}\) else \(\hat{x}_{child}\) = \(n_{rightchild}\) <br>
+					<font color="#8E44AD">// Find children associated with \(x^f\) and \(x^b\)</font><br>
+					\(x^f_{child} =\) \(n_{leftchild}\) if \(x[n_{feature}] < n_{threshold}\) else \(x^f_{child}\) = \(n_{rightchild}\) <br>
+					\(x^b_{child} =\) \(n_{leftchild}\) if \(x^b[n_{feature}] < n_{threshold}\) else \(x^b_{child}\) = \(n_{rightchild}\) <br>
 					<font color="#8E44AD">// Case 2: Feature was encountered previously</font><br>
 					if \(x_a[n_{feature}]>0\):
 					<ul style="font-size:16px">
-						return RECURSE(\(x_{child}\),\(S^c\),\(N^c\),\(x_a\),\(\hat{x}_a\))
+						return RECURSE(\(x^f_{child}\),\(S^c\),\(N^c\),\(x^f_a\),\(x^b_a\))
 					</ul>
-					if \(\hat{x}_a[n_{feature}]>0\):
+					if \(x^b_a[n_{feature}]>0\):
 					<ul style="font-size:16px">
-						return RECURSE(\(\hat{x}_{child}\),\(S^c\),\(N^c\),\(x_a\),\(\hat{x}_a\))
+						return RECURSE(\(x^b_{child}\),\(S^c\),\(N^c\),\(x^f_a\),\(x^b_a\))
 					</ul>
 
-					<font color="#8E44AD">// Case 3: \(x\) and \(\hat{x}\) go to same children</font><br>
-					if \(x_{child}==\hat{x}_{child}\):
+					<font color="#8E44AD">// Case 3: \(x^f\) and \(x^b\) go to same children</font><br>
+					if \(x^f_{child}==x^b_{child}\):
 					<ul style="font-size:16px">
-						return RECURSE(\(x_{child}\),\(S^c\),\(N^c\),\(x\),\(\hat{x}\))
+						return RECURSE(\(x^f_{child}\),\(S^c\),\(N^c\),\(x^f\),\(x^b\))
 					</ul>
-					<font color="#8E44AD">// Case 4: \(x\) and \(\hat{x}\) go to different children</font><br>
-					\(X_a =\) copy(\(x_a\)); \(X_a[n_{feature}]=X_a[n_{feature}]+1\)<br>
-					\(\hat{X}_a =\) copy(\(\hat{x}_a\)); \(\hat{X}_a[n_{feature}]=\hat{X}_a[n_{feature}]+1\)<br>
-					if not \(x_{child}==\hat{x}_{child}\):
+					<font color="#8E44AD">// Case 4: \(x^f\) and \(x^b\) go to different children</font><br>
+					\(X_a =\) copy(\(x^f_a\)); \(X_a[n_{feature}]=X_a[n_{feature}]+1\)<br>
+					\(x^b_a =\) copy(\(x^b_a\)); \(x^b_a[n_{feature}]=x^b_a[n_{feature}]+1\)<br>
+					if not \(x^f_{child}==x^b_{child}\):
 					<ul style="font-size:16px">
-						\(pos_x,neg_x=\) RECURSE(\(x_{child}\),\(S^c+1\),\(N^c+1\),\(X_a\),\(\hat{x}_a\))<br>
-						\(pos_{\hat{x}},neg_{\hat{x}}=\) RECURSE(\(\hat{x}_{child}\),\(S^c\),\(N^c+1\),\(x_a\),\(\hat{X}_a\))<br>
-						\(\phi[n_{feature}]=\phi[n_{feature}]+pos_{x}+neg_{\hat{x}}\)<br>
-						return (\(pox_{x}+pox_{\hat{x}}\),\(neg_{x}+neg_{\hat{x}}\))
+						\(pos_x,neg_x=\) RECURSE(\(x^f_{child}\),\(S^c+1\),\(N^c+1\),\(x^f_a\),\(x^b_a\))<br>
+						\(pos_{x^b},neg_{x^b}=\) RECURSE(\(x^b_{child}\),\(S^c\),\(N^c+1\),\(x^f_a\),\(x^b_a\))<br>
+						\(\phi[n_{feature}]=\phi[n_{feature}]+pos_{x}+neg_{x^b}\)<br>
+						return (\(pox_{x}+pox_{x^b}\),\(neg_{x}+neg_{x^b}\))
 					</ul>
 				</ul>
 				return RECURSE(tree.root, 0, 0, [0]*\(len(x)\), [0]*\(len(x)\))
@@ -1311,17 +1364,17 @@ div.tooltip {
 	</div>
 
     <p class="w3-opacity w3-justify">
-		The computational complexity to compute \(\phi_i(f,x,\hat{x})\) using <font style="font-family:courier">ITE_D()</font> for all features is now just \(O(T_{numnodes})\) where \(T_{numnodes}\) is the number of nodes in the tree.  This is because every case for each node now only requires a constant amount of work.  
+		The computational complexity to compute \(\phi_i(f,x,x^b)\) using the dynamic programming algorithm for all features is now just \(O(T_{numnodes})\) where \(T_{numnodes}\) is the number of nodes in the tree.  In <a href="#example6">Example 6</a> it is easy to see that each node now only requires a constant amount of work.  
 	</p>
 
     <p class="w3-opacity w3-justify">
-		Finally, our original goal was to compute \(\phi_i(f,x)\).  We simply need to compute \(\phi_i(f,x,\hat{x})\) for many references, resulting in a run time of \(O(|D|T_{numnodes})\) where \(|D|\) is the number of samples in the background distribution.  In practice, using a fixed number of about 100 to 1000 references works well.
+		Finally, our original goal was to compute \(\phi_i(f,x)\).  We simply need to compute \(\phi_i(f,x,x^b)\) for many references, resulting in a run time of \(O(|D|T_{numnodes})\) where \(|D|\) is the number of samples in the background distribution.  In practice, using a fixed number of about 100 to 1000 references works well.
 	</p>
 
     <h3 class="w3-justify" id="comparison_of_methods">2.4 Comparison of SHAP Methods</h3>
 
     <p class="w3-opacity w3-justify">
-    	It should be noted that there are a number of alternative methods (Path Dependent Tree Explainer, Kernel Explainer, and Sampling Explainer) in the SHAP package.  If you are explaining tree-based models, it may not be clear which one you should use.  In this article we briefly overview the methods and compare them to ITE:
+    	It should be noted that there are a number of alternative methods that aim to approximate SHAP values: Path Dependent Tree Explainer, Kernel Explainer, and Sampling Explainer.  If you are explaining tree-based models, it may not be clear which one you should use.  In this article we briefly overview the methods and compare them to ITE:
 	</p>
 
     <p class="w3-opacity w3-justify">
@@ -1745,6 +1798,10 @@ sc_dict6[treeData[0].name] = 0;
 var pos_dict6 = {};
 var neg_dict6 = {};
 
+ex6_update_nc_sc();
+ex6_update_phi();
+nextnodes6.push(treeData[0]);
+
 function dynamicRunAll() {
 	for (var i = 0; i < 20; i++) {
 		dynamicStep();
@@ -1752,15 +1809,15 @@ function dynamicRunAll() {
 }
 
 function dynamicStep() {
-	if (ex6_is_initialize) {
-		ex6_update_str('<strong>Case 0</strong>: Initialize');
-		ex6_update_nc_sc();
-		ex6_update_phi();
+	// if (ex6_is_initialize) {
+	// 	ex6_update_str('<strong>Case 0</strong>: Initialize');
+	// 	ex6_update_nc_sc();
+	// 	ex6_update_phi();
 
-		ex6_is_initialize = false;
-		nextnodes6.push(treeData[0]);
-		return(1);
-	}
+	// 	ex6_is_initialize = false;
+	// 	nextnodes6.push(treeData[0]);
+	// 	return(1);
+	// }
 
 	if (nextnodes6.length == 0) {
 		return(1);
