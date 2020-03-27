@@ -210,7 +210,7 @@ function update(source) {
 
   // Normalize for fixed-depth.
   nodes.forEach(function(d) { d.y = d.depth * 80 + 20; });
-  nodes.forEach(function(d) { d.x = d.x*1.2 - 25; });
+  nodes.forEach(function(d) { d.x = d.x*1 - 25; });
 
   // Declare the nodes…
   var i = 0;

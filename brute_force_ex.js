@@ -28,7 +28,7 @@ function update4(source) {
 
 	// Normalize for fixed-depth.
 	nodes.forEach(function(d) { d.y = d.depth * 60 + 20; });
-	nodes.forEach(function(d) { d.x = d.x * 1.3; });
+	nodes.forEach(function(d) { d.x = (d.x - 10) * 1.3; });
 
 	// Declare the nodes…
 	var node = svg4.selectAll("g.node")
@@ -63,7 +63,7 @@ function update4(source) {
 		}
 	})
 	.style("font-family", "courier")
-	.style("font-size", "16px")
+	.style("font-size", "14px")
 	.style("fill-opacity", 1);
 
 	// Declare the links…

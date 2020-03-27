@@ -14,7 +14,7 @@
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>d3v4 = d3;</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
-
+<script src="https://distill.pub/template.v1.js"></script>
 
 <style id="distill-prerendered-styles" type="text/css">/*
  * Copyright 2018 The Distill Template Authors
@@ -1040,6 +1040,14 @@ svg .rect {
   stroke: steelblue;
   stroke-width: 5px;
 }
+
+.no-space {
+  margin-top:0px;
+  margin-bottom:0px;
+  line-height:0.1em;
+  padding-top:0.3em;
+  padding-bottom:0.0em;
+}
 </style>
 
 <body>
@@ -1096,7 +1104,7 @@ svg .rect {
     </p>
 
   <!-- Figure 1 -->
-  <figure class="l-body-outset">
+  <figure>
     <div id="fig1"></div>
     <figcaption>
       <a href="#fig1" class="figure-number">1</a>: The most popular data science methods according to a <a href="https://www.kaggle.com/surveys/2017">2017 Kaggle survey</a> (based on a total of 7,301 responses).
@@ -1297,8 +1305,9 @@ svg .rect {
     	The <i>do</i> notation is causal inference's <i>do</i>-operator <d-cite bibtex-key="pearl2009causality"></d-cite>.  In words, we break the dependence between the features in \(S\) and the remaining features, which is analogous to <i>intervening</i> on the remaining features (more on this in <a href="#background_distribution">Section 1.3</a>).  The motivation behind this decision comes from <d-cite bibtex-key="janzing2019feature"></d-cite> which is also very close to Random Baseline Shapley in <d-cite bibtex-key="sundararajan2019many"></d-cite>.  Additionally, this is exactly the assumption made by <a href="https://shap.readthedocs.io/en/latest/#shap.KernelExplainer">Kernel Explainer</a> <d-cite bibtex-key="lundberg2017unified"></d-cite> and <a href="https://shap.readthedocs.io/en/latest/#shap.SamplingExplainer">Sampling Explainer</a> from the SHAP package.
     </p>
 
+
     <!-- Figure 3 -->
-    <figure id="linear_shap_ex" class="l-page">
+    <figure id="linear_shap_ex">
       <div align=center style="margin-bottom: 20px">
 
     		<table style="width:110px;display:inline;margin-right:25px;border:none;">
@@ -1445,9 +1454,9 @@ svg .rect {
       <figcaption>
         <a href="#linear_shap_ex" class="figure-number">3</a>: Comparing two versions of SHAP values: conditional expectation (CE) and interventional conditional expectation (ICE).  We make two simplifying assumptions:
 
-        <ul align="left" style="margin-top:0px;margin-bottom:0px;line-height:0.2em;padding-top:0.2em;padding-bottom:0.2em;">
-          <li style="margin-top:0px;margin-bottom:0px;line-height:0.2em;padding-top:0.2em;padding-bottom:0.2em;">The function is linear (\(f=\beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \beta_4 x_4\))</li>
-          <li style="margin-top:0px;margin-bottom:0px;line-height:0.2em;padding-top:0.2em;padding-bottom:0.2em;">The data-generating distribution is multivariate normal (\(D\sim \mathcal{N}_4(0,C)\))</li>
+        <ul>
+          <li class="no-space">The function is linear (\(f=\beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \beta_4 x_4\))</li>
+          <li class="no-space">The data-generating distribution is multivariate normal (\(D\sim \mathcal{N}_4(0,C)\))</li>
         </ul>
       </figcaption>
     </figure>
@@ -1555,7 +1564,7 @@ svg .rect {
     Now our goal is to tackle the simpler problem of obtaining single reference SHAP values \(\phi_i(f,x^f,x^b)\) that are attributions for a single foreground (sample being explained) and background sample (sample being compared to).  In this section, we consider a specific foreground sample, background sample, and tree as specified in <a href="#example3">Example 3</a>.
 	</p>
 
-	<figure>
+	<figure id="define_tree_samples">
 		<p align=center style="font-size:15px;">
 			Tree Parameters <d-footnote>Green links indicate the foreground sample goes down a particular split, red indicates the background sample does, and blue indicates both samples do.</d-footnote> (Click nodes)</strong> <br>
 		</p>
@@ -1629,7 +1638,7 @@ svg .rect {
     </div>
 
     <figcaption>
-      <a href="#shapley_value_ex" class="figure-number">4</a>: Choose foreground sample \(x^f\), background sample \(x^b\), and tree parameters for the remainder of <a href="#algorithm">Section 2</a>.
+      <a href="#define_tree_samples" class="figure-number">4</a>: Choose foreground sample \(x^f\), background sample \(x^b\), and tree parameters for the remainder of <a href="#algorithm">Section 2</a>.
     </figcaption>
 
 	</figure>
@@ -1654,143 +1663,137 @@ svg .rect {
 	</p>
 
 
-  <div id="table_container" style="overflow-x:auto;align:center;">
-  	<p align="left" style="margin:20px">
-		<strong>Example 4</strong>: Brute force algorithm for the tree and samples specified in Example 3.
-    </p>
-	</div>
+  <figure id="brute_force_ex" class="l-page">
+    <div class="container" style="width:800px">
 
-  <!-- <div id="table_container" style="overflow-x:auto;align:center"> -->
-  <figure class="l-page">
-  <div class="container">
+      <div class="first" style="width:350px;height:720px">
+      	<p align=center style="font-size:15px;margin-bottom:-5px">Tree Parameters</p>
+      	<div align=center id="ex4_divtree" style="margin-top:0px;margin-bottom:-30px"></div>
+      
+        <table align=center style="border:none;margin-bottom:-5px">
+          <col width="60px"/>
+          <col width="90px"/>
+          <col width="90px"/>
+          <col width="90px"/>
+          <tr>
+            <td align=center colspan="4">Foreground & background sample</td>
+          </tr>
+          <tr>
+            <th></th>
+            <th>\(x_1\)</th>
+            <th>\(x_2\)</th>
+            <th>\(x_3\)</th>
+          </tr>
+          <tr>
+            <td>\(x^f\)</td>
+            <td id="ex4_fx1">0</td>
+            <td id="ex4_fx2">0</td>
+            <td id="ex4_fx3">10</td>
+          </tr>
+          <tr>
+            <td>\(x^b\)</td>
+            <td id="ex4_bx1">10</td>
+            <td id="ex4_bx2">10</td>
+            <td id="ex4_bx3">0</td>
+          </tr>
+          <tr id="ex4_hS">
+            <td>\(h^S\)</td>
+            <td id="ex4_hs1"></td>
+            <td id="ex4_hs2"></td>
+            <td id="ex4_hs3"></td>
+          </tr>
+          <tr id="ex4_hSi">
+            <td>\(h^{S\cup i}\)</td>
+            <td id="ex4_hsi1"></td>
+            <td id="ex4_hsi2"></td>
+            <td id="ex4_hsi3"></td>
+          </tr>
+        </table>
 
-    <div class="first" style="width:460px;height:300px">
-    	<p style="margin: 0px 0px 0px 20px;"><strong>Tree Parameters</strong></p>
-    	<div id="ex4_divtree" style="margin-top:10px;"></div>
+        <table align=center style="border:none;margin-bottom:-5px">
+          <col width="50px"/>
+          <col width="70px"/>
+          <col width="70px"/>
+          <col width="80px"/>
+          <col width="80px"/>
+          <tr>
+            <td align=center colspan="5">Algorithm State</td>
+          </tr>
+          <tr>
+            <td>\(W\)</td>
+            <td>\(S\)</td>
+            <td id="ex4_fxS">\(f(x_S)\)</td>
+            <td>\(S\cup{i}\)</td>
+            <td id="ex4_fxSi">\(f(x_{S\cup{i}})\)</td>
+          </tr>
+          <tr id="ex4_s1_row">
+            <td>1/3</td>
+            <td id="s1"></td>
+            <td id="s1_val"></td>
+            <td id="s1i"></td>
+            <td id="s1i_val"></td>
+          </tr>
+          <tr id="ex4_s2_row">
+            <td>1/6</td>
+            <td id="s2"></td>
+            <td id="s2_val"></td>
+            <td id="s2i"></td>
+            <td id="s2i_val"></td>
+          </tr>
+          <tr id="ex4_s3_row">
+            <td>1/6</td>
+            <td id="s3"></td>
+            <td id="s3_val"></td>
+            <td id="s3i"></td>
+            <td id="s3i_val"></td>
+          </tr>
+          <tr id="ex4_s4_row">
+            <td>1/3</td>
+            <td id="s4"></td>
+            <td id="s4_val"></td>
+            <td id="s4i"></td>
+            <td id="s4i_val"></td>
+          </tr>
+        </table>
+
+        <table align=center style="border:none;">
+          <col width="20px"/>
+          <col width="80px"/>
+          <col width="20px"/>
+          <col width="80px"/>
+          <col width="20px"/>
+          <col width="80px"/>
+          <tr>
+            <td align=center colspan="6">Attribution Values</td>
+          </tr>
+          <tr>
+            <td id="ex4_phi1">\(\phi_1\)</td>
+            <td align=center id="ex4_phi1_val">0</td>
+            <td id="ex4_phi2">\(\phi_2\)</td>
+            <td align=center id="ex4_phi2_val">0</td>
+            <td id="ex4_phi3">\(\phi_3\)</td>
+            <td align=center id="ex4_phi3_val">0</td>
+          </tr>
+        </table>
+
+      </div>
+
+
+      <div class="second" style="width:450px;height:720px">
+
+        <p>filler</p>
+      </div>
+
+      <input type="button" class="w3-button w3-green" value="<<" onclick="ex4_reset()">
+      <input type="button" class="w3-button w3-green" value=">" onclick="bruteForceStep()">
+      <input type="button" class="w3-button w3-green" value=">>" onclick="bruteForceRunAll()">
+      <br><br>
+      <div class="clear"></div>
     </div>
 
-
-    <div class="second" style="width:300px;height:300px">
-    	<p style="margin: 0px 0px 0px -100px;"><strong>Foreground & background sample</strong></p>
-		<table cellpadding="10" style="margin: 10px 0px 0px -10px">
-			<col width="40px"/>
-			<col width="50px"/>
-			<col width="50px"/>
-			<tr>
-				<th></th>
-				<th>\(x_1\)</th>
-				<th>\(x_2\)</th>
-				<th>\(x_3\)</th>
-			</tr>
-			<tr>
-				<td>\(x^f\)</td>
-				<td id="ex4_fx1">0</td>
-				<td id="ex4_fx2">0</td>
-				<td id="ex4_fx3">10</td>
-			</tr>
-			<tr>
-				<td>\(x^b\)</td>
-				<td id="ex4_bx1">10</td>
-				<td id="ex4_bx2">10</td>
-				<td id="ex4_bx3">0</td>
-			</tr>
-			<tr id="ex4_hS">
-				<td>\(h^S\)</td>
-				<td id="ex4_hs1"></td>
-				<td id="ex4_hs2"></td>
-				<td id="ex4_hs3"></td>
-			</tr>
-			<tr id="ex4_hSi">
-				<td>\(h^{S\cup i}\)</td>
-				<td id="ex4_hsi1"></td>
-				<td id="ex4_hsi2"></td>
-				<td id="ex4_hsi3"></td>
-			</tr>
-		</table>
-    </div>
-
-    <div class="clear"></div>
-    <div class="container">
-    	<div class="first" style="width:460px;height:280px">
-		<p style="margin: 0px 0px 0px 20px;"><strong>Brute Force Values</strong></p>
-    		<table cellpadding="10" style="margin: 10px 0px 0px 90px">
-	      <col width="40px"/>
-	      <col width="50px"/>
-	      <col width="50px"/>
-	      <col width="60px"/>
-	      <col width="60px"/>
-		<thead>
-			<tr>
-				<th>\(W\)</th>
-				<th>\(S\)</th>
-				<th id="ex4_fxS">\(f(x_S)\)</th>
-				<th>\(S\cup{i}\)</th>
-				<th id="ex4_fxSi">\(f(x_{S\cup{i}})\)</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr id="ex4_s1_row">
-				<td>1/3</td>
-				<td id="s1"></td>
-				<td id="s1_val"></td>
-				<td id="s1i"></td>
-				<td id="s1i_val"></td>
-			</tr>
-			<tr id="ex4_s2_row">
-				<td>1/6</td>
-				<td id="s2"></td>
-				<td id="s2_val"></td>
-				<td id="s2i"></td>
-				<td id="s2i_val"></td>
-			</tr>
-			<tr id="ex4_s3_row">
-				<td>1/6</td>
-				<td id="s3"></td>
-				<td id="s3_val"></td>
-				<td id="s3i"></td>
-				<td id="s3i_val"></td>
-			</tr>
-			<tr id="ex4_s4_row">
-				<td>1/3</td>
-				<td id="s4"></td>
-				<td id="s4_val"></td>
-				<td id="s4i"></td>
-				<td id="s4i_val"></td>
-			</tr>
-		</tbody>
-		</table>
-    	</div>
-
-    	<div class="second" style="width:300px;height:280px">
-    	<p style="margin: 0px 0px 0px -110px;"><strong>Attribution Values</strong></p>
-
-		<table cellpadding="10" style="margin: 10px 0px 0px -10px">
-	      <col width="60px"/>
-	      <col width="80px"/>
-			<thead>
-			<!-- <tr style="background-color:#8BC34A;"> -->
-			<tr id="ex4_phi1">
-				<td>\(\phi_1(f,x^f,x^b)\)</td>
-				<td id="ex4_phi1_val">0</td>
-			</tr>
-			<tr id="ex4_phi2">
-				<td>\(\phi_2(f,x^f,x^b)\)</td>
-				<td id="ex4_phi2_val">0</td>
-			</tr>
-			<tr id="ex4_phi3">
-				<td>\(\phi_3(f,x^f,x^b)\)</td>
-				<td id="ex4_phi3_val">0</td>
-			</tr>
-		</thead>
-		</table>
-    	</div>
-    </div>
-    <input type="button" class="w3-button w3-green" value="<<" onclick="ex4_reset()">
-    <input type="button" class="w3-button w3-green" value=">" onclick="bruteForceStep()">
-    <input type="button" class="w3-button w3-green" value=">>" onclick="bruteForceRunAll()">
-    <br><br>
-    <div class="clear"></div>
-  </div>
+    <figcaption>
+      <a href="#brute_force_ex" class="figure-number">5</a>: Brute force algorithm for the tree and samples specified in <a href="#define_tree_samples" class="figure-number">4</a>.
+    </figcaption>
   </figure>
 
 
@@ -1809,46 +1812,38 @@ svg .rect {
 		Before we get into the algorithm, we first describe a theorem that is the basis for this naive implementation.
 	</p>    
 
-	<p>
-    	<strong>Theorem 1: To calculate \(\phi_i(f,x,x^b)\), we can calculate attributions for each path from the root to each leaf.</strong>  For a given path \(P\), we define \(N_P\) to be the "unique" features encountered and \(S_P\) to be the "unique" features that came from \(x\).  Finally, define \(v\) to be the value of the path's leaf.  Then, the attribution of the path is:
+	<p style="margin-bottom: 0px">
+  	<strong>Theorem 1: To calculate \(\phi_i(f,x,x^b)\), we can calculate attributions for each path from the root to each leaf.</strong>  
+  </p>
 
-    	$$
+  <p>
+    For a given path \(P\), we define \(N_P\) to be the "unique" features encountered and \(S_P\) to be the "unique" features that came from \(x\).  Finally, define \(v\) to be the value of the path's leaf.  Then, the attribution of the path is:
+
+  	$$
 		\phi_i^P(f,x,x^b)=
-	    \begin{cases}
-	    	0 & \text{if}\ i\notin N_P \\
-	    	\textcolor{green}{W(|S_P|-1,|N_P|)\times v} & \text{if}\ i\in S_P \\
-	    	\textcolor{red}{-W(|S_P|,|N_P|)\times v} & \text{o.w.}
-	    \end{cases}
-    	$$
-
+    \begin{cases}
+    	0 & \text{if}\ i\notin N_P \\
+    	\textcolor{green}{W(|S_P|-1,|N_P|)\times v} & \text{if}\ i\in S_P \\
+    	\textcolor{red}{-W(|S_P|,|N_P|)\times v} & \text{o.w.}
+    \end{cases}
+  	$$
 	</p>
 
 	<!-- Proof -->
-	<div style="background-color:aliceblue;">
-
-		<div style="padding-left:10px;padding-right:10px">
-
-			<p><a onclick="hideshow('proof')"><strong>Theorem 1 Sketch of Proof (Click)</strong></a></p>
-
-			<div id="proof", style="display:none">
-
-				<p>
-					If we treat each path in the tree from the root to the leaf as a separate model \(f'(x)\) that returns the value of the leaf if that path is traversed by \(x\) or zero otherwise, then we have \(L\) models that operate on disjoint parts of the input space.  Then, \(f(x)=\sum f'(x)\) and by the additivity of SHAP values, \(\phi_i(f,x,x^b)=\sum_f\phi_i(f',x,x^b)\).  Then, we can simply calculate \(\phi_i\) for each path model.  Since the path model is zero everywhere except for the associated path, it is easy to arrive to the solution in Theorem 1.
-				</p>
-
-			</div>
-		</div>
-
+	<p><a onclick="hideshow('proof')"><strong>+ Technical Details</strong></a></p>
+	<div id="proof", style="display:none">
+		<p>
+			<i>Sketch of proof</i>: If we treat each path in the tree from the root to the leaf as a separate model \(f'(x)\) that returns the value of the leaf if that path is traversed by \(x\) or zero otherwise, then we have \(L\) models that operate on disjoint parts of the input space.  Then, \(f(x)=\sum f'(x)\) and by the additivity of SHAP values, \(\phi_i(f,x,x^b)=\sum_f\phi_i(f',x,x^b)\).  Then, we can simply calculate \(\phi_i\) for each path model.  Since the path model is zero everywhere except for the associated path, it is easy to arrive to the solution in Theorem 1.
+		</p>
 	</div>
 
 	<p>
 		Then the goal of the algorithm is to obtain \(N_P\) and \(S_P\) for each path by recursively traversing the tree.  We will start by explaining the algorithm via an example:
 	</p>
 
-	<figure>
-		<figcaption>Figure 3: Green paths are associated with \(\textcolor{green}{x^f}\), red paths are \(\textcolor{red}{x^b}\), and blue paths are associated with both.</figcaption>
-    <br>
-		<img src="images/tree_example3.png" alt="Tree Example 3" style="width: 360px;">
+	<figure id="tree_example_cases" align=center>
+		<img src="images/tree_example3.png" alt="Tree Example 3" style="width: 360px;margin-bottom: 20px;">
+    <figcaption><a href="#tree_example_cases" class="figure-number">6</a>:  Green paths are associated with \(\textcolor{green}{x^f}\), red paths are \(\textcolor{red}{x^b}\), and blue paths are associated with both.</figcaption>
 	</figure>
 
 	<p>
@@ -1981,60 +1976,44 @@ svg .rect {
 
 	</div>
 
-
 	<!-- Pseudocode -->
-	<div style="background-color:#e6ffee;">
+	<div style="padding-left:10px;padding-right:10px">
 
-		<div style="padding-left:10px;padding-right:10px">
+		<p><a onclick="hideshow('pseudocode_naive')"><strong>+ Pseudocode</strong></a></p>
 
-			<p><a onclick="hideshow('pseudocode_naive')"><strong>Naive Pseudocode (Click)</strong></a></a></p>
+		<div id="pseudocode_naive" style="display:none">
+      <dt-code block language="python">
+        def ite_naive(array xf, array xb, tree T) {
+          def recurse(node n, list np, list sp):
+            // Case 1: Leaf
+            if n.is_leaf:
+              return(phi_i_p) [based on Theorem 1]
 
-			<div id="pseudocode_naive" style="display:none">
-			<p class="no-margin" style="font-family:courier;font-size:16px">
-				ITE_N(array \(x^f\), array \(x^b\), tree \(T\)):
-			</p>
+            // Find children associated with xf and xb
+            xf_child = n.leftchild if xf[n.feat] < n.thres else n.rightchild
+            xb_child = n.leftchild if xb[n.feat] < n.thres else n.rightchild
 
-			<ul class="no-margin" style="font-family:courier;font-size:16px">
-				RECURSE(node \(n\), list \(S_P\), list \(N_P\), array \(x^f\), array \(x^b\)):
-				<ul style="font-size:16px">
-					<font color="#8E44AD">// Case 1: At a leaf</font><br>
-					if n is a leaf:
-					<ul style="font-size:16px">
-						return \(\phi_i^P(f,x^f,x^b)\) based on \(S_P\) and \(N_P\) (Theorem 1)
-					</ul>
-					<font color="#8E44AD">// Find children associated with \(x\) and \(x^b\)</font><br>
-					\(x^f_{child} =\) \(n_{leftchild}\) if \(x^f[n_{feature}] < n_{threshold}\) else \(x^f_{child}\) = \(n_{rightchild}\) <br>
-					\(x^b_{child} =\) \(n_{leftchild}\) if \(x^b[n_{feature}] < n_{threshold}\) else \(x^b_{child}\) = \(n_{rightchild}\) <br>
-					<font color="#8E44AD">// Case 2: Feature was encountered previously</font><br>
-					if \(n_{feature}\in N_P\):
-					<ul style="font-size:16px">
-						if \(n_{feature}\in S_P\):
-						<ul style="font-size:16px">
-							return ITE_N(\(x^f_{child}\),\(S_P\),\(N_P\),\(x^f\),\(x^b\))
-						</ul>
-						else: 
-						<ul style="font-size:16px">
-							return ITE_N(\(x^b_{child}\),\(S_P\),\(N_P\),\(x^f\),\(x^b\))
-						</ul>
-					</ul>
+            // Case 2: Feature encountered before
+            if n.feat in np:
+              if n.feat in sp:
+                return ite_naive(xf_child,np,sp)
+              else:
+                return ite_naive(xb_child,np,sp)
 
-					<font color="#8E44AD">// Case 3: \(x^f\) and \(x^b\) go to same children</font><br>
-					if \(x^f_{child}==x^b_{child}\):
-					<ul style="font-size:16px">
-						return ITE_N(\(x^f_{child}\),\(S_P\),\(N_P\),\(x\),\(x^b\))
-					</ul>
-					<font color="#8E44AD">// Case 4: \(x^f\) and \(x^b\) go to different children</font><br>
-					if not \(x^f_{child}==x^b_{child}\):
-					<ul style="font-size:16px">
-						return ITE_N(\(x^b_{child}\),\(S_P\),\(N_P+[n_{feature}]\),\(x^f\),\(x^b\)) + <br> ITE_N(\(x^f_{child}\),\(S_P+[n_{feature}]\),\(N_P+[n_{feature}]\),\(x^f\),\(x^b\))
-					</ul>
-				</ul>
-				return RECURSE(\(T_{rootnode}\), \(S_P=[\ ]\), \(N_P=[\ ]\), \(x^f\), \(x^b\))
-			</ul>
-			</div>
+            // Case 3: xf and xb go the same way
+            if xf_child == xb_child:
+              return(ite_naive(xf_child,np,sp))
 
-		</div>
+            // Case 4: xf and xb don't go the same way
+            if not xf_child == xb_child:
+              f_phi = ite_naive(xf_child,np+[n.feat],sp+[n.feat])
+              b_phi = ite_naive(xb_child,np+[n.feat],sp)
+              return(b_phi+f_phi)
 
+          return(recurse(n=T.root,sp=[],np=[]))
+        }
+      </dt-code>
+    </div>
 	</div>
 
     <p>
