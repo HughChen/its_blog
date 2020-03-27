@@ -16,6 +16,829 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
 
 
+<style id="distill-prerendered-styles" type="text/css">/*
+ * Copyright 2018 The Distill Template Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+html {
+  font-size: 14px;
+  line-height: 1.6em;
+  /* font-family: "Libre Franklin", "Helvetica Neue", sans-serif; */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+  /*, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";*/
+  text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media(min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  color: #004276;
+}
+
+figure {
+  margin: 0;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+table th {
+  text-align: left;
+}
+
+table thead {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+table thead th {
+  padding-bottom: 0.5em;
+}
+
+table tbody :first-child td {
+  padding-top: 0.5em;
+}
+
+pre {
+  overflow: auto;
+  max-width: 100%;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
+sup, sub {
+  vertical-align: baseline;
+  position: relative;
+  top: -0.4em;
+  line-height: 1em;
+}
+
+sub {
+  top: 0.4em;
+}
+
+.kicker,
+.marker {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+
+/* Headline */
+
+@media(min-width: 1024px) {
+  d-title h1 span {
+    display: block;
+  }
+}
+
+/* Figure */
+
+figure {
+  position: relative;
+  margin-bottom: 2.5em;
+  margin-top: 1.5em;
+}
+
+figcaption+figure {
+
+}
+
+figure img {
+  width: 100%;
+}
+
+figure svg text,
+figure svg tspan {
+}
+
+figcaption,
+.figcaption {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 12px;
+  line-height: 1.5em;
+}
+
+@media(min-width: 1024px) {
+figcaption,
+.figcaption {
+    font-size: 13px;
+  }
+}
+
+figure.external img {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+figcaption a {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+figcaption b,
+figcaption strong, {
+  font-weight: 600;
+  color: rgba(0, 0, 0, 1.0);
+}
+/*
+ * Copyright 2018 The Distill Template Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@supports not (display: grid) {
+  .base-grid,
+  distill-header,
+  d-title,
+  d-abstract,
+  d-article,
+  d-appendix,
+  distill-appendix,
+  d-byline,
+  d-footnote-list,
+  d-citation-list,
+  distill-footer {
+    display: block;
+    padding: 8px;
+  }
+}
+
+.base-grid,
+distill-header,
+d-title,
+d-abstract,
+d-article,
+d-appendix,
+distill-appendix,
+d-byline,
+d-footnote-list,
+d-citation-list,
+distill-footer {
+  display: grid;
+  justify-items: stretch;
+  grid-template-columns: [screen-start] 8px [page-start kicker-start text-start gutter-start middle-start] 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr [text-end page-end gutter-end kicker-end middle-end] 8px [screen-end];
+  grid-column-gap: 8px;
+}
+
+.grid {
+  display: grid;
+  grid-column-gap: 8px;
+}
+
+@media(min-width: 768px) {
+  .base-grid,
+  distill-header,
+  d-title,
+  d-abstract,
+  d-article,
+  d-appendix,
+  distill-appendix,
+  d-byline,
+  d-footnote-list,
+  d-citation-list,
+  distill-footer {
+    grid-template-columns: [screen-start] 1fr [page-start kicker-start middle-start text-start] 45px 45px 45px 45px 45px 45px 45px 45px [ kicker-end text-end gutter-start] 45px [middle-end] 45px [page-end gutter-end] 1fr [screen-end];
+    grid-column-gap: 16px;
+  }
+
+  .grid {
+    grid-column-gap: 16px;
+  }
+}
+
+@media(min-width: 1000px) {
+  .base-grid,
+  distill-header,
+  d-title,
+  d-abstract,
+  d-article,
+  d-appendix,
+  distill-appendix,
+  d-byline,
+  d-footnote-list,
+  d-citation-list,
+  distill-footer {
+    grid-template-columns: [screen-start] 1fr [page-start kicker-start] 50px [middle-start] 50px [text-start kicker-end] 50px 50px 50px 50px 50px 50px 50px 50px [text-end gutter-start] 50px [middle-end] 50px [page-end gutter-end] 1fr [screen-end];
+    grid-column-gap: 16px;
+  }
+
+  .grid {
+    grid-column-gap: 16px;
+  }
+}
+
+@media(min-width: 1180px) {
+  .base-grid,
+  distill-header,
+  d-title,
+  d-abstract,
+  d-article,
+  d-appendix,
+  distill-appendix,
+  d-byline,
+  d-footnote-list,
+  d-citation-list,
+  distill-footer {
+    grid-template-columns: [screen-start] 1fr [page-start kicker-start] 60px [middle-start] 60px [text-start kicker-end] 60px 60px 60px 60px 60px 60px 60px 60px [text-end gutter-start] 60px [middle-end] 60px [page-end gutter-end] 1fr [screen-end];
+    grid-column-gap: 32px;
+  }
+
+  .grid {
+    grid-column-gap: 32px;
+  }
+}
+
+
+
+
+.base-grid {
+  grid-column: screen;
+}
+
+/* .l-body,
+d-article > *  {
+  grid-column: text;
+}
+
+.l-page,
+d-title > *,
+d-figure {
+  grid-column: page;
+} */
+
+.l-gutter {
+  grid-column: gutter;
+}
+
+.l-text,
+.l-body {
+  grid-column: text;
+}
+
+.l-page {
+  grid-column: page;
+}
+
+.l-body-outset {
+  grid-column: middle;
+}
+
+.l-page-outset {
+  grid-column: page;
+}
+
+.l-screen {
+  grid-column: screen;
+}
+
+.l-screen-inset {
+  grid-column: screen;
+  padding-left: 16px;
+  padding-left: 16px;
+}
+
+
+/* Aside */
+
+d-article aside {
+  grid-column: gutter;
+  font-size: 12px;
+  line-height: 1.6em;
+  color: rgba(0, 0, 0, 0.6)
+}
+
+@media(min-width: 768px) {
+  aside {
+    grid-column: gutter;
+  }
+
+  .side {
+    grid-column: gutter;
+  }
+}
+/*
+ * Copyright 2018 The Distill Template Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+d-title {
+  padding: 2rem 0 1.5rem;
+  contain: layout style;
+  overflow-x: hidden;
+}
+
+@media(min-width: 768px) {
+  d-title {
+    padding: 4rem 0 1.5rem;
+  }
+}
+
+d-title h1 {
+  grid-column: text;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.1em;
+  margin: 0 0 0.5rem;
+}
+
+@media(min-width: 768px) {
+  d-title h1 {
+    font-size: 50px;
+  }
+}
+
+d-title p {
+  font-weight: 300;
+  font-size: 1.2rem;
+  line-height: 1.55em;
+  grid-column: text;
+}
+
+d-title .status {
+  margin-top: 0px;
+  font-size: 12px;
+  color: #009688;
+  opacity: 0.8;
+  grid-column: kicker;
+}
+
+d-title .status span {
+  line-height: 1;
+  display: inline-block;
+  padding: 6px 0;
+  border-bottom: 1px solid #80cbc4;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+/*
+ * Copyright 2018 The Distill Template Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+d-byline {
+  contain: style;
+  overflow: hidden;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 0.8rem;
+  line-height: 1.8em;
+  padding: 1.5rem 0;
+  min-height: 1.8em;
+}
+
+
+d-byline .byline {
+  grid-template-columns: 1fr 1fr;
+  grid-column: text;
+}
+
+@media(min-width: 768px) {
+  d-byline .byline {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+
+d-byline .authors-affiliations {
+  grid-column-end: span 2;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 1em;
+}
+
+@media(min-width: 768px) {
+  d-byline .authors-affiliations {
+    margin-bottom: 0;
+  }
+}
+
+d-byline h3 {
+  font-size: 0.6rem;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.5);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+d-byline p {
+  margin: 0;
+}
+
+d-byline a,
+d-article d-byline a {
+  color: rgba(0, 0, 0, 0.8);
+  text-decoration: none;
+  border-bottom: none;
+}
+
+d-article d-byline a:hover {
+  text-decoration: underline;
+  border-bottom: none;
+}
+
+d-byline p.author {
+  font-weight: 500;
+}
+
+d-byline .affiliations {
+
+}
+/*
+ * Copyright 2018 The Distill Template Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+d-article {
+  contain: layout style;
+  overflow-x: hidden;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding-top: 2rem;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+d-article > * {
+  grid-column: text;
+}
+
+@media(min-width: 768px) {
+  d-article {
+    font-size: 16px;
+  }
+}
+
+@media(min-width: 1024px) {
+  d-article {
+    font-size: 1.06rem;
+    line-height: 1.7em;
+  }
+}
+
+
+/* H2 */
+
+
+d-article .marker {
+  text-decoration: none;
+  border: none;
+  counter-reset: section;
+  grid-column: kicker;
+  line-height: 1.7em;
+}
+
+d-article .marker:hover {
+  border: none;
+}
+
+d-article .marker span {
+  padding: 0 3px 4px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  position: relative;
+  top: 4px;
+}
+
+d-article .marker:hover span {
+  color: rgba(0, 0, 0, 0.7);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.7);
+}
+
+d-article h2 {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1.25em;
+  margin: 2rem 0 1.5rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 1rem;
+}
+
+@media(min-width: 1024px) {
+  d-article h2 {
+    font-size: 36px;
+  }
+}
+
+/* H3 */
+
+d-article h3 {
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.4em;
+  margin-bottom: 1em;
+  margin-top: 2em;
+}
+
+@media(min-width: 1024px) {
+  d-article h3 {
+    font-size: 20px;
+  }
+}
+
+/* H4 */
+
+d-article h4 {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 14px;
+  line-height: 1.4em;
+}
+
+d-article a {
+  color: inherit;
+}
+
+d-article p,
+d-article ul,
+d-article ol,
+d-article blockquote {
+  margin-top: 0;
+  margin-bottom: 1em;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+d-article blockquote {
+  border-left: 2px solid rgba(0, 0, 0, 0.2);
+  padding-left: 2em;
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+d-article a {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  text-decoration: none;
+}
+
+d-article a:hover {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.8);
+}
+
+d-article .link {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+d-article ul,
+d-article ol {
+  padding-left: 24px;
+}
+
+d-article li {
+  margin-bottom: 1em;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+d-article li:last-child {
+  margin-bottom: 0;
+}
+
+d-article pre {
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+d-article hr {
+  grid-column: screen;
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  margin-top: 60px;
+  margin-bottom: 60px;
+}
+
+d-article section {
+  margin-top: 60px;
+  margin-bottom: 60px;
+}
+
+d-article span.equation-mimic {
+  font-family: georgia;
+  font-size: 115%;
+  font-style: italic;
+}
+
+d-article > d-code,
+d-article section > d-code  {
+  display: block;
+}
+
+d-article > d-math[block],
+d-article section > d-math[block]  {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  d-article > d-code,
+  d-article section > d-code,
+  d-article > d-math[block],
+  d-article section > d-math[block] {
+      overflow-x: scroll;
+      -ms-overflow-style: none;  // IE 10+
+      overflow: -moz-scrollbars-none;  // Firefox
+  }
+
+  d-article > d-code::-webkit-scrollbar,
+  d-article section > d-code::-webkit-scrollbar,
+  d-article > d-math[block]::-webkit-scrollbar,
+  d-article section > d-math[block]::-webkit-scrollbar {
+    display: none;  // Safari and Chrome
+  }
+}
+
+d-article .citation {
+  color: #668;
+  cursor: pointer;
+}
+
+d-include {
+  width: auto;
+  display: block;
+}
+
+d-figure {
+  contain: layout style;
+}
+
+/* KaTeX */
+
+.katex, .katex-prerendered {
+  contain: style;
+  display: inline-block;
+}
+
+/* Tables */
+
+d-article table {
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+d-article table th {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+d-article table td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+d-article table tr:last-of-type td {
+  border-bottom: none;
+}
+
+d-article table th,
+d-article table td {
+  font-size: 15px;
+  padding: 2px 8px;
+}
+
+d-article table tbody :first-child td {
+  padding-top: 2px;
+}
+/*
+ * Copyright 2018 The Distill Template Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+span.katex-display {
+  text-align: left;
+  padding: 8px 0 8px 0;
+  margin: 0.5em 0 0.5em 1em;
+}
+
+span.katex {
+  -webkit-font-smoothing: antialiased;
+  color: rgba(0, 0, 0, 0.8);
+  font-size: 1.18em;
+}
+/*
+ * Copyright 2018 The Distill Template Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@media print {
+
+  @page {
+    size: 8in 11in;
+    @bottom-right {
+      content: counter(page) " of " counter(pages);
+    }
+  }
+
+  html {
+    /* no general margins -- CSS Grid takes care of those */
+  }
+
+  p, code {
+    page-break-inside: avoid;
+  }
+
+  h2, h3 {
+    page-break-after: avoid;
+  }
+
+  d-header {
+    visibility: hidden;
+  }
+
+  d-footer {
+    display: none!important;
+  }
+
+}
+</style>
+
 <style>
 hover a {
     color: "Olive";
@@ -475,7 +1298,7 @@ svg .rect {
     </p>
 
     <!-- Figure 3 -->
-    <figure id="linear_shap_ex">
+    <figure id="linear_shap_ex" class="l-page">
       <div align=center style="margin-bottom: 20px">
 
     		<table style="width:110px;display:inline;margin-right:25px;border:none;">
@@ -581,55 +1404,53 @@ svg .rect {
 
       <div align=center style="margin-bottom:20px">
   	  	<table style="width:300px;display:inline;margin-right:25px;border:none;">
-	      <col width="180px">
-	      <col width="80px">
-	      <col width="80px">
-	      <col width="80px">
-	      <col width="80px">
-	      <tr align="center">
-	      	<td></td>
-	      	<td>\(\phi_1\)</td>
-	      	<td>\(\phi_2\)</td>
-	      	<td>\(\phi_3\)</td>
-	      	<td>\(\phi_4\)</td>
-	  	  </tr>
-  		  <tr align="center">
-  		    <td>SHAP Values (CE)</td>
-  		    <td id="ex2_CE_phi1">1</td>
-  		    <td id="ex2_CE_phi2">2</td>
-  		    <td id="ex2_CE_phi3">3</td>
-  		    <td id="ex2_CE_phi4">4</td>
-  		  </tr>
-  		  <tr align="center">
-  		  	<td>SHAP Values (ICE)</td>
-  		    <td id="ex2_ICE_phi1">1</td>
-  		    <td id="ex2_ICE_phi2">2</td>
-  		    <td id="ex2_ICE_phi3">3</td>
-  		    <td id="ex2_ICE_phi4">4</td>
-  		  </tr>
-  		</table>
-    </div>
+  	      <col width="180px">
+  	      <col width="80px">
+  	      <col width="80px">
+  	      <col width="80px">
+  	      <col width="80px">
+  	      <tr align="center">
+  	      	<td></td>
+  	      	<td>\(\phi_1\)</td>
+  	      	<td>\(\phi_2\)</td>
+  	      	<td>\(\phi_3\)</td>
+  	      	<td>\(\phi_4\)</td>
+  	  	  </tr>
+    		  <tr align="center">
+    		    <td>SHAP Values (CE)</td>
+    		    <td id="ex2_CE_phi1">1</td>
+    		    <td id="ex2_CE_phi2">2</td>
+    		    <td id="ex2_CE_phi3">3</td>
+    		    <td id="ex2_CE_phi4">4</td>
+    		  </tr>
+    		  <tr align="center">
+    		  	<td>SHAP Values (ICE)</td>
+    		    <td id="ex2_ICE_phi1">1</td>
+    		    <td id="ex2_ICE_phi2">2</td>
+    		    <td id="ex2_ICE_phi3">3</td>
+    		    <td id="ex2_ICE_phi4">4</td>
+    		  </tr>
+  		  </table>
+      </div>
 
-  <div align=center style="margin-bottom: 10px">
+      <div align=center style="margin-bottom: 10px">
+    		<input type="button" value="Preset A" class="w3-button w3-teal" id="ex2_presetA" onclick="ex2_presetA()">
+      	<input type="button" value="Preset B" class="w3-button w3-green" id="ex2_presetB" onclick="ex2_presetB()">
+      	<input type="button" value="Preset C" class="w3-button w3-green" id="ex2_presetC" onclick="ex2_presetC()">
+      	<input type="button" value="Preset D" class="w3-button w3-green" id="ex2_presetD" onclick="ex2_presetD()">
+      </div>
 
-		<input type="button" value="Preset A" class="w3-button w3-teal" id="ex2_presetA" onclick="ex2_presetA()">
-  	<input type="button" value="Preset B" class="w3-button w3-green" id="ex2_presetB" onclick="ex2_presetB()">
-  	<input type="button" value="Preset C" class="w3-button w3-green" id="ex2_presetC" onclick="ex2_presetC()">
-  	<input type="button" value="Preset D" class="w3-button w3-green" id="ex2_presetD" onclick="ex2_presetD()">
+	    <p align="center" id="ex2_preset_text" style="font-size:13px">Independent variables.</p>
 
-  </div>
+      <figcaption>
+        <a href="#linear_shap_ex" class="figure-number">3</a>: Comparing two versions of SHAP values: conditional expectation (CE) and interventional conditional expectation (ICE).  We make two simplifying assumptions:
 
-	<p align="center" id="ex2_preset_text" style="font-size:13px">Independent variables.</p>
-
-  <figcaption>
-    <a href="#linear_shap_ex" class="figure-number">3</a>: Comparing two versions of SHAP values: conditional expectation (CE) and interventional conditional expectation (ICE).  We make two simplifying assumptions:
-
-    <ul align="left" style="margin:20px">
-      <li>The function is linear (\(f=\beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \beta_4 x_4\))</li>
-      <li>The data-generating distribution is multivariate normal (\(D\sim \mathcal{N}_4(0,C)\))</li>
-    </ul>
-  </figcaption>
-  </figure>
+        <ul align="left" style="margin-top:0px;margin-bottom:0px;line-height:0.2em;padding-top:0.2em;padding-bottom:0.2em;">
+          <li style="margin-top:0px;margin-bottom:0px;line-height:0.2em;padding-top:0.2em;padding-bottom:0.2em;">The function is linear (\(f=\beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \beta_4 x_4\))</li>
+          <li style="margin-top:0px;margin-bottom:0px;line-height:0.2em;padding-top:0.2em;padding-bottom:0.2em;">The data-generating distribution is multivariate normal (\(D\sim \mathcal{N}_4(0,C)\))</li>
+        </ul>
+      </figcaption>
+    </figure>
 
 
   <p>
@@ -735,58 +1556,77 @@ svg .rect {
 	</p>
 
 	<figure>
-    <div align=center style="margin-bottom: 10px;">
-    	<table style="width:300px;display:inline;margin-right:25px;border:none;">
-	      <col width="100px"/>
-	      <col width="150px"/>
-	      <col width="50px"/>
-	      <col width="150px"/>
-	      <col width="50px"/>
-	      <col width="50px"/>
-  	    <tr>
-  	      <td>Variable</td>
-  	      <td colspan="2">Foreground Sample \(x^f\)</td>
-  	      <td colspan="2">Background Sample \(x^b\)</td>
-  	      <td style="border:none;"></td>
-  	    </tr>
-  	    <tr>
-  	      <td>\(x_1\)</td>
-  	      <td><input type="range" min="-15" max="15" value="0" class="slider" id="fx1"></td>
-  	      <td align="left" id="fx1_out"></td>
-  	      <td><input type="range" min="-15" max="15" value="10" class="slider" id="bx1"></td>
-  	      <td align="left" id="bx1_out"></td>
-  	      <td style="border:none;"></td>
-  	    </tr>
-  	    <tr>
-  	      <td>\(x_2\)</td>
-  	      <td><input type="range" min="-15" max="15" value="0" class="slider" id="fx2"></td>
-  	      <td align="left" id="fx2_out"></td>
-  	      <td><input type="range" min="-15" max="15" value="10" class="slider" id="bx2"></td>
-  	      <td align="left" id="bx2_out"></td>
-  	      <td style="border:none;"><input type="button" value="Reset" class="w3-button w3-green" onclick="ex3_reset()"> </td>
-  	    </tr>
-  	    <tr>
-  	      <td>\(x_3\)</td>
-  	      <td><input type="range" min="-15" max="15" value="10" class="slider" id="fx3"></td>
-  	      <td align="left" id="fx3_out"></td>
-  	      <td><input type="range" min="-15" max="15" value="0" class="slider" id="bx3"></td>
-  	      <td align="left" id="bx3_out"></td>
-  	      <td style="border:none;"></td>
-  	    </tr>
-      </table>
-    </div>
-
 		<p align=center style="font-size:15px;">
-			Tree Parameters* (Click nodes)</strong> <br>
+			Tree Parameters <d-footnote>Green links indicate the foreground sample goes down a particular split, red indicates the background sample does, and blue indicates both samples do.</d-footnote> (Click nodes)</strong> <br>
 		</p>
 
-    <div align=center>
+    <!-- The SVG tree itself -->
+    <div align=center style="margin-bottom: -45px">
   	  <div id="graphic"></div> 
   	  <div class="tooltip" id="tooltip"></div>
     </div>
-		<p style="margin:-30px 0px 30px 0px;font-size:12px;">
-			*Green links indicate the foreground sample goes down a particular split, red indicates the background sample does, and blue indicates both samples do.
-		</p>
+
+    <!-- Select variable/threshold -->
+    <div align=center style="margin-bottom: 20px">
+      <span id="ex3_var_label" style="font-size: 15px">Node Variable:</span>
+      <input type="button" value="x1" class="w3-button w3-teal" id="ex3_x1_select" onclick="ex3_select_feat1()" style="font-size: 15px">
+      <input type="button" value="x2" class="w3-button w3-green" id="ex3_x2_select" onclick="ex3_select_feat2()" style="font-size: 15px">
+      <input type="button" value="x3" class="w3-button w3-green" id="ex3_x3_select" onclick="ex3_select_feat3()" style="font-size: 15px">
+    </div>
+
+    <div id="ex3_thres_div" align=center style="margin-bottom: 20px">
+      <span style="font-size: 15px">Node Threshold:</span>
+      <input type="range" min="-15" max="15" value="5" class="slider" id="ex3_thres" style="width: 130px;">
+      <span style="font-size: 15px;width: 20px;display: inline-block;" id="ex3_thres_out">5</span>
+    </div>
+
+    <div id="ex3_val_div" align=center style="margin-bottom: 20px;display: none;">
+      <span style="font-size: 15px">Leaf Value:</span>
+      <input type="range" min="-15" max="15" value="5" class="slider" id="ex3_val" style="width: 130px;">
+      <span style="font-size: 15px;width: 20px;display: inline-block;" id="ex3_val_out">5</span>
+    </div>
+
+    <!-- Foreground and background samples -->
+    <div align=center style="margin-bottom: 10px;">
+      <table style="width:500px;display:inline;border:none;">
+        <col width="100px"/>
+        <col width="150px"/>
+        <col width="50px"/>
+        <col width="150px"/>
+        <col width="50px"/>
+        <tr>
+          <td>Variable</td>
+          <td colspan="2">Foreground Sample \(x^f\)</td>
+          <td colspan="2">Background Sample \(x^b\)</td>
+        </tr>
+        <tr>
+          <td>\(x_1\)</td>
+          <td><input type="range" min="-15" max="15" value="0" class="slider" id="fx1"></td>
+          <td align="left" id="fx1_out"></td>
+          <td><input type="range" min="-15" max="15" value="10" class="slider" id="bx1"></td>
+          <td align="left" id="bx1_out"></td>
+        </tr>
+        <tr>
+          <td>\(x_2\)</td>
+          <td><input type="range" min="-15" max="15" value="0" class="slider" id="fx2"></td>
+          <td align="left" id="fx2_out"></td>
+          <td><input type="range" min="-15" max="15" value="10" class="slider" id="bx2"></td>
+          <td align="left" id="bx2_out"></td>
+        </tr>
+        <tr>
+          <td>\(x_3\)</td>
+          <td><input type="range" min="-15" max="15" value="10" class="slider" id="fx3"></td>
+          <td align="left" id="fx3_out"></td>
+          <td><input type="range" min="-15" max="15" value="0" class="slider" id="bx3"></td>
+          <td align="left" id="bx3_out"></td>
+        </tr>
+      </table>
+    </div>
+
+
+    <div align=center style="margin-bottom: 10px">
+      <input type="button" value="Reset" class="w3-button w3-green" onclick="ex3_reset()">
+    </div>
 
     <figcaption>
       <a href="#shapley_value_ex" class="figure-number">4</a>: Choose foreground sample \(x^f\), background sample \(x^b\), and tree parameters for the remainder of <a href="#algorithm">Section 2</a>.
@@ -814,143 +1654,144 @@ svg .rect {
 	</p>
 
 
-    <div id="table_container" style="overflow-x:auto;align:center;">
-    	<p align="left" style="margin:20px">
-			<strong>Example 4</strong>: Brute force algorithm for the tree and samples specified in Example 3.
-		</p>
+  <div id="table_container" style="overflow-x:auto;align:center;">
+  	<p align="left" style="margin:20px">
+		<strong>Example 4</strong>: Brute force algorithm for the tree and samples specified in Example 3.
+    </p>
 	</div>
 
-    <div id="table_container" style="overflow-x:auto;align:center">
-	  <div class="container">
+  <!-- <div id="table_container" style="overflow-x:auto;align:center"> -->
+  <figure class="l-page">
+  <div class="container">
 
-	    <div class="first" style="width:460px;height:300px">
-	    	<p style="margin: 0px 0px 0px 20px;"><strong>Tree Parameters</strong></p>
-	    	<div id="ex4_divtree" style="margin-top:10px;"></div>
-	    </div>
-
-
-	    <div class="second" style="width:300px;height:300px">
-	    	<p style="margin: 0px 0px 0px -100px;"><strong>Foreground & background sample</strong></p>
-			<table cellpadding="10" style="margin: 10px 0px 0px -10px">
-				<col width="40px"/>
-				<col width="50px"/>
-				<col width="50px"/>
-				<tr>
-					<th></th>
-					<th>\(x_1\)</th>
-					<th>\(x_2\)</th>
-					<th>\(x_3\)</th>
-				</tr>
-				<tr>
-					<td>\(x^f\)</td>
-					<td id="ex4_fx1">0</td>
-					<td id="ex4_fx2">0</td>
-					<td id="ex4_fx3">10</td>
-				</tr>
-				<tr>
-					<td>\(x^b\)</td>
-					<td id="ex4_bx1">10</td>
-					<td id="ex4_bx2">10</td>
-					<td id="ex4_bx3">0</td>
-				</tr>
-				<tr id="ex4_hS">
-					<td>\(h^S\)</td>
-					<td id="ex4_hs1"></td>
-					<td id="ex4_hs2"></td>
-					<td id="ex4_hs3"></td>
-				</tr>
-				<tr id="ex4_hSi">
-					<td>\(h^{S\cup i}\)</td>
-					<td id="ex4_hsi1"></td>
-					<td id="ex4_hsi2"></td>
-					<td id="ex4_hsi3"></td>
-				</tr>
-			</table>
-	    </div>
-
-	    <div class="clear"></div>
-	    <div class="container">
-	    	<div class="first" style="width:460px;height:280px">
-			<p style="margin: 0px 0px 0px 20px;"><strong>Brute Force Values</strong></p>
-      		<table cellpadding="10" style="margin: 10px 0px 0px 90px">
-		      <col width="40px"/>
-		      <col width="50px"/>
-		      <col width="50px"/>
-		      <col width="60px"/>
-		      <col width="60px"/>
-			<thead>
-				<tr>
-					<th>\(W\)</th>
-					<th>\(S\)</th>
-					<th id="ex4_fxS">\(f(x_S)\)</th>
-					<th>\(S\cup{i}\)</th>
-					<th id="ex4_fxSi">\(f(x_{S\cup{i}})\)</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr id="ex4_s1_row">
-					<td>1/3</td>
-					<td id="s1"></td>
-					<td id="s1_val"></td>
-					<td id="s1i"></td>
-					<td id="s1i_val"></td>
-				</tr>
-				<tr id="ex4_s2_row">
-					<td>1/6</td>
-					<td id="s2"></td>
-					<td id="s2_val"></td>
-					<td id="s2i"></td>
-					<td id="s2i_val"></td>
-				</tr>
-				<tr id="ex4_s3_row">
-					<td>1/6</td>
-					<td id="s3"></td>
-					<td id="s3_val"></td>
-					<td id="s3i"></td>
-					<td id="s3i_val"></td>
-				</tr>
-				<tr id="ex4_s4_row">
-					<td>1/3</td>
-					<td id="s4"></td>
-					<td id="s4_val"></td>
-					<td id="s4i"></td>
-					<td id="s4i_val"></td>
-				</tr>
-			</tbody>
-			</table>
-	    	</div>
-
-	    	<div class="second" style="width:300px;height:280px">
-	    	<p style="margin: 0px 0px 0px -110px;"><strong>Attribution Values</strong></p>
-
-			<table cellpadding="10" style="margin: 10px 0px 0px -10px">
-		      <col width="60px"/>
-		      <col width="80px"/>
-				<thead>
-				<!-- <tr style="background-color:#8BC34A;"> -->
-				<tr id="ex4_phi1">
-					<td>\(\phi_1(f,x^f,x^b)\)</td>
-					<td id="ex4_phi1_val">0</td>
-				</tr>
-				<tr id="ex4_phi2">
-					<td>\(\phi_2(f,x^f,x^b)\)</td>
-					<td id="ex4_phi2_val">0</td>
-				</tr>
-				<tr id="ex4_phi3">
-					<td>\(\phi_3(f,x^f,x^b)\)</td>
-					<td id="ex4_phi3_val">0</td>
-				</tr>
-			</thead>
-			</table>
-	    	</div>
-	    </div>
-	    <input type="button" class="w3-button w3-green" value="<<" onclick="ex4_reset()">
-	    <input type="button" class="w3-button w3-green" value=">" onclick="bruteForceStep()">
-	    <input type="button" class="w3-button w3-green" value=">>" onclick="bruteForceRunAll()">
-	    <br><br>
-	    <div class="clear"></div>
-	  </div>
+    <div class="first" style="width:460px;height:300px">
+    	<p style="margin: 0px 0px 0px 20px;"><strong>Tree Parameters</strong></p>
+    	<div id="ex4_divtree" style="margin-top:10px;"></div>
     </div>
+
+
+    <div class="second" style="width:300px;height:300px">
+    	<p style="margin: 0px 0px 0px -100px;"><strong>Foreground & background sample</strong></p>
+		<table cellpadding="10" style="margin: 10px 0px 0px -10px">
+			<col width="40px"/>
+			<col width="50px"/>
+			<col width="50px"/>
+			<tr>
+				<th></th>
+				<th>\(x_1\)</th>
+				<th>\(x_2\)</th>
+				<th>\(x_3\)</th>
+			</tr>
+			<tr>
+				<td>\(x^f\)</td>
+				<td id="ex4_fx1">0</td>
+				<td id="ex4_fx2">0</td>
+				<td id="ex4_fx3">10</td>
+			</tr>
+			<tr>
+				<td>\(x^b\)</td>
+				<td id="ex4_bx1">10</td>
+				<td id="ex4_bx2">10</td>
+				<td id="ex4_bx3">0</td>
+			</tr>
+			<tr id="ex4_hS">
+				<td>\(h^S\)</td>
+				<td id="ex4_hs1"></td>
+				<td id="ex4_hs2"></td>
+				<td id="ex4_hs3"></td>
+			</tr>
+			<tr id="ex4_hSi">
+				<td>\(h^{S\cup i}\)</td>
+				<td id="ex4_hsi1"></td>
+				<td id="ex4_hsi2"></td>
+				<td id="ex4_hsi3"></td>
+			</tr>
+		</table>
+    </div>
+
+    <div class="clear"></div>
+    <div class="container">
+    	<div class="first" style="width:460px;height:280px">
+		<p style="margin: 0px 0px 0px 20px;"><strong>Brute Force Values</strong></p>
+    		<table cellpadding="10" style="margin: 10px 0px 0px 90px">
+	      <col width="40px"/>
+	      <col width="50px"/>
+	      <col width="50px"/>
+	      <col width="60px"/>
+	      <col width="60px"/>
+		<thead>
+			<tr>
+				<th>\(W\)</th>
+				<th>\(S\)</th>
+				<th id="ex4_fxS">\(f(x_S)\)</th>
+				<th>\(S\cup{i}\)</th>
+				<th id="ex4_fxSi">\(f(x_{S\cup{i}})\)</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr id="ex4_s1_row">
+				<td>1/3</td>
+				<td id="s1"></td>
+				<td id="s1_val"></td>
+				<td id="s1i"></td>
+				<td id="s1i_val"></td>
+			</tr>
+			<tr id="ex4_s2_row">
+				<td>1/6</td>
+				<td id="s2"></td>
+				<td id="s2_val"></td>
+				<td id="s2i"></td>
+				<td id="s2i_val"></td>
+			</tr>
+			<tr id="ex4_s3_row">
+				<td>1/6</td>
+				<td id="s3"></td>
+				<td id="s3_val"></td>
+				<td id="s3i"></td>
+				<td id="s3i_val"></td>
+			</tr>
+			<tr id="ex4_s4_row">
+				<td>1/3</td>
+				<td id="s4"></td>
+				<td id="s4_val"></td>
+				<td id="s4i"></td>
+				<td id="s4i_val"></td>
+			</tr>
+		</tbody>
+		</table>
+    	</div>
+
+    	<div class="second" style="width:300px;height:280px">
+    	<p style="margin: 0px 0px 0px -110px;"><strong>Attribution Values</strong></p>
+
+		<table cellpadding="10" style="margin: 10px 0px 0px -10px">
+	      <col width="60px"/>
+	      <col width="80px"/>
+			<thead>
+			<!-- <tr style="background-color:#8BC34A;"> -->
+			<tr id="ex4_phi1">
+				<td>\(\phi_1(f,x^f,x^b)\)</td>
+				<td id="ex4_phi1_val">0</td>
+			</tr>
+			<tr id="ex4_phi2">
+				<td>\(\phi_2(f,x^f,x^b)\)</td>
+				<td id="ex4_phi2_val">0</td>
+			</tr>
+			<tr id="ex4_phi3">
+				<td>\(\phi_3(f,x^f,x^b)\)</td>
+				<td id="ex4_phi3_val">0</td>
+			</tr>
+		</thead>
+		</table>
+    	</div>
+    </div>
+    <input type="button" class="w3-button w3-green" value="<<" onclick="ex4_reset()">
+    <input type="button" class="w3-button w3-green" value=">" onclick="bruteForceStep()">
+    <input type="button" class="w3-button w3-green" value=">>" onclick="bruteForceRunAll()">
+    <br><br>
+    <div class="clear"></div>
+  </div>
+  </figure>
 
 
 	<p>
@@ -1004,13 +1845,11 @@ svg .rect {
 		Then the goal of the algorithm is to obtain \(N_P\) and \(S_P\) for each path by recursively traversing the tree.  We will start by explaining the algorithm via an example:
 	</p>
 
-	<div id="table_container" style="overflow-x:auto;">
-		<figure>
-			<figcaption>Figure 3: Green paths are associated with \(\textcolor{green}{x^f}\), red paths are \(\textcolor{red}{x^b}\), and blue paths are associated with both.</figcaption>
-      <br>
-			<img src="images/tree_example3.png" alt="Tree Example 3" style="width: 360px;">
-		</figure>
-	</div>
+	<figure>
+		<figcaption>Figure 3: Green paths are associated with \(\textcolor{green}{x^f}\), red paths are \(\textcolor{red}{x^b}\), and blue paths are associated with both.</figcaption>
+    <br>
+		<img src="images/tree_example3.png" alt="Tree Example 3" style="width: 360px;">
+	</figure>
 
 	<p>
 		In the naive algorithm, we maintain lists \(N_P\) and \(S_P\) as we traverse the tree.  At each internal node (Cases 2-4) we update the lists and then pass them to the node's children.  At the leaf nodes (Case 1), we calculate the attribution for each path.  In Figure 3, we see four possible cases:

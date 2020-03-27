@@ -118,8 +118,6 @@ function ex5_color_tree(s_t_pairs, colors) {
 	}
 }
 
-var newColor = "rgb(210, 180, 222)";
-
 function reset_all_node_colors() {
 	var nodes = svg5.selectAll("g.node");
 	nodes[0].forEach(function (d) {
@@ -213,7 +211,6 @@ function compute_W(s_len, n_len) {
 
 function ex5_reset() {
 	// Reset variables
-	is_initialize = true;
 	ex5_phi = [0,0,0];
 	nextnodes = [];
 	nodesseen = [];
@@ -226,6 +223,7 @@ function ex5_reset() {
 	sp_dict = {};
 	np_dict[treeData[0].name] = [];
 	sp_dict[treeData[0].name] = [];
+	nextnodes.push(treeData[0]);
 
 	ex5_update_str("Naive algorithm");
 	ex5_update_np_sp();
@@ -241,7 +239,6 @@ function ex5_reset() {
 	update5(treeData[0]);
 }
 
-var is_initialize = true;
 var ex5_phi = [0,0,0];
 var currnode;
 var nextnodes = [];

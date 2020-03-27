@@ -26,6 +26,26 @@ function ex3_reset() {
 	svg.selectAll("g.node").remove();
 
 	update(treeData[0]);
+
+  // Set and color current node
+  ex3_curr_node = treeData[0]["name"];
+  // Reset and recolor current node
+  ex3_reset_all_node_colors();
+  ex3_change_node_color(ex3_curr_node);
+
+  // Update button colors
+  update_feat_select_color();
+
+  // Update theshold value
+  update_threshold_value();
+
+  // Update example 3 text and links
+  update_all_text();
+
+  // Refresh other examples
+  ex4_reset();
+  ex5_reset();
+  ex6_reset(); 
 }
 
 /////////////////////////////////////////////////////////////////
@@ -156,8 +176,8 @@ function update_links() {
     let fleft = false;
     let bleft = false;
 
-    if (fxval <= d2.source.threshold) fleft = true;
-    if (bxval <= d2.source.threshold) bleft = true;
+    if (fxval < d2.source.threshold) fleft = true;
+    if (bxval < d2.source.threshold) bleft = true;
 
     var stroke = document.createAttribute("stroke");
     if (d2.target.childtype == "left") {
@@ -175,130 +195,10 @@ function update_links() {
         stroke.value = "#b3de69"; // Green
       } else if (!fleft && !bleft) {
         stroke.value = "#80b1d3"; // Blue
-      } 
+      }
     }
     d.attributes.setNamedItem(stroke);
   });
-}
-
-function update_internal_tooltip(var_name, thres_val, new_click) {
-  /* @desc Update tooltip based on variable and threshold */
-  var content;
-  content =  "<div style='text-align: center;background: white;width:200px; box-shadow:3px 3px 5px #797878;height:190px; padding:8%;position:relative;z-index:10'>";
-  content += '<table style="width:300px;display:inline;margin-right:25px;font-size:16px;">'
-  content += '<col width="60px"><col width="60px"><col width="60px">'
-  content += '<tr align="center"><td colspan="3">Variable</td></tr>'
-  content += '<tr align="center">'
-  if (var_name == "x1") {
-    content += "<td><input class='w3-button w3-teal' type='button' id='x1button' value='x1'/></td>";
-  } else {
-    content += "<td><input class='w3-button w3-green' type='button' id='x1button' value='x1'/></td>";
-  }
-
-  if (var_name == "x2") {
-    content += "<td><input class='w3-button w3-teal' type='button' id='x2button' value='x2'/></td>";
-  } else {
-    content += "<td><input class='w3-button w3-green' type='button' id='x2button' value='x2'/></td>";
-  }
-
-  if (var_name == "x3") {
-    content += "<td><input class='w3-button w3-teal' type='button' id='x3button' value='x3'/></td>";
-  } else {
-    content += "<td><input class='w3-button w3-green' type='button' id='x3button' value='x3'/></td>";
-  }
-  content += '</tr>';  
-  content += '<tr align="center"><td colspan="3"><br>Threshold</td></tr>'
-  content += '<tr align="center"><td colspan="3"><input type="range" min="-15" max="15" value="'+thres_val+'" class="slider" id="xthres"></td></tr>';
-  content += '<tr align="center"><td colspan="3" id="xthres_out"></td></tr>';
-  content += '</table>';
-
-  // Check if new_click
-  if (new_click) {
-    divtooltip.html(content)
-      .style("left", (d3.event.pageX) + "px") 
-      .style("top", (d3.event.pageY) + "px")
-      .style("display", "block");
-  } else {
-    divtooltip.html(content);
-  }
-
-  // Update the slider output
-  s_name = "xthres";
-  var s     = document.getElementById(s_name);
-  var s_out = document.getElementById(s_name+"_out");
-  s_out.innerHTML = s.value;
-  s.paired_out    = s_out;
-  s.oninput = function() {
-	this.paired_out.innerHTML = this.value;
-  }
-
-  let d = curr_node;
-  function get_click_f(var_name) {
-	return function () {
-		d.variable = var_name;
-		update_node_text(d, false, false);
-		update_internal_tooltip(d.variable, d.threshold, false);
-	 	ex4_reset();
-	 	ex5_reset();
-    ex6_reset();
-	}
-  }
-  divtooltip.select('input#x1button').on('click', get_click_f("x1"));
-  divtooltip.select('input#x2button').on('click', get_click_f("x2"));
-  divtooltip.select('input#x3button').on('click', get_click_f("x3"));
-
-  divtooltip.select('input#xthres').on('click', function () {
-    var thresval = document.getElementById("xthres").value;
-    d.threshold = Number(thresval);
-    update_node_text(d, false, false);
-    ex4_reset();
-    ex5_reset();
-    ex6_reset();
-  })
-}
-
-// Update leaf tooltip
-function update_leaf_tooltip(value, new_click) {
-  /* @desc Update leaf tooltip based on variable and threshold */
-  var content;
-  content =  "<div style='text-align:center;background:white;width:200px;box-shadow:3px 3px 5px #797878;height:105px; padding:8%;position:relative;z-index:10'>";
-  content += '<table style="width:300px;display:inline;margin-right:25px;font-size:16px;">'
-
-  content += '<col width="60px"><col width="60px"><col width="60px">'
-  content += '<tr align="center"><td colspan="3">Value</td></tr>'
-  content += '<tr align="center"><td colspan="3"><input type="range" min="-15" max="15" value="'+value+'" class="slider" id="leafvalue"></td></tr>'
-  content += '<tr align="center"><td colspan="3" id="leafvalue_out">Value</td></tr>'
-  content += '</table>'
-
-  // Check if new_click
-  if (new_click) {
-    divtooltip.html(content)
-      .style("left", (d3.event.pageX) + "px") 
-      .style("top", (d3.event.pageY) + "px")
-      .style("display", "block");
-  } else {
-    divtooltip.html(content);
-  }
-
-  // Update the slider output
-  s_name = "leafvalue";
-  var s     = document.getElementById(s_name);
-  var s_out = document.getElementById(s_name+"_out");
-  s_out.innerHTML = s.value;
-  s.paired_out    = s_out;
-  s.oninput = function() {
-    this.paired_out.innerHTML = this.value;
-  }
-
-  d = curr_node;
-  divtooltip.select('input#leafvalue').on('click', function () {
-    var leafvalue = document.getElementById("leafvalue").value;
-    d.value = leafvalue;
-    update_node_text(d, true, false);
-    ex4_reset();
-    ex5_reset();
-    ex6_reset();
-  })
 }
 
 function update(source) {
@@ -379,11 +279,6 @@ function update_node_text(d, is_leaf, is_tooltip) {
 
     // Update the HTML
     n1[0].lastChild.innerHTML = d.value;
-
-    if (is_tooltip) {
-	    // Update SVG
-	    update_leaf_tooltip(d.value, false);	    	
-    }
   } else {
     // Get appropriate node
     let nodes = tree.nodes(treeData[0]).reverse(), links = tree.links(nodes);
@@ -393,58 +288,161 @@ function update_node_text(d, is_leaf, is_tooltip) {
     
     // Update the HTML
     n1[0].lastChild.innerHTML = d.variable+"&gt;"+d.threshold;
-
-    // Update SVG
-    if (is_tooltip) {
-    	update_internal_tooltip(d.variable, d.threshold, false);	    	
-    }
-    update_links();
   }
 }
-
-var curr_node;
 
 // Toggle children on click.
 function click(d) {
-  console.log("Click");
-  curr_node = d;
-  if (d.name.startsWith("Leaf")) {
-    update_leaf_tooltip(d.value, true);
-
-    divtooltip.select('input#leafvalue').on('click', function () {
-      var leafvalue = document.getElementById("leafvalue").value;
-      d.value = leafvalue;
-      update_node_text(d, true, false);
-      ex4_reset();
-      ex5_reset();
-      ex6_reset();
-    })
-  } else { // Internal nodes
-    update_internal_tooltip(d.variable, d.threshold, true);
-
-	function get_click_f(var_name) {
-		return function () {
-			d.variable = var_name;
-			update_node_text(d, false, false);
-			update_internal_tooltip(d.variable, d.threshold, false);
-			ex4_reset();
-			ex5_reset();
-      ex6_reset();
-		}
-	}
-    divtooltip.select('input#x1button').on('click', get_click_f("x1"));
-    divtooltip.select('input#x2button').on('click', get_click_f("x2"));
-    divtooltip.select('input#x3button').on('click', get_click_f("x3"));
-
-    divtooltip.select('input#xthres').on('click', function () {
-      var thresval = document.getElementById("xthres").value;
-      d.threshold = Number(thresval);
-      update_node_text(d, false, false);
-      ex4_reset();
-      ex5_reset();
-      ex6_reset();
-    })
-    
-  }
-
+  ex3_curr_node = d["name"];
+  update_all();
 }
+
+var ex3_x1_ele = document.getElementById("ex3_x1_select");
+var ex3_x2_ele = document.getElementById("ex3_x2_select");
+var ex3_x3_ele = document.getElementById("ex3_x3_select");
+
+function get_node(node_name) {
+  var return_node;
+  var node_queue = [treeData[0]];
+  while (node_queue.length > 0) {
+    node = node_queue.pop();
+    if (node["name"] == node_name) {
+      return_node = node;
+    }
+    if (node.children) {
+      node_queue.push(node.children[0]);
+      node_queue.push(node.children[1]);
+    }
+  }
+  return(return_node);
+}
+
+function update_feat_select_color() {
+  if (ex3_curr_node.includes("Leaf")) {
+    document.getElementById("ex3_var_label").style.visibility = 'hidden';
+    ex3_x1_ele.style.visibility = 'hidden';
+    ex3_x2_ele.style.visibility = 'hidden';
+    ex3_x3_ele.style.visibility = 'hidden';
+  } else {
+    document.getElementById("ex3_var_label").style.visibility = 'visible';
+    ex3_x1_ele.style.visibility = 'visible';
+    ex3_x2_ele.style.visibility = 'visible';
+    ex3_x3_ele.style.visibility = 'visible';
+    ex3_x1_ele.className = "w3-button w3-green";
+    ex3_x2_ele.className = "w3-button w3-green";
+    ex3_x3_ele.className = "w3-button w3-green";
+    if (get_node(ex3_curr_node)["variable"] == "x1") {
+      ex3_x1_ele.className = "w3-button w3-teal";
+    } else if (get_node(ex3_curr_node)["variable"] == "x2") {
+      ex3_x2_ele.className = "w3-button w3-teal";
+    } else if (get_node(ex3_curr_node)["variable"] == "x3") {
+      ex3_x3_ele.className = "w3-button w3-teal";
+    }
+  }
+}
+
+function update_threshold_value() {
+  if (ex3_curr_node.includes("Leaf")) {
+    document.getElementById("ex3_val_div").style.display   = "block";
+    document.getElementById("ex3_thres_div").style.display = "none";
+    var slider = document.getElementById("ex3_thres");
+    var val = get_node(ex3_curr_node)["value"];
+    slider.value = val;
+    slider.paired_out.innerHTML = val;
+  } else {
+    document.getElementById("ex3_thres_div").style.display = "block";
+    document.getElementById("ex3_val_div").style.display   = "none";
+    var slider = document.getElementById("ex3_thres");
+    var threshold = get_node(ex3_curr_node)["threshold"];
+    slider.value = threshold;
+    slider.paired_out.innerHTML = threshold;
+  }
+}
+
+function update_all() {
+  // Reset and recolor current node
+  ex3_reset_all_node_colors();
+  ex3_change_node_color(ex3_curr_node);
+
+  // Update button colors
+  update_feat_select_color();
+
+  // Update theshold value
+  update_threshold_value();
+
+  // Update example 3 text and links
+  update_all_text();
+
+  // Refresh other examples
+  ex4_reset();
+  ex5_reset();
+  ex6_reset(); 
+}
+
+// Function to update treeData based on the ex3_curr_node
+function ex3_update_node(node_name, field_name, value) {
+  get_node(node_name)[field_name] = value;
+  // Update everything
+  update_all();
+}
+
+s_name = "ex3_thres"
+var s      = document.getElementById(s_name);
+var s_out  = document.getElementById(s_name+"_out");
+s.paired_out = s_out;
+s.oninput = function() {
+  ex3_update_node(ex3_curr_node, "threshold", this.value);
+  this.paired_out.innerHTML = this.value;
+  update_all();
+}
+
+s_name = "ex3_val"
+var s      = document.getElementById(s_name);
+var s_out  = document.getElementById(s_name+"_out");
+s.paired_out = s_out;
+s.oninput = function() {
+  ex3_update_node(ex3_curr_node, "value", this.value);
+  this.paired_out.innerHTML = this.value;
+  update_all();
+}
+
+function ex3_select_feat1() {ex3_update_node(ex3_curr_node, "variable", "x1");}
+function ex3_select_feat2() {ex3_update_node(ex3_curr_node, "variable", "x2");}
+function ex3_select_feat3() {ex3_update_node(ex3_curr_node, "variable", "x3");}
+
+// Change node colors
+var newColor = "rgb(1,151,136)";
+
+function ex3_reset_all_node_colors() {
+  var nodes = svg.selectAll("g.node");
+  nodes[0].forEach(function (d) {
+    oldHTML = d.innerHTML;
+    if (oldHTML.includes(newColor)) {
+      splitHTML = oldHTML.split(newColor);
+      prefix = splitHTML[0];
+      suffix = splitHTML[1];
+      newHTML = prefix + "rgb(255, 255, 255)" + suffix;
+      d.innerHTML = newHTML;      
+    }
+  })
+}
+
+function ex3_change_node_color(node_name) {
+  var nodes = svg.selectAll("g.node");
+  nodes[0].forEach(function (d) {
+    if (d.__data__["name"] == node_name) {
+      oldHTML = d.innerHTML;
+      if (oldHTML.includes("rgb(255, 255, 255)")) {
+        splitHTML = oldHTML.split("rgb(255, 255, 255)");
+        prefix = splitHTML[0];
+        suffix = splitHTML[1];
+        newHTML = prefix + newColor + suffix;
+        d.innerHTML = newHTML;
+      }
+    }
+  })
+}
+
+var ex3_curr_node = "n1";
+
+ex3_change_node_color(ex3_curr_node);
