@@ -15,7 +15,6 @@
 <script>d3v4 = d3;</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
 <script src="https://distill.pub/template.v1.js"></script>
-
 <style id="distill-prerendered-styles" type="text/css">/*
  * Copyright 2018 The Distill Template Authors
  *
@@ -1044,11 +1043,20 @@ svg .rect {
 .no-space {
   margin-top:0px;
   margin-bottom:0px;
-  line-height:0.1em;
-  padding-top:0.3em;
+  /*line-height:0.1em;*/
+  /*padding-top:0.3em;*/
   padding-bottom:0.0em;
 }
+
+pre {
+  background: #f5f2f0;
+}
 </style>
+
+<head>
+  <link href="prism.css" rel="stylesheet" />
+</head>
+
 
 <body>
 
@@ -1063,7 +1071,7 @@ svg .rect {
   </d-front-matter>
 
   <d-title>
-    <h1>A fast and exact game-theoretic algorithm to explain trees</h1>
+    <h1 id="top">A fast and exact game-theoretic algorithm to explain trees</h1>
       <p style="font-size: 150%;">Shapley values have recently been adapted to explain machine learning algorithms; however, calculating them is NP-hard.  By restricting our machine learning model class to trees, we can calculate them exactly in linear time.</p>
       <img
         src="./images/trees.jpg"
@@ -1074,18 +1082,18 @@ svg .rect {
 
     <d-contents>
       <nav class="l-text toc figcaption">
-        <h3>Top</h3>
+        <a href="#top"><h3>Top</h3></a>
         <!--<div><a href="#introduction">Introduction</a></div>-->
-        <div><a href="#introduction">Introduction</a></div>
-        <div><a href="#background">What's in a SHAP Value?</a></div>
+        <!-- <div><a href="#introduction">Introduction</a></div> -->
+        <div><a href="#background">Defining the feature attribution problem</a></div>
         <ul>
           <li><a href="#shapley_values">1: Back to basics with Shapley values</a></li>
-          <li><a href="#shap_values">2: Adapting Shapley values to machine learning</a></li>
-          <li><a href="#">3: Masking missing features</a></li>
-          <li><a href="#">4: Imputing missing features by conditioning</a></li>
-          <li><a href="#background_distribution">5: Interventional conditional expectation SHAP values with a background distribution</a></li>
+          <li><a href="#shap_values">2: Adapting Shapley values to explain machine learning models</a></li>
+          <li><a href="#masking_missing">3: Masking missing features</a></li>
+          <li><a href="#shap_conditional_distribution">4: Imputing missing features by conditioning</a></li>
+          <li><a href="#background_distribution">5: Single reference SHAP values</a></li>
         </ul>
-        <div><a href="#claim-2">Explaining trees quickly and exactly</a></div>
+        <div><a href="#algorithm">Explaining trees quickly and exactly</a></div>
         <ul>
           <li><a href="#brute_force">1: The brute force algorithm</a></li>
           <li><a href="#naive_implementation">2: The naive algorithm</a></li>
@@ -1098,7 +1106,7 @@ svg .rect {
 
   <!-- Introduction -->
   <div style="max-width:800px" id="abstract">
-    <h2 id="introduction">Introduction</h2>
+    <!-- <h2 id="introduction">Introduction</h2> -->
     <p>
       Nowadays, machine learning (ML) is widespread.  In this field, one of the most popular machine learning model type is tree-based models.  As evidence, a recent survey of data scientists and researchers found that tree models were both the second and third most popular class of method, beaten only by Logistic Regression (Figure 1).  Although small tree models can be interpretable <d-cite bibtex-key="rudin2019stop"></d-cite>, most tree models are generally large and hard for humans to interpret.  
     </p>
@@ -1120,7 +1128,7 @@ svg .rect {
     <i>What is the goal of this article?</i> 
 
     <p>
-    Given that there is a long history of model explanations going awry when users do not understand what an explanation means (e.g., p-values for linear models <d-cite bibtex-key="schervish1996p"></d-cite>), it is critical to have a broadly accessible explanation of SHAP values and how they are obtained for tree models to ensure that they are not misused.  To this end, we aim to provide an easily accessible answer to two questions: 1.) What are SHAP values?  2.) How can we obtain SHAP values for trees?  In particular, we focus on explaining an algorithm that was empirically evaluated in <d-cite bibtex-key="lundberg2020local"></d-cite>.
+    Given that there is a long history of model explanations going awry when users do not understand what an explanation means (e.g., p-values for linear models <d-cite bibtex-key="schervish1996p"></d-cite>), it is critical to have a broadly accessible explanation of SHAP values and how they are obtained for tree models to ensure that they are not misused.  To this end, we aim to provide an easy to understand answer to two questions: 1.) What are SHAP values?  2.) How can we obtain SHAP values for trees?  In particular, we focus on explaining an algorithm to explain trees that is widely used in the popular SHAP package <d-cite bibtex-key="lundberg2020local"></d-cite>.
   </p>
   </div>
 
@@ -1128,7 +1136,7 @@ svg .rect {
 
   <!-- The Background Section -->
   <div style="max-width:800px">
-    <h2 id="background">1. What's in a SHAP value?</h2>
+    <h2 id="background">1. Defining the feature attribution problem</h2>
     
     <p>
  	   In this section, we describe Shapley values and a few versions that have been used to explain machine learning models.  Then, we use a linear model example to justify a specific extension of the Shapley values.  With this formulation, we show how obtaining the SHAP values reduces to a average over so-called single reference SHAP values that can be thought of as explanations with respect to a single foreground sample (explicand) and a single background sample (reference).
@@ -1136,7 +1144,7 @@ svg .rect {
 
 
     <!-- What are Shapley Values? -->
-    <h3 id="shapley_values">1.1 Back to basics: Shapley values</h3>
+    <h3 id="shapley_values">1.1 Back to basics with Shapley values</h3>
 	<p>
     	Shapley values are a method to spread credit among players in a "coalitional game".  We can define the players to be a set \(N=\{1,\cdots,d\}\).  Then, the coalitional game is a function that maps subsets of the players to a scalar value:
 
@@ -1151,14 +1159,17 @@ svg .rect {
     	$$
     	\overbrace{\phi_i(v)}^{\text{Shapley value of }i}=\sum_{S\subseteq N\setminus\{i\}}\underbrace{\frac{|S|!(|N|-|S|-1)!}{|N|!}}_{\text{Weight }W(|S|,|N|)}(\overbrace{v(S\cup\{i\})-v(S)}^{\text{Profit individual }i\text{ adds}})
     	$$
-      <a href="#shapley_value_ex">Figure 2</a> computes this summation for an arbitrary coalitional game with three players.
     </p>
 
   <!-- Figure 2 -->
 	<figure id="shapley_value_ex">
   
-    <div>
-  	  <table align="center" style="width:500px;border:none;">
+    <figcaption>
+      <a href="#shapley_value_ex" class="figure-number">2</a>: Shapley values for a company that makes a profit \(v(S)\) based on it's three prospective employees \(Ava\), \(Ben\), and \(Cat\).
+    </figcaption>
+
+    <div style="margin-bottom:10px;">
+  	  <table align="center" style="width:500px;border:none;margin-bottom:10px;">
   	  	<col width="200px"/>
       	<col width="250px"/>
       	<col width="50px"/>
@@ -1214,21 +1225,21 @@ svg .rect {
     </div>
 
     <div style="margin-bottom:0px">
-  	  <table align="center" style="width:200px;border:none;">
-    		<col width="100px"/>
-      	<col width="100px"/>
+  	  <table align="center" style="border:none;">
+		<col width="80px"/>
+      	<col width="80px"/>
+		<col width="80px"/>
+      	<col width="80px"/>
+		<col width="80px"/>
+      	<col width="80px"/>
         <tr align="center">
-          <td style="border:none;" colspan="2">Shapley values</td>
+          <td style="border:none;" colspan="6">Shapley values</td>
         </tr>
     		<tr>
     			<td align=center>\(\phi_{Ava}(v)\)</td>
     			<td align=center id="phi_a">0</td>
-    		</tr>
-    		<tr>
     			<td align=center>\(\phi_{Ben}(v)\)</td>
     			<td align=center id="phi_b">0</td>
-    		</tr>
-    		<tr>
     			<td align=center>\(\phi_{Cat}(v)\)</td>
     			<td align=center id="phi_c">0</td>
     		</tr>
@@ -1244,67 +1255,229 @@ svg .rect {
 
 	  <p align="center" style="font-size:13px" id="ex1_preset_text">No credit.</p>
 
-    <figcaption>
-      <a href="#shapley_value_ex" class="figure-number">2</a>: Shapley values for a company that makes a profit \(v(S)\) based on it's three prospective employees \(Ava\), \(Ben\), and \(Cat\).
-    </figcaption>
 	</figure>
 
-	<p>
-    	The Shapley values consider how much an individual increases profit when they work together with all other possible teams.  Furthermore, they are a unique solution to spreading credit as defined by several desirable properties <d-cite bibtex-key="young1985monotonic"></d-cite> (all of which hold for any coalitional game, as can be seen in <a href="#shapley_value_ex">Figure 2</a>):
-    	<ul>
-    		<li>Local Accuracy/Efficiency: The sum of Shapley values for all employees adds up to the profit with all employees minus the profit with no employees:</li>
-	    		$$
-	    			\sum_{i\in N} \phi_i(v)=v(N)-v(\{\})
-	    		$$
-    		<li>Consistency/Monotonicity: If an employee \(i\) always increases company \(v_1\)'s profit more than they would company \(v_2\) for all teams of other employees, then \(i\)'s attribution for \(v_1\) should be greater than or equal to their attribution in \(v_2\):</li>
-    			$$
-    			v_1(S\cup {i})-v_1(S)\geq v_2(S\cup {i})-v_2(S) \forall S \implies \phi_i(v_1)\geq \phi_i(v_2)
-    			$$
-    		<li>Missingness: Employees \(i\) that don't help or hurt the company's profit must have no attribution.</li>
-    			$$
-    			v(S\cup {i})=v(S)\forall S\implies \phi_i(v)=0
-    			$$
-    	</ul>
-    </p>
 
-	<p>
-    	In <d-cite bibtex-key="lundberg2017unified"></d-cite>, Lundberg and Lee extend Shapley values to explain ML models (<a href="#shap_values">Section 1.2</a>).
+    <p>
+      Shapley values are an excellent way to give credit to individuals in a coalitional game.  In fact, they are known to be a unique solution to spreading credit as defined by several desirable properties <d-cite bibtex-key="young1985monotonic"></d-cite> (all of which hold for any coalitional game, as can be seen in <a href="#shapley_value_ex">Figure 2</a>):
+      <ul>
+        <li>Local Accuracy/Efficiency: The sum of Shapley values for all employees adds up to the profit with all employees minus the profit with no employees:</li>
+          $$
+            \sum_{i\in N} \phi_i(v)=v(N)-v(\{\})
+          $$
+        <li>Consistency/Monotonicity: If an employee \(i\) always increases company \(v_1\)'s profit more than they would company \(v_2\) for all teams of other employees, then \(i\)'s attribution for \(v_1\) should be greater than or equal to their attribution in \(v_2\):</li>
+          $$
+          v_1(S\cup {i})-v_1(S)\geq v_2(S\cup {i})-v_2(S) \forall S \implies \phi_i(v_1)\geq \phi_i(v_2)
+          $$
+        <li>Missingness: Employees \(i\) that don't help or hurt the company's profit must have no attribution.</li>
+          $$
+          v(S\cup {i})=v(S)\forall S\implies \phi_i(v)=0
+          $$
+      </ul>
     </p>
-
 
     <!-- What are SHAP Values? -->
-    <h3 id="shap_values">1.2 SHAP values</h3>
-	<p>
-    	SHAP values are a variant of Shapley values to explain ML models.  For SHAP values, the game \(v(S)\) is now related to a machine learning model \(f(x)\) and the set of players is now a feature vector \(x:=\{x_1,\cdots,x_d\}\in\mathbb{R}^d\).  
+    <h3 id="shap_values">1.2 Adapting Shapley values to explain machine learning models</h3>
+
+
+    <p>
+      Although Shapley values are an optimal solution for allocating credit among players in coalitional games, our goal is actually to allocate credit among features (\(x:=\{x_1,\cdots,x_d\}\in\mathbb{R}^d\)) in a machine learning model (\(f(x)\)).  This begs the question: how exactly do coalitional games differ to machine learning models?
     </p>
 
     <p>
-    	In contrast, Shapley values define a game's output \(v(S)\) to be the value of the game with some players "present" and the remaining players "missing".  Here, "missing" is naturally defined: whether or not a player \(i\) is present in the set \(S\) (or, as in our example, whether an employee was working for the company).
+      Well, a machine learning model with binary features \(x_i\in(0,1)\) <d-footnote>Where 1 indicates presence of a feature and 0 indicates absence of a feature.</d-footnote> would in fact be a coalitional game.  In this setting, the best way to assign credit to features is to just use the Shapley values where we define a new set function:
+        $$
+        v(S):=f(z^S)\text{, where } z^S_i = 1\text{ if }i\in S\text{, }0\text{ otherwise}
+        $$
+      However, most machine learning models actually have continuous features.  In order to explain a machine learning model with continuous features, we now have to define both the presence and absence of features<d-footnote>More accurately, we have to define a new set function \(v(S)\) related to the model's prediction \(f(x)\) where the features in \(S\) are present and the remaining features are absent.</d-footnote>.
     </p>
 
     <p>
-    	In comparison, ML models generally require a fixed length input with continuous values which makes setting features to be "missing" or "present" less straightforward.  One simple approach is to impute the "missing" features by masking them by a fixed background sample \(x^b \in \mathbb{R}^d\).
-    	$$
-		v(S)=f(h^S)\text{, where } h^S_i = x_i\text{ if }i\in S\text{, }h^S_i = x^b_i\text{ otherwise}
-    	$$
-    	For instance, if we want to set the feature <i>Height</i> to "missing", we could replace it with a specific <i>background value</i>.  One natural option of <i>background value</i> is zero.  However, this is unsatisfying because a <i>Height</i> of zero is impossible.  Another option of <i>background value</i> could be the average human height.  This is arguably a better choice, however it means that explanations for people who are exactly average height will be biased to give no weight to height.  In fact, masking with any single background sample will introduce bias to SHAP values.  Alternatively, instead of using a single background sample, we can use an entire background distribution to define missingness.
+      First, to address the presence of a feature, our goal is to obtain <i>local feature attributions</i><d-footnote>As opposed to a <i>global feature attribution</i> that aims to assign per-feature importance for the model as a whole.</d-footnote>: a vector of importance for each feature of a model prediction for a specific sample \(x^f\) (explicand <d-footnote>The sample being explained.</d-footnote>).  Then, if feature \(i\) is present, we can simply set that feature to be from the explicand \(x_i^f\). The next step is to address the absence of a feature which can be done in many ways.
     </p>
 
-	<p>
-    	Then, a very natural approach to impute features is with conditional expectation.  Instead of simply replacing "missing" features with a fixed value, we condition on the set of features that are "present" as if we know them and use those to guess at the "missing" features.  If we define \(D\) to be the background (underlying) distribution our samples are drawn from, the value of the game is:
+  <h3 id="masking_missing">1.3 Masking missing features</h3>
+
+    <p>
+      One straightforward way to address the absence of a feature is to define a baseline \(x^b\).  In this case, if feature \(i\) is absent, we can simply set that feature to be \(x_i^b\).  Putting this all together, our new set function is simply:
+      $$
+      v(S)=f(h^S)\text{, where } h^S_i = x^f_i\text{ if }i\in S\text{, }x^b_i\text{ otherwise}
+      $$
+    </p>
+
+    <p>
+      This specific adaptation of Shapley values to machine learning models is called Baseline Shapley, and have been shown to be be a unique solution to attribution methods with a single baseline based on cost-sharing literature <d-cite bibtex-key="sundararajan2019many"></d-cite>.  However, the choice of the baseline is a complicated one, and many different baselines have been considered including an all-zeros baseline, an average across features, a uniformly distributed baseline, etc. (<d-cite bibtex-key="sundararajan2017axiomatic"></d-cite>, <d-cite bibtex-key="shrikumar2017learning"></d-cite>, <d-cite bibtex-key="sturmfels2020visualizing"></d-cite>) <d-footnote>For an in-depth discussion of this concept and a comparison of several baselines for Aumann-Shapley values applied to explaining images see <d-cite bibtex-key="sturmfels2020visualizing"></d-cite>.</d-footnote>.
+    </p>
+
+
+    <figure id="single_baselines_bad">
+
+      <p align=center style="font-size: 15px"></p>
+
+      <div align=center style="margin-bottom: -10px">
+        <table style="border:none;">
+          <col width="130px">
+          <col width="40px">
+          <col width="60px">
+          <col width="40px">
+          <col width="60px">
+          <col width="40px">
+          <col width="60px">
+          <tr align="left">
+          	<td colspan="7" style="border:none;">a.) Model and sample being explained.</td>
+          </tr>
+          <tr align="center">
+          	<td align=right>Linear Model:</td>
+            <td>\(\beta_1\)</td>
+            <td>2</td>
+            <td>\(\beta_2\)</td>
+            <td>-1</td>
+            <td>\(\beta_3\)</td>
+            <td>10</td>
+          </tr>
+          <tr align="center">
+          	<td align=right>Explicand:</td>
+            <!-- Height (in) -->
+            <td>\(x^f_1\)</td>
+            <td>70</td>
+            <!-- Weight (lbs) -->
+			<td>\(x^f_2\)</td>
+            <td>135</td>
+            <!-- Gender 1-male, 0-female -->
+            <td>\(x^f_3\)</td>
+            <td>0</td>
+          </tr>
+        </table>
+    </div>
+
+      <hr style="margin-top:0px;margin-bottom:10px;">
+
+      <div align=center style="margin-bottom: -10px">
+        <table style="border:none;">
+          <col width="130px">
+          <col width="40px">
+          <col width="60px">
+          <col width="40px">
+          <col width="60px">
+          <col width="40px">
+          <col width="60px">
+          <tr align="left">
+          	<td colspan="7" style="border:none;">b.) Zero baseline.</td>
+          </tr>
+          <tr align="center">
+          	<td align=right>Baseline:</td>
+            <td>\(x^b_1\)</td>
+            <td>0</td>
+            <td>\(x^b_2\)</td>
+            <td>0</td>
+            <td>\(x^b_3\)</td>
+            <td>0</td>
+          </tr>
+          <tr align="center">
+          	<td align=right>Attribution:</td>
+            <td>\(\phi_1\)</td>
+            <td>140</td>
+            <td>\(\phi_2\)</td>
+            <td>-135</td>
+            <td>\(\phi_3\)</td>
+            <td>0</td>
+          </tr>
+        </table>
+      </div>
+
+
+      <hr style="margin-top:0px;margin-bottom:10px;">
+
+      <div align=center style="margin-bottom: -10px">
+        <table style="border:none;">
+          <col width="130px">
+          <col width="40px">
+          <col width="60px">
+          <col width="40px">
+          <col width="60px">
+          <col width="40px">
+          <col width="60px">
+          <tr align="left">
+          	<td colspan="7" style="border:none;">c.) Average baseline.</td>
+          </tr>
+          <tr align="center">
+          	<td align=right>Baseline:</td>
+            <td>\(x^b_1\)</td>
+            <td>70</td>
+            <td>\(x^b_2\)</td>
+            <td>135</td>
+            <td>\(x^b_3\)</td>
+            <td>0.5</td>
+          </tr>
+          <tr align="center">
+          	<td align=right>Attribution:</td>
+            <td>\(\phi_1\)</td>
+            <td>0</td>
+            <td>\(\phi_2\)</td>
+            <td>0</td>
+            <td>\(\phi_3\)</td>
+            <td>-5</td>
+          </tr>
+        </table>
+      </div>
+
+    <figcaption>
+      <a href="#single_baselines_bad" class="figure-number">3</a>: Figure illustrating the downsides of a single baseline for Shapley values.  Feature 1 corresponds to age (inches), feature 2 is weight (pounds), and feature 3 is gender (0 is male, 1 is female).  The first baseline is an all-zero baseline.  The second is an average feature value baseline.
+    </figcaption>
+    </figure>
+
+  <!-- Proof -->
+  <div">
+    <p><a onclick="hideshow('proof_linearmodel_baseline')"><strong>+ Technical details</strong></a></p>
+
+    <div id="proof_linearmodel_baseline", style="display:none">
+      <p>
+        For masking, the SHAP values for a linear model are easy to compute:
+        $$
+        \begin{aligned}
+        \phi_i(f,x^f,x^b)&= \sum_{S\in C } W(|S|,|N|)(f(h^{S\cup i}) {-} f(h^{S}))\\
+        &= \sum_{S\in C } W(|S|,|N|)(\beta h^{S\cup i} {-} \beta h^{S})\\
+        &=\sum_{S\in C } W(|S|,|N|) \beta_i (x^f_i-x^b_i)\\ 
+        &= \beta_i (x^f_i-x^b_i)\\ 
+        \end{aligned}
+        $$
+        Note that \(\sum_{S\in C } W(|S|,|N|)=1\).
+    </p>
+  </div>
+
+
+    <p>
+      One criticism of this method is that the choice of baseline is very influential to the resulting feature attributions.  In <a href="#single_baselines_bad" class="figure-number">3</a>, we can see that the choice of baseline heavily influences the resulting attribution value.
+    </p>
+
+    <p>
+      <a href="#single_baselines_bad" class="figure-number">3b</a> is the all-zeros baseline.  In this case, it appears that height and weight are quite important, however being male is not important at all.  This is a bit counter-intuitive, because relative to being female, being male reduces the prediction for this individual.  Put another way, we can consider a new model where \(x_3\) is 0 for female, rather than 1 for female.  Then, an equivalent model would be \(y=2x_1-x_2-10x_3+10\).  In this case, using the same zero-baseline gives an attribution value of 10 instead of 0 for being male for the exact same model.  Since the meaning of zero is often arbitrary for different variables, selecting it as your baseline can result in misleading attributions.
+    </p>
+
+    <p>
+      Alternatively, we could use a mean-baseline as in <a href="#single_baselines_bad" class="figure-number">3c</a>.  Although the mean of a binary variable does not have a natural interpretation it fixes the Gender problem.  However, for Height and Weight, we can see that the all-mean baseline introduces bias and effectively forces zero attribution to individuals with average heights and weights.  This is undesirable because their height and weight are clearly influencing the model's prediction.
+    </p>
+
+    <p>
+      Instead of using a single <i>background sample</i> (baseline), we can use many.  In the next section we will describe two approaches to incorporate <i>background distributions</i> to our set functions \(v(S)\) for a much better definition of missingness.
+    </p>
+
+    <h3 id="shap_conditional_distribution">1.4 Imputing missing features by conditioning</h3>
+
+    <p>
+		The most natural approach to incorporate a background distribution is with conditional expectations.  Instead of simply replacing "missing" features with a fixed value, we condition on the set of features that are "present" as if we know them and use those to guess at the "missing" features.  If we define \(D\) to be the background (underlying) distribution our samples are drawn from, the value of the game is:
     	$$
-		v(S)=\mathbb{E}_D[f(x)|x_{S}]
+		  v(S)=\mathbb{E}_D[f(x)|x_{S}]
     	$$
     </p>
 
-	<p>
+    <p>
     	One caveat is that getting this conditional expectation for actual data is very difficult.  Furthermore, even if you do manage to do so, the resulting explanations can end up having undesirable characteristics (more on this later).  Because our goal is to focus on explaining the model itself, an arguably more natural approach is to use causal inference's <i>interventional conditional expectation</i>:
     	$$
     	v(S)=\mathbb{E}_D[f(x)|\text{do}(x_{S})]
     	$$
-    	The <i>do</i> notation is causal inference's <i>do</i>-operator <d-cite bibtex-key="pearl2009causality"></d-cite>.  In words, we break the dependence between the features in \(S\) and the remaining features, which is analogous to <i>intervening</i> on the remaining features (more on this in <a href="#background_distribution">Section 1.3</a>).  The motivation behind this decision comes from <d-cite bibtex-key="janzing2019feature"></d-cite> which is also very close to Random Baseline Shapley in <d-cite bibtex-key="sundararajan2019many"></d-cite>.  Additionally, this is exactly the assumption made by <a href="https://shap.readthedocs.io/en/latest/#shap.KernelExplainer">Kernel Explainer</a> <d-cite bibtex-key="lundberg2017unified"></d-cite> and <a href="https://shap.readthedocs.io/en/latest/#shap.SamplingExplainer">Sampling Explainer</a> from the SHAP package.
+    	The <i>do</i> notation is causal inference's <i>do</i>-operator <d-cite bibtex-key="pearl2009causality"></d-cite>.  In words, we break the dependence between the features in \(S\) and the remaining features, which is analogous to <i>intervening</i> on the remaining features (more on this in <a href="#background_distribution">Section 1.5</a>).  The motivation behind this decision comes from <d-cite bibtex-key="janzing2019feature"></d-cite> which is also very close to Random Baseline Shapley in <d-cite bibtex-key="sundararajan2019many"></d-cite>.  Additionally, this is exactly the assumption made by <a href="https://shap.readthedocs.io/en/latest/#shap.KernelExplainer">Kernel Explainer</a> <d-cite bibtex-key="lundberg2017unified"></d-cite> and <a href="https://shap.readthedocs.io/en/latest/#shap.SamplingExplainer">Sampling Explainer</a> from the SHAP package.
     </p>
-
 
     <!-- Figure 3 -->
     <figure id="linear_shap_ex">
@@ -1452,7 +1625,7 @@ svg .rect {
 	    <p align="center" id="ex2_preset_text" style="font-size:13px">Independent variables.</p>
 
       <figcaption>
-        <a href="#linear_shap_ex" class="figure-number">3</a>: Comparing two versions of SHAP values: conditional expectation (CE) and interventional conditional expectation (ICE).  We make two simplifying assumptions:
+        <a href="#linear_shap_ex" class="figure-number">4</a>: Comparing two versions of SHAP values: conditional expectation (CE) and interventional conditional expectation (ICE).  We make two simplifying assumptions:
 
         <ul>
           <li class="no-space">The function is linear (\(f=\beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \beta_4 x_4\))</li>
@@ -1463,7 +1636,11 @@ svg .rect {
 
 
   <p>
-    In <a href="#example2">Example 2</a> we highlight tradeoffs between the conditional expectation and the interventional conditional expectation by devising a simple example with a linear function and a multivariate normally distributed background distribution.  In general, computing the conditional expectation SHAP value is difficult; however, because we choose a multivariate normal distribution the conditional expectation is well defined.  In addition, we choose a linear function because the conditional expectation of the function equals the function applied to the conditional expectation.
+    In general, computing the conditional expectation SHAP value is difficult; however, for a multivariate normal distribution the conditional expectation is easy to calculate.  In addition, for a linear function the conditional expectation of the function equals the function applied to the conditional expectation (\(E[f(x)|x_S]=f(E[x|x_S])\)<d-footnote>Note that this is not generally true.  Only for affine functions.</d-footnote>).  
+  </p>
+
+  <p>
+    In <a href="#linear_shap_ex" class="figure-number">4</a> we highlight tradeoffs between the conditional expectation and the interventional conditional expectation for a linear model.  Comparing Preset A to Preset B, we can see that the correlation between variables will cause the CE SHAP values to be split between correlated variables.  Although this may be desirable at times<d-footnote>For example, if we are interested in detecting whether a model is secretly using a confounding variable, we may want CE SHAP values.</d-footnote>, it can feel somewhat unnatural as in Preset D, where feature \(x_4\) is as important as feature \(x_3\) despite not being used in the model.  Although both CE SHAP values and ICE SHAP values are meaningful, we focus on ICE SHAP values because they are tractable to compute and they explain what the model is doing, rather than on what relationships exist in the data itself.
   </p>
 
 
@@ -1473,7 +1650,7 @@ svg .rect {
 
 		<div id="proof_linearmodel", style="display:none">
 	    <p>
-	    	Computing SHAP values for a linear model is much easier than for other model classes.  This is how we compute them for <a href="#example2">Example 2</a>.
+	    	Computing SHAP values for a linear model is much easier than for other model classes <d-footnote>Note that we assume features have zero mean in the following calculations.</d-footnote>.  This is how we compute them for <a href="#linear_shap_ex" class="figure-number">4</a>.
 	    </p>
 
 	    <p>
@@ -1483,11 +1660,11 @@ svg .rect {
   			\phi_i(f,x)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(x)|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[f(x)|do(x_{S})])\\
   			&=\sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[\beta x|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[\beta x|do(x_{S})])\\
   			&=\sum_{S\in C } W(|S|,|N|) \beta (\mathbb{E}_{D}[x|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[x|do(x_{S})])\\
-  			&=\sum_{S\in C } W(|S|,|N|) \beta (h^{S\cup \{i\}} {-} h^S)\\ 
   			&=\sum_{S\in C } W(|S|,|N|) \beta_i x^f_i\\ 
   			&= \beta_i x^f_i\\ 
   			\end{aligned}
-        $$
+        	$$
+        	Note that \(\sum_{S\in C } W(|S|,|N|)=1\).
 		</p>
 
 	    <p>
@@ -1506,7 +1683,7 @@ svg .rect {
 	</div>
 
     <!-- Background distribution -->
-    <h3 id="background_distribution">1.3 Single reference SHAP values</h3>
+    <h3 id="background_distribution">1.5 Single reference SHAP values</h3>
 
 	<p>
 		As we saw earlier, to compute \(\phi_i(f,x^f)\) we evaluate the interventional conditional expectation.  However, this depends on a <i>background distribution</i> \(D\) that the sample we are explaining, otherwise known as the foreground sample \(x^f\), will be compared to.  
@@ -1519,9 +1696,9 @@ svg .rect {
 		$$
 		This is in part because the interventional conditional expectation has a very natural definition when the background distribution is a single sample \(x^b\) (\(D_{x^b}\)):
 		$$
-		\mathbb{E}_{D_{x^b}}[f(x^f)|\text{do}(x_{S})]=h^S
+		\mathbb{E}_{D_{x^b}}[f(x^f)|\text{do}(x_{S})]=h^S\text{, where } h^S_i = x^f_i\text{ if }i\in S\text{, }x^b_i\text{ otherwise}
 		$$
-		Where \(h^S\in\mathbb{R}^d\) with \(h^S_i=x^f_i\) if \(i\in S\) otherwise \(h^S_i=x^b_i\).  In words, the interventional conditional expectation of \(x^f\) given a set of features \(S\) and \(x^b\) is a hybrid sample where the features in \(S\) are from \(x^f\) and the remaining features are from \(x^b\).  This is as if <i>we intervene on features in the foreground sample with features from the background sample</i>. 
+		In words, the interventional conditional expectation of \(x^f\) given a set of features \(S\) and \(x^b\) is a hybrid sample where the features in \(S\) are from \(x^f\) and the remaining features are from \(x^b\).  This is as if <i>we intervene on features in the foreground sample with features from the background sample</i>.  This should look very familiar, as it is equivalent to obtaining the SHAP value by treating a sample in the background distribution as a baseline and masking (<a href="#masking_missing">Section 1.3</a>)
 	</p>  
 
 	<!-- Background Distribution Proof -->
@@ -1558,10 +1735,10 @@ svg .rect {
 
   <!-- The Algorithm Section -->
   <div style="max-width:800px">
-    <h2 id="algorithm">2. Algorithm</h2>
+    <h2 id="algorithm">2. An algorithm to explain trees quickly and exactly</h2>
     
     <p>
-    Now our goal is to tackle the simpler problem of obtaining single reference SHAP values \(\phi_i(f,x^f,x^b)\) that are attributions for a single foreground (sample being explained) and background sample (sample being compared to).  In this section, we consider a specific foreground sample, background sample, and tree as specified in <a href="#example3">Example 3</a>.
+    Now our goal is to tackle the simpler problem of obtaining single reference SHAP values \(\phi_i(f,x^f,x^b)\) that are attributions for a single foreground (sample being explained) and background sample (sample being compared to).  In this section, we consider a specific foreground sample, background sample, and tree as specified in <a href="#define_tree_samples" class="figure-number">5</a>.
 	</p>
 
 	<figure id="define_tree_samples">
@@ -1569,34 +1746,46 @@ svg .rect {
 			Tree Parameters <d-footnote>Green links indicate the foreground sample goes down a particular split, red indicates the background sample does, and blue indicates both samples do.</d-footnote> (Click nodes)</strong> <br>
 		</p>
 
-    <!-- The SVG tree itself -->
-    <div align=center style="margin-bottom: -45px">
-  	  <div id="graphic"></div> 
-  	  <div class="tooltip" id="tooltip"></div>
-    </div>
+    <div style="max-width:800px;height:320px;text-align:center">
+      <div style="width:350px;height:300px;display:inline-block;">
 
-    <!-- Select variable/threshold -->
-    <div align=center style="margin-bottom: 20px">
-      <span id="ex3_var_label" style="font-size: 15px">Node Variable:</span>
-      <input type="button" value="x1" class="w3-button w3-teal" id="ex3_x1_select" onclick="ex3_select_feat1()" style="font-size: 15px">
-      <input type="button" value="x2" class="w3-button w3-green" id="ex3_x2_select" onclick="ex3_select_feat2()" style="font-size: 15px">
-      <input type="button" value="x3" class="w3-button w3-green" id="ex3_x3_select" onclick="ex3_select_feat3()" style="font-size: 15px">
-    </div>
+        <!-- The SVG tree itself -->
+        <div align=center>
+      	  <div id="graphic"></div> 
+      	  <div class="tooltip" id="tooltip"></div>
+        </div>
 
-    <div id="ex3_thres_div" align=center style="margin-bottom: 20px">
-      <span style="font-size: 15px">Node Threshold:</span>
-      <input type="range" min="-15" max="15" value="5" class="slider" id="ex3_thres" style="width: 130px;">
-      <span style="font-size: 15px;width: 20px;display: inline-block;" id="ex3_thres_out">5</span>
-    </div>
+      </div>
 
-    <div id="ex3_val_div" align=center style="margin-bottom: 20px;display: none;">
-      <span style="font-size: 15px">Leaf Value:</span>
-      <input type="range" min="-15" max="15" value="5" class="slider" id="ex3_val" style="width: 130px;">
-      <span style="font-size: 15px;width: 20px;display: inline-block;" id="ex3_val_out">5</span>
+      <div style="width:180px;height:300px;display:inline-block;vertical-align: top;">
+
+        <!-- Select variable/threshold -->
+        <div align=center style="margin-bottom: 20px">
+          <p id="ex3_var_label" align=center style="font-size: 15px">Node Variable:</p>
+          <div align=center>
+            <input type="button" value="x1" class="w3-button w3-teal" id="ex3_x1_select" onclick="ex3_select_feat1()" style="font-size: 15px">
+            <input type="button" value="x2" class="w3-button w3-green" id="ex3_x2_select" onclick="ex3_select_feat2()" style="font-size: 15px">
+            <input type="button" value="x3" class="w3-button w3-green" id="ex3_x3_select" onclick="ex3_select_feat3()" style="font-size: 15px">
+          </div>
+        </div>
+
+        <div id="ex3_thres_div" align=center style="margin-bottom: 20px">
+          <p style="font-size: 15px">Node Threshold:</p>
+          <input type="range" min="-15" max="15" value="5" class="slider" id="ex3_thres" style="width: 130px;">
+          <p style="font-size: 15px;width: 20px;" id="ex3_thres_out">5</p>
+        </div>
+
+        <div id="ex3_val_div" align=center style="margin-bottom: 20px;display: none;">
+          <p style="font-size: 15px">Leaf Value:</p>
+          <input type="range" min="-15" max="15" value="5" class="slider" id="ex3_val" style="width: 130px;">
+          <p style="font-size: 15px;width: 20px;" id="ex3_val_out">5</p>
+        </div>
+      </div>
+    
     </div>
 
     <!-- Foreground and background samples -->
-    <div align=center style="margin-bottom: 10px;">
+    <div align=center style="margin-bottom: 20px;">
       <table style="width:500px;display:inline;border:none;">
         <col width="100px"/>
         <col width="150px"/>
@@ -1638,7 +1827,7 @@ svg .rect {
     </div>
 
     <figcaption>
-      <a href="#define_tree_samples" class="figure-number">4</a>: Choose foreground sample \(x^f\), background sample \(x^b\), and tree parameters for the remainder of <a href="#algorithm">Section 2</a>.
+      <a href="#define_tree_samples" class="figure-number">5</a>: Choose foreground sample \(x^f\), background sample \(x^b\), and tree parameters for the remainder of <a href="#algorithm">Section 2</a>.
     </figcaption>
 
 	</figure>
@@ -1647,29 +1836,45 @@ svg .rect {
     <h3 id="brute_force">2.1 Brute force</h3>
 
     <p>
-    	Based on the proof in <a href="#background_distribution">Section 1.3</a>, the brute force approach would be to compute the following:
+    	Based on the proof in <a href="#background_distribution">Section 1.5</a>, the brute force approach would be to compute the following:
 
     	$$
     	\phi_i(f,x^f,x^b)=\sum_{S\subseteq N\setminus\{i\}} \underbrace{W(|S|,|N|)}_{W}\underbrace{f(h^{S\cup \{i\}})}_{\text{\textcolor{green}{Pos} term}} {-} \underbrace{f(h^S)}_{\text{\textcolor{red}{Neg} term}})
     	$$
+
+    	The pseudocode and the computation for a specific example is then:
     </p>
 
-    <p>
-    	If we assume the computational cost of computing the weight \(W\) is constant, then the complexity of the brute force method is the number of terms in the summation multiplied by the cost of making a prediction (on the order of the depth of the tree \((D)\)).  Then, the computational complexity of the brute force approach is \(O(D\times2^{d})\).
-    </p>
+  <figure id="brute_force_ex" style="margin-bottom: 0px">
+    <div class="container" style="width:700px">
 
-    <p>
-    	In order to compute \(\phi_i(f,x^f,x^b)\) for all features, we have to re-run the entire algorithm \(d\) times, giving us a complexity of \(O(d\times D\times 2^{d})\).
-	</p>
+      <div class="first" style="width:350px;height:410px">
+      	<p align=center style="font-size:15px;margin-bottom:10px">Tree Parameters</p>
+      	<div align=center id="ex4_divtree" style="margin-top:0px;margin-bottom:0px"></div>
 
+	    <table align=center style="border:none;">
+	      <col width="20px"/>
+	      <col width="80px"/>
+	      <col width="20px"/>
+	      <col width="80px"/>
+	      <col width="20px"/>
+	      <col width="80px"/>
+	      <tr>
+	        <td align=center colspan="6">Attribution Values</td>
+	      </tr>
+	      <tr>
+	        <td id="ex4_phi1">\(\phi_1\)</td>
+	        <td align=center id="ex4_phi1_val"></td>
+	        <td id="ex4_phi2">\(\phi_2\)</td>
+	        <td align=center id="ex4_phi2_val"></td>
+	        <td id="ex4_phi3">\(\phi_3\)</td>
+	        <td align=center id="ex4_phi3_val"></td>
+	      </tr>
+	    </table>
+      	</div>
+      </div>
 
-  <figure id="brute_force_ex" class="l-page">
-    <div class="container" style="width:800px">
-
-      <div class="first" style="width:350px;height:720px">
-      	<p align=center style="font-size:15px;margin-bottom:-5px">Tree Parameters</p>
-      	<div align=center id="ex4_divtree" style="margin-top:0px;margin-bottom:-30px"></div>
-      
+      <div class="second" style="width:350px;height:410px">
         <table align=center style="border:none;margin-bottom:-5px">
           <col width="60px"/>
           <col width="90px"/>
@@ -1712,19 +1917,19 @@ svg .rect {
 
         <table align=center style="border:none;margin-bottom:-5px">
           <col width="50px"/>
-          <col width="70px"/>
-          <col width="70px"/>
-          <col width="80px"/>
-          <col width="80px"/>
+          <col width="67px"/>
+          <col width="67px"/>
+          <col width="67px"/>
+          <col width="67px"/>
           <tr>
             <td align=center colspan="5">Algorithm State</td>
           </tr>
           <tr>
             <td>\(W\)</td>
             <td>\(S\)</td>
-            <td id="ex4_fxS">\(f(x_S)\)</td>
+            <td id="ex4_fxS">\(f(h^S)\)</td>
             <td>\(S\cup{i}\)</td>
-            <td id="ex4_fxSi">\(f(x_{S\cup{i}})\)</td>
+            <td id="ex4_fxSi">\(f(h^{S\cup{i}})\)</td>
           </tr>
           <tr id="ex4_s1_row">
             <td>1/3</td>
@@ -1755,50 +1960,71 @@ svg .rect {
             <td id="s4i_val"></td>
           </tr>
         </table>
+	  </div>
 
-        <table align=center style="border:none;">
-          <col width="20px"/>
-          <col width="80px"/>
-          <col width="20px"/>
-          <col width="80px"/>
-          <col width="20px"/>
-          <col width="80px"/>
-          <tr>
-            <td align=center colspan="6">Attribution Values</td>
-          </tr>
-          <tr>
-            <td id="ex4_phi1">\(\phi_1\)</td>
-            <td align=center id="ex4_phi1_val">0</td>
-            <td id="ex4_phi2">\(\phi_2\)</td>
-            <td align=center id="ex4_phi2_val">0</td>
-            <td id="ex4_phi3">\(\phi_3\)</td>
-            <td align=center id="ex4_phi3_val">0</td>
-          </tr>
-        </table>
-
-      </div>
-
-
-      <div class="second" style="width:450px;height:720px">
-
-        <p>filler</p>
-      </div>
-
-      <input type="button" class="w3-button w3-green" value="<<" onclick="ex4_reset()">
-      <input type="button" class="w3-button w3-green" value=">" onclick="bruteForceStep()">
-      <input type="button" class="w3-button w3-green" value=">>" onclick="bruteForceRunAll()">
-      <br><br>
       <div class="clear"></div>
     </div>
 
+    <div align=center style="margin-bottom: 20px">
+      <dt-code id="bf_1" block="" language="python">
+        def ite_brute(array xf, array xb, tree T, array N):
+      </dt-code>
+      <dt-code id="bf_2" block="" language="python">
+          phi = [0]*len(xf)
+      </dt-code>
+      <dt-code id="bf_3" block="" language="python">
+          for each feature i in N:
+      </dt-code>
+      <dt-code id="bf_4" block="" language="python">
+            for each set S in powerset(setminus(N,i)):
+      </dt-code>
+      <dt-code id="bf_5" block="" language="python">
+              hs  = [xf[j] for j in N if j in S else xb[j]] // Hybrid samples
+      </dt-code>
+      <dt-code id="bf_6" block="" language="python">
+              hsi = [xf[j] for j in N if j in union(S,i) else xb[j]]
+      </dt-code>
+      <dt-code id="bf_7" block="" language="python">
+              fxs  = T.predict(hs) // Predictions
+      </dt-code>
+      <dt-code id="bf_8" block="" language="python">
+              fxsi = T.predict(hsi)
+      </dt-code>
+      <dt-code id="bf_9" block="" language="python">
+              W = (len(S)!*(len(N)-len(S)-1)!)/(len(N)!) // Weight
+      </dt-code>
+      <dt-code id="bf_10" block="" language="python">
+              phi[i] += W*(fxsi-fxs) // Calculate phi contribution
+      </dt-code>
+    </div>
+
+    <div align=center style="margin-bottom: 0px">
+      <input type="button" class="w3-button w3-green" value="<<" onclick="ex4_reset()">
+      <input type="button" class="w3-button w3-green" value=">" onclick="bruteForceStep()">
+      <input type="button" class="w3-button w3-green" value=">>" onclick="bruteForceRunAll()">
+    </div>
+  </figure>
+
+  <figure>
     <figcaption>
-      <a href="#brute_force_ex" class="figure-number">5</a>: Brute force algorithm for the tree and samples specified in <a href="#define_tree_samples" class="figure-number">4</a>.
+      <a href="#brute_force_ex" class="figure-number">6</a>: Brute force algorithm for the tree and samples specified in <a href="#define_tree_samples" class="figure-number">5</a>.
     </figcaption>
   </figure>
 
+    <p>
+    	If we assume the computational cost of computing the weight \(W\) is constant<d-footnote>In order to do so, we can simply memoize \(k!\) for \(k=1,\cdots,d\).</d-footnote>, then the complexity of the brute force method is the number of terms in the summation multiplied by the cost of making a prediction (on the order of the depth of the tree).  This gives \(O((\text{tree depth})\times 2^{d})\).
+    </p>
+
+    <p>
+    	Then, in order to compute \(\phi_i(f,x^f,x^b)\) for all features \(i\), we have to re-run the entire algorithm \(d\) times, giving us an overall complexity of
+    	$$
+    	O((\text{tree depth})\times d\times  2^{d})
+    	$$
+	</p>
+
 
 	<p>
-	    However, if we <i>constrain \(f(x)\) to be a tree-based model</i> (e.g., XGBoost, decision trees, random forests, etc.), then we can come up with a polynomial time algorithm to compute \(\phi_i(f,x^f,x^b)\) exactly.  Why is this the case?  Well, looking at Example 4, we can see that even for explaining a single feature, the brute force algorithm may consider a particular path multiple times.  However, to compute the SHAP value for a single feature, it turns out that we only need to consider each path once.  This insight leads us to the naive algorithm in <a href="#naive_implementation">Section 2.2</a>.
+	    An exponential computational complexity is bad; however, if we <i>constrain \(f(x)\) to be a tree-based model</i> (e.g., XGBoost, decision trees, random forests, etc.), then we can come up with a polynomial time algorithm to compute \(\phi_i(f,x^f,x^b)\) exactly.  Why is this the case?  Well, looking at <a href="#brute_force_ex" class="figure-number">6</a>, we can see that even for explaining a single feature, the brute force algorithm may consider a particular path multiple times.  However, to compute the SHAP value for a single feature, it turns out that we only need to consider each path once.  This insight leads us to the naive algorithm in <a href="#naive_implementation">Section 2.2</a>.
 	</p>
 
 
@@ -1813,14 +2039,14 @@ svg .rect {
 	</p>    
 
 	<p style="margin-bottom: 0px">
-  	<strong>Theorem 1: To calculate \(\phi_i(f,x,x^b)\), we can calculate attributions for each path from the root to each leaf.</strong>  
+  	<strong>Theorem 1: To calculate \(\phi_i(f,x^f,x^b)\), we can calculate attributions for each path from the root to each leaf.</strong>  
   </p>
 
   <p>
     For a given path \(P\), we define \(N_P\) to be the "unique" features encountered and \(S_P\) to be the "unique" features that came from \(x\).  Finally, define \(v\) to be the value of the path's leaf.  Then, the attribution of the path is:
 
   	$$
-		\phi_i^P(f,x,x^b)=
+		\phi_i^P(f,x^f,x^b)=
     \begin{cases}
     	0 & \text{if}\ i\notin N_P \\
     	\textcolor{green}{W(|S_P|-1,|N_P|)\times v} & \text{if}\ i\in S_P \\
@@ -1830,10 +2056,10 @@ svg .rect {
 	</p>
 
 	<!-- Proof -->
-	<p><a onclick="hideshow('proof')"><strong>+ Technical Details</strong></a></p>
-	<div id="proof", style="display:none">
+	<p><a onclick="hideshow('naive_alg_proof')"><strong>+ Technical Details</strong></a></p>
+	<div id="naive_alg_proof", style="display:none">
 		<p>
-			<i>Sketch of proof</i>: If we treat each path in the tree from the root to the leaf as a separate model \(f'(x)\) that returns the value of the leaf if that path is traversed by \(x\) or zero otherwise, then we have \(L\) models that operate on disjoint parts of the input space.  Then, \(f(x)=\sum f'(x)\) and by the additivity of SHAP values, \(\phi_i(f,x,x^b)=\sum_f\phi_i(f',x,x^b)\).  Then, we can simply calculate \(\phi_i\) for each path model.  Since the path model is zero everywhere except for the associated path, it is easy to arrive to the solution in Theorem 1.
+			<i>Sketch of proof</i>: If we treat each path in the tree from the root to the leaf as a separate model \(f'(x)\) that returns the value of the leaf if that path is traversed by \(x\) or zero otherwise, then we have \(L\) models that operate on disjoint parts of the input space.  Then, \(f(x)=\sum f'(x)\) and by the additivity of SHAP values, \(\phi_i(f,x^f,x^b)=\sum_f\phi_i(f',x^f,x^b)\).  Then, we can simply calculate \(\phi_i\) for each path model.  Since the path model is zero everywhere except for the associated path, we can arrive to the solution in Theorem 1.
 		</p>
 	</div>
 
@@ -1843,213 +2069,317 @@ svg .rect {
 
 	<figure id="tree_example_cases" align=center>
 		<img src="images/tree_example3.png" alt="Tree Example 3" style="width: 360px;margin-bottom: 20px;">
-    <figcaption><a href="#tree_example_cases" class="figure-number">6</a>:  Green paths are associated with \(\textcolor{green}{x^f}\), red paths are \(\textcolor{red}{x^b}\), and blue paths are associated with both.</figcaption>
+    <figcaption><a href="#tree_example_cases" class="figure-number">7</a>:  Green paths are associated with \(\textcolor{green}{x^f}\), red paths are \(\textcolor{red}{x^b}\), and blue paths are associated with both.</figcaption>
 	</figure>
 
 	<p>
 		In the naive algorithm, we maintain lists \(N_P\) and \(S_P\) as we traverse the tree.  At each internal node (Cases 2-4) we update the lists and then pass them to the node's children.  At the leaf nodes (Case 1), we calculate the attribution for each path.  In Figure 3, we see four possible cases:
 		<ul>
-			<li>Case 1: \(n\) is a leaf</li>
-			<ul>
-				<li>Return the attribution in Theorem 1 based on \(N_P\) and \(S_P\)</li>
+			<li class="no-space">Case 1: \(n\) is a leaf</li>
+			<ul class="no-space">
+				<li class="no-space">Return the attribution in Theorem 1 based on \(N_P\) and \(S_P\)</li>
 			</ul>
 
-			<li>Case 2: The feature has been encountered already (\(n_{feature}\in N_P\))</li>
-			<ul>
-				<li>Depending on if we split on \(x^f\) or \(x^b\), we compare either \(x^f_{n_{feature}}\) or \(x^b_{n_{feature}}\) to \(n_{threshold}\) and go down the appropriate child</li>
-				<li>Pass down \(N_P\) and \(S_P\) without modifications because we did not add a new feature</li>
+			<li class="no-space">Case 2: The feature has been encountered already (\(n_{feature}\in N_P\))</li>
+			<ul class="no-space">
+				<li class="no-space">Depending on if we split on \(x^f\) or \(x^b\), we compare either \(x^f_{n_{feature}}\) or \(x^b_{n_{feature}}\) to \(n_{threshold}\) and go down the appropriate child</li>
+				<li class="no-space">Pass down \(N_P\) and \(S_P\) without modifications because we did not add a new feature</li>
 			</ul>
 
-			<li>Case 3: Both \(x\) and \(x^b\) are on the same side of \(n\)'s split</li>
-			<ul>
-				<li>Pass down \(N_P\) and \(S_P\) without modifications because relative to \(x\) and \(x^b\) it's as if this node doesn't exist</li>
+			<li class="no-space">Case 3: Both \(x\) and \(x^b\) are on the same side of \(n\)'s split</li>
+			<ul class="no-space">
+				<li class="no-space">Pass down \(N_P\) and \(S_P\) without modifications because relative to \(x\) and \(x^b\) it's as if this node doesn't exist</li>
 			</ul>
 
-			<li>Case 4: \(x\) and \(x^b\) go to different children</li>
-			<ul>
-				<li>Add \(n_{feature}\) to both \(N_P\) and \(S_P\) and pass both lists to the \(x\) child</li>
-				<li>Only add \(n_{feature}\) to \(N_P\) and pass both lists to the \(x^b\) child</li>
+			<li class="no-space">Case 4: \(x\) and \(x^b\) go to different children</li>
+			<ul class="no-space">
+				<li class="no-space">Add \(n_{feature}\) to both \(N_P\) and \(S_P\) and pass both lists to the \(x\) child</li>
+				<li class="no-space">Only add \(n_{feature}\) to \(N_P\) and pass both lists to the \(x^b\) child</li>
 			</ul>
 		</ul>
 	</p>
 
+  <figure id="naive_ex" class="l-middle" style="margin-bottom: -10px;">
 
-    <div id="table_container" style="overflow-x:auto;align:center;">
-    	<p align="left" style="margin:20px">
-			<strong>Example 5</strong>: Naive algorithm for the tree and samples from Example 3.
-		</p>
-	</div>
+  	<div class="container" style="width:1000px">
+    	<div class="first" style="width:400px;height:620px">
+        <p align=center style="font-size:15px;margin-bottom:10px">Tree Parameters</p>
+        <div id="ex5_divtree" style="margin-top:0px;margin-bottom:-5px;"></div>
+            
+  			<table align=center style="border:none;">
+          <col width="60px"/>
+          <col width="90px"/>
+          <col width="90px"/>
+          <col width="90px"/>
+          <tr>
+            <td align=center colspan="4">Foreground & background sample</td>
+          </tr>
+    			<tr>
+    				<td></td>
+    				<td>\(x_1\)</td>
+    				<td>\(x_2\)</td>
+    				<td>\(x_3\)</td>
+    			</tr>
+    			<tr>
+    				<td>\(x^f\)</td>
+    				<td id="ex5_fx1">0</td>
+    				<td id="ex5_fx2">0</td>
+    				<td id="ex5_fx3">10</td>
+    			</tr>
+    			<tr>
+    				<td>\(x^b\)</td>
+    				<td id="ex5_bx1">10</td>
+    				<td id="ex5_bx2">10</td>
+    				<td id="ex5_bx3">0</td>
+    			</tr>
+    			<tr id="ex5_h">
+    				<td>\(h\)</td>
+    				<td id="ex5_h1"></td>
+    				<td id="ex5_h2"></td>
+    				<td id="ex5_h3"></td>
+    			</tr>
+  			</table>
 
-    <div id="table_container" style="overflow-x:auto;align:center">
-    	<p style="margin: 0px 0px 0px 20px;"><strong>Tree Parameters</strong></p>
-    	<div id="ex5_divtree" style="margin-top:10px;"></div>
-    </div>
+        <table align=center style="border:none;">
+          <col width="40px"/>
+          <col width="120px"/>
+          <col width="40px"/>
+          <col width="120px"/>
+          <td align=center colspan="4">Algorithm State</td>
+          <tr>
+            <td>\(S_P\)</td>
+            <td id="ex5_sp"></td>
+            <td>\(N_P\)</td>
+            <td id="ex5_np"></td>
+          </tr>
+        </table>
 
-    <div id="table_container" style="overflow-x:auto;align:center">
-    	<div class="container">
+        <table align=center style="border:none;">
+          <col width="20px"/>
+          <col width="80px"/>
+          <col width="20px"/>
+          <col width="80px"/>
+          <col width="20px"/>
+          <col width="80px"/>
+          <tr>
+            <td align=center colspan="6">Attribution Values</td>
+          </tr>
+          <tr>
+            <td id="ex5_phi1">\(\phi_1\)</td>
+            <td align=center id="ex5_phi1_val"></td>
+            <td id="ex5_phi2">\(\phi_2\)</td>
+            <td align=center id="ex5_phi2_val"></td>
+            <td id="ex5_phi3">\(\phi_3\)</td>
+            <td align=center id="ex5_phi3_val"></td>
+          </tr>
+        </table>
+      </div>
 
-    	<div class="first" style="width:300px;height:220px">
-			<p style="margin: 0px 0px 0px 30px;"><strong>Foreground & background sample</strong></p>
-			<table cellpadding="10" style="margin: 10px 0px 0px 60px">
-			<col width="40px"/>
-			<col width="50px"/>
-			<col width="50px"/>
-			<tr>
-				<th></th>
-				<th>\(x_1\)</th>
-				<th>\(x_2\)</th>
-				<th>\(x_3\)</th>
-			</tr>
-			<tr>
-				<td>\(x^f\)</td>
-				<td id="ex5_fx1">0</td>
-				<td id="ex5_fx2">0</td>
-				<td id="ex5_fx3">10</td>
-			</tr>
-			<tr>
-				<td>\(x^b\)</td>
-				<td id="ex5_bx1">10</td>
-				<td id="ex5_bx2">10</td>
-				<td id="ex5_bx3">0</td>
-			</tr>
-			<tr id="ex5_h">
-				<td>\(h\)</td>
-				<td id="ex5_h1"></td>
-				<td id="ex5_h2"></td>
-				<td id="ex5_h3"></td>
-			</tr>
-			</table>
+	  <div class="second" style="width:600px;height:620px;margin-top:20px;">
+        <dt-code id="naivecode_1" class="indent0" block="" language="python">
+        def ite_naive(array xf, array xb, tree T):
+        </dt-code>
+        <dt-code id="naivecode_2" class="indent1" block="" language="python">
+          phi = [0]*len(xf)
+        </dt-code>
+        <dt-code id="naivecode_3" class="indent1" block="" language="python">
+          def recurse(node n, list np, list sp):
+        </dt-code>
+        <dt-code id="naivecode_4" class="indent2" block="" language="python">
+            // Case 1: Leaf
+        </dt-code>
+        <dt-code id="naivecode_5" class="indent2" block="" language="python">
+            if n.is_leaf: [Theorem 1]
+        </dt-code>
+        <dt-code id="naivecode_6" class="indent3" block="" language="python">
+              for i in N:
+        </dt-code>
+        <dt-code id="naivecode_7" class="indent4" block="" language="python">
+                if i in sp:
+        </dt-code>
+        <dt-code id="naivecode_8" class="indent5" block="" language="python">
+                  phi[i] += W(len(sp)-1,len(np)) 
+        </dt-code>
+        <dt-code id="naivecode_9" class="indent4" block="" language="python">
+                elif:
+        </dt-code>
+        <dt-code id="naivecode_10" class="indent5" block="" language="python">
+                  phi[i] -= W(len(sp),len(np)) 
+        </dt-code>
+        <dt-code id="naivecode_11" class="indent2" block="" language="python">
+            // Find children associated with xf and xb
+        </dt-code>
+        <dt-code id="naivecode_12" class="indent2" block="" language="python">
+            xf_child = n.left if xf[n.feat] < n.thres else n.right
+        </dt-code>
+        <dt-code id="naivecode_13" class="indent2" block="" language="python">
+            xb_child = n.left if xb[n.feat] < n.thres else n.right
+
+        </dt-code>
+        <dt-code id="naivecode_14" class="indent2" block="" language="python">
+            // Case 2: Feature encountered before
+        </dt-code>
+        <dt-code id="naivecode_15" class="indent2" block="" language="python">
+            if n.feat in np:
+        </dt-code>
+        <dt-code id="naivecode_16" class="indent3" block="" language="python">
+              if n.feat in sp:
+        </dt-code>
+        <dt-code id="naivecode_17" class="indent4" block="" language="python">
+                return(recurse(xf_child,np,sp))
+        </dt-code>
+        <dt-code id="naivecode_18" class="indent3" block="" language="python">
+              else:
+        </dt-code>
+        <dt-code id="naivecode_19" class="indent4" block="" language="python">
+                return(recurse(xb_child,np,sp))
+
+        </dt-code>
+        <dt-code id="naivecode_20" class="indent2" block="" language="python">
+            // Case 3: xf and xb go the same way
+        </dt-code>
+        <dt-code id="naivecode_21" class="indent2" block="" language="python">
+            if xf_child == xb_child:
+        </dt-code>
+        <dt-code id="naivecode_22" class="indent3" block="" language="python">
+              return(recurse(xf_child,np,sp))
+
+        </dt-code>
+        <dt-code id="naivecode_23" class="indent2" block="" language="python">
+            // Case 4: xf and xb don't go the same way
+        </dt-code>
+        <dt-code id="naivecode_24" class="indent2" block="" language="python">
+            if not xf_child != xb_child:
+        </dt-code>
+        <dt-code id="naivecode_25" class="indent3" block="" language="python">
+              f_phi = recurse(xf_child,np+[n.feat],sp+[n.feat])
+        </dt-code>
+        <dt-code id="naivecode_26" class="indent3" block="" language="python">
+              b_phi = recurse(xb_child,np+[n.feat],sp)
+        </dt-code>
+        <dt-code id="naivecode_27" class="indent1" block="" language="python">
+          recurse(n=T.root,sp=[],np=[])
+        </dt-code>
+      </div>
+
+      <div class="clear"></div>
 		</div>
 
-    	<div class="first" style="width:250px;height:220px">
-	    	<p style="margin: 0px 0px 0px 30px;"><strong>Algorithm state</strong></p>
-			<table cellpadding="10" style="margin: 10px 0px 0px 80px">
-				<col width="40px"/>
-				<col width="80px"/>
-				<tr>
-					<td>\(S_P\)</td>
-					<td id="ex5_sp"></td>
-				</tr>
-				<tr>
-					<td>\(N_P\)</td>
-					<td id="ex5_np"></td>
-				</tr>
-			</table>
-    	</div>
-
-
-    	<div class="first" style="width:210px;height:220px">
-	    	<p style="margin: 0px 0px 0px 10px;"><strong>Attribution Values</strong></p>
-
-			<table cellpadding="10" style="margin: 10px 0px 0px 10px">
-		      <col width="60px"/>
-		      <col width="80px"/>
-				<thead>
-				<!-- <tr style="background-color:#8BC34A;"> -->
-				<tr id="ex5_phi1">
-					<td>\(\phi_1(f,x^f,x^b)\)</td>
-					<td id="ex5_phi1_val"></td>
-				</tr>
-				<tr id="ex5_phi2">
-					<td>\(\phi_2(f,x^f,x^b)\)</td>
-					<td id="ex5_phi2_val"></td>
-				</tr>
-				<tr id="ex5_phi3">
-					<td>\(\phi_3(f,x^f,x^b)\)</td>
-					<td id="ex5_phi3_val"></td>
-				</tr>
-			</thead>
-			</table>
-    	</div>
-
-	    <div class="clear"></div>
-		</div>
-
-
+    <div align=center>
     	<input type="button" class="w3-button w3-green" value="<<" onclick="ex5_reset()">
     	<input type="button" class="w3-button w3-green" value=">" onclick="naiveStep()">
     	<input type="button" class="w3-button w3-green" value=">>" onclick="naiveRunAll()">
+    </div>
 
-    	<br><br>
+    <!-- <p align=center id="ex5_naive_step">Naive algorithm</p> -->
+  </figure>
 
-		<p style="margin: 0px 0px 20px 0px;" id="ex5_naive_step">Naive algorithm</p>
+  <figure>
 
-	</div>
+    <figcaption>
+      <a href="#naive_ex" class="figure-number">8</a>: Naive algorithm for the tree and samples specified in <a href="#define_tree_samples" class="figure-number">5</a>.
+    </figcaption>
+
+	</figure>
 
 	<!-- Pseudocode -->
-	<div style="padding-left:10px;padding-right:10px">
+<!-- 	<div style="padding-left:10px;padding-right:10px">
 
 		<p><a onclick="hideshow('pseudocode_naive')"><strong>+ Pseudocode</strong></a></p>
 
 		<div id="pseudocode_naive" style="display:none">
       <dt-code block language="python">
-        def ite_naive(array xf, array xb, tree T) {
+        def ite_naive(array xf, array xb, tree T):
           def recurse(node n, list np, list sp):
             // Case 1: Leaf
             if n.is_leaf:
               return(phi_i_p) [based on Theorem 1]
 
             // Find children associated with xf and xb
-            xf_child = n.leftchild if xf[n.feat] < n.thres else n.rightchild
-            xb_child = n.leftchild if xb[n.feat] < n.thres else n.rightchild
+            xf_child = n.left if xf[n.feat] < n.thres else n.right
+            xb_child = n.left if xb[n.feat] < n.thres else n.right
 
             // Case 2: Feature encountered before
             if n.feat in np:
               if n.feat in sp:
-                return ite_naive(xf_child,np,sp)
+                return recurse(xf_child,np,sp)
               else:
-                return ite_naive(xb_child,np,sp)
+                return recurse(xb_child,np,sp)
 
             // Case 3: xf and xb go the same way
             if xf_child == xb_child:
-              return(ite_naive(xf_child,np,sp))
+              return(recurse(xf_child,np,sp))
 
             // Case 4: xf and xb don't go the same way
-            if not xf_child == xb_child:
-              f_phi = ite_naive(xf_child,np+[n.feat],sp+[n.feat])
-              b_phi = ite_naive(xb_child,np+[n.feat],sp)
+            if not xf_child != xb_child:
+              f_phi = recurse(xf_child,np+[n.feat],sp+[n.feat])
+              b_phi = recurse(xb_child,np+[n.feat],sp)
               return(b_phi+f_phi)
 
           return(recurse(n=T.root,sp=[],np=[]))
-        }
       </dt-code>
     </div>
 	</div>
-
+ -->
     <p>
-		The computational complexity to compute the single reference SHAP value using the naive algorithm is \(O(T_{numnodes}\times T_{depth})\) where \(T_{numnodes}\) is the number of nodes in the tree and \(T_{depth}\) is the depth of the tree.  This is because in the worst case, each internal node needs to check the lists \(S_P\) and \(N_P\) which are of length \(O(T_{depth})\).  Furthermore, each leaf node needs to check if \(i\) is in \(S_P\) which is also \(O(T_{depth})\) cost.  Note that we can actually get rid of the multiplicative \(T_{depth}\) factor by representing \(S_P\) and \(N_P\) as arrays and keeping track of the sizes of \(|S|\) and \(|N|\).
+		Then, we examine the computational complexity to compute \(\phi_i(f,x^f,x^b)\) for all features \(i\) using the naive algorithm.
 	</p>
 
 	<p>
-		Finally, getting the attributions for all features means that we will have to repeat the above algorithm \(|N|\) times.  In the next section we present a dynamic programming approach that allows us to compute the attributions for all features simultaneously.
+		First of all, the worst case complexity for each internal node is based on Cases 2-4.  In the worst case, we need to check whether the current node's feature has been encountered previously by iterating through \(S_P\) and \(N_P\).  Since these lists are of length \((\text{tree depth})\) in the worst case, each node incurs a linear \(O(\text{tree depth})\) cost.
+	</p>
+
+	<p>
+		Next, for the leaf nodes, we compute the contributions for each feature (of which there are \(d\)).  Then, computing the contributions for each feature requires checking whether the feature is in \(S_P\).  This means that each leaf node incurs a cost of \(O((\text{tree depth})\times d)\) cost.
+	</p>
+
+	<p>
+		Putting this together, we get an overall cost of:
+		$$
+		O((\text{\# internal nodes})\times (\text{tree depth})) + O((\text{\# leaf nodes})\times (\text{tree depth}) \times d)
+		$$
+	</p>
+
+	<p>
+		In the next section we present two observations that allows us to compute \(\phi_i(f,x^f,x^b)\) for all features \(i\) in \(O(\text{\# nodes})\) time.
 	</p>
 
     <!-- Dynamic Programming -->
     <h3 id="dynamic_programming_implementation">2.3 Dynamic Programming Implementation</h3>
 
     <p>
-	    For the dynamic programming version of the algorithm, we can compute the attributions for all features simultaneously as we traverse the tree by passing \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) attributions to parent nodes.  Before describing the algorithm in more detail, we first present an figure that illustrates why passing up the attributions is sufficient.
+    	To improve the computational complexity of the straightforward naive algorithm, we can make two observations.
+    </p>
+
+    <p>
+    	The first observation is that we can actually get rid of the multiplicative \((\text{tree depth})\) factor by focusing on what the lists \(S_P\) and \(N_P\) are used for.  The first use is to check if a feature has been previously encountered.  By replacing the lists with boolean arrays, we can check if a given feature has been encountered by a constant time access into the arrays.  This means the internal nodes now incur a constant cost.  The second use of \(S_P\) and \(N_P\) is to calculate the sizes of \(|S|\) and \(|N|\) at the leaves.  By instead maintaining integers that keep track of these values, the leaves no longer have a multiplicative \((\text{tree depth})\) factor.  This means the new computational complexity is:
+		$$
+		O((\text{\# internal nodes}) + O((\text{\# leaf nodes}) \times d)
+		$$
+    </p>
+
+    <p>
+	    The second observation is that we can compute the attributions for all features simultaneously as we traverse the tree by passing \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) attributions to parent nodes.  Before describing the algorithm in more detail, we first present a figure that illustrates why passing up the attributions is sufficient.
 	</p>
 
-	<div id="table_container" style="overflow-x:auto;">
-
-		<figure style="float:left">
-			<figcaption>Figure 4: Example to illustrate collapsibility for features.  Green paths are associated with \(\textcolor{green}{x}\) and red paths are \(\textcolor{red}{x^b}\)</figcaption>
-      <br>
-			<img src="images/tree_example4.png" alt="Tree Example 3" style="width: 220px;">
+	<figure id="collapsibility_fig">
+		<figure align=center style="margin-bottom: 10px">
+			<img align=center src="images/tree_example4.png" alt="Tree Example 3" style="width: 220px;">
 		</figure>
 
-		<table cellpadding="10" align="center">
-			<tr bgcolor="#F8F8F8">
+		<table cellpadding="10" align="center" style="border:none;">
+			<tr>
 				<td align="left">\(\phi_1(f,x^f,x^b)\)</td>
 				<td align="left">\(\textcolor{green}{\text{Pos}_1}+\textcolor{green}{\text{Pos}_2}+\textcolor{red}{\text{Neg}_3}+\textcolor{red}{\text{Neg}_4}\)</td>
 			</tr>
-			<tr bgcolor="#F8F8F8">
+			<tr>
 				<td align="left">\(\phi_2(f,x^f,x^b)\)</td>
 				<td align="left">\(\textcolor{red}{\text{Neg}_1}+\textcolor{green}{\text{Pos}_2}+\textcolor{green}{\text{Pos}_3}+\textcolor{red}{\text{Neg}_4}\)</td>
 			</tr>
 		</table>
-	</div>
+
+    <figcaption><a href="#collapsibility_fig" class="figure-number">10</a> Example to illustrate collapsibility for features.  Green paths are associated with \(\textcolor{green}{x}\) and red paths are \(\textcolor{red}{x^b}\)</figcaption>
+	</figure>
 
 
 
@@ -2058,193 +2388,253 @@ svg .rect {
 	</p>
 
 	<p>
-		<strong>Observation:  In order to compute the attribution for any feature \(i\) it is sufficient to consider the paths that correspond to each Case 4 node's children.</strong>  First, focusing on a specific Case 4 node \(n\), we know that one child is associated with \(x^f\) child and one child is associated with \(x^b\).  Then, the attribution to \(n\)'s feature is:
+		<strong>Observation:  In order to compute the attribution for any feature \(i\) it is sufficient to consider the paths that correspond to each Case 4 node's children.</strong>  First, focusing on a specific Case 4 node \(n\), we know that one child is associated with \(x^f\) child and one child is associated with \(x^b\).  Then, the attribution to the node's feature is:
 		$$
-		\sum_{\text{paths }P\text{ under }x\text{ child}}\textcolor{green}{\text{Pos}_P} + \sum_{\text{paths }P\text{ under }x^b\text{ child}}\textcolor{red}{\text{Neg}_P}
+		\sum_{\text{paths }P\text{ under }x^f\text{ child}}\textcolor{green}{\text{Pos}_P} + \sum_{\text{paths }P\text{ under }x^b\text{ child}}\textcolor{red}{\text{Neg}_P}
 		$$
-
-		Then, doing this for all nodes is equivalent to explaining all features (because SHAP values are additive).
 	</p>
 
 	<p>
-		Furthermore, this observation suggests that we can always add the \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) terms at a given node and pass them up to the parent.  This information is sufficient to calculate the attributions for each upstream feature.  This aggregation of the \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) terms is the dynamic programming observation that allows each upstream node to only need a constant number of operations to compute its feature's attribution.
+		This observation suggests that we can always add the \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) terms at a given node and pass them up to the parent.  This information is sufficient to calculate the attributions for each upstream feature.  This aggregation of the \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) terms is the dynamic programming observation that allows each upstream node to only need a constant number of operations to compute its feature's attribution.
 	</p>
 
 	<p>
 		Using this observation, we devise an algorithm that computes the attributions for all features simultaneously:
 	</p>
 
-    <div id="table_container" style="overflow-x:auto;align:center;">
-    	<p id="example6" align="left" style="margin:20px">
-			<strong>Example 6</strong>: DP algorithm for the tree and samples from Example 3.
-		</p>
-	</div>
+    <figure id="dynamic_ex" class="l-middle" style="margin-bottom: -10px;">
+      <div class="container" style="width:1000px">
+        <div class="first" style="width:400px;height:620px">
+        	<p align=center style="font-size:15px;margin-bottom:10px">Tree Parameters</p>
+        	<div id="ex6_divtree" style="margin-top:0px;margin-bottom:-5px;"></div>
 
-    <div id="table_container" style="overflow-x:auto;align:center">
-    	<p style="margin: 0px 0px 0px 20px;"><strong>Tree Parameters</strong></p>
-    	<div id="ex6_divtree" style="margin-top:10px;"></div>
-    </div>
+          <table align=center style="border:none;">
+            <col width="60px"/>
+            <col width="90px"/>
+            <col width="90px"/>
+            <col width="90px"/>
+            <tr>
+              <td align=center colspan="4">Foreground & background sample</td>
+            </tr>
+      			<tr>
+      				<th></th>
+      				<th>\(x_1\)</th>
+      				<th>\(x_2\)</th>
+      				<th>\(x_3\)</th>
+      			</tr>
+      			<tr>
+      				<td>\(x^f\)</td>
+      				<td id="ex6_fx1">0</td>
+      				<td id="ex6_fx2">0</td>
+      				<td id="ex6_fx3">10</td>
+      			</tr>
+      			<tr>
+      				<td>\(x^b\)</td>
+      				<td id="ex6_bx1">10</td>
+      				<td id="ex6_bx2">10</td>
+      				<td id="ex6_bx3">0</td>
+      			</tr>
+      			<tr id="ex6_h">
+      				<td>\(h\)</td>
+      				<td id="ex6_h1"></td>
+      				<td id="ex6_h2"></td>
+      				<td id="ex6_h3"></td>
+      			</tr>
+    			</table>
 
-    <div id="table_container" style="overflow-x:auto;align:center">
-    	<div class="container">
+          <table align=center style="border:none;">
+            <col width="40px"/>
+            <col width="120px"/>
+            <col width="40px"/>
+            <col width="120px"/>
+            <td align=center colspan="4">Algorithm State</td>
+            <tr>
+              <td>\(S_C\)</td>
+              <td id="ex6_sc"></td>
+              <td>\(N_C\)</td>
+              <td id="ex6_nc"></td>
+            </tr>
+          </table>
 
-    	<div class="first" style="width:300px;height:220px">
-			<p style="margin: 0px 0px 0px 30px;"><strong>Foreground & background sample</strong></p>
-			<table cellpadding="10" style="margin: 10px 0px 0px 60px">
-			<col width="40px"/>
-			<col width="50px"/>
-			<col width="50px"/>
-			<tr>
-				<th></th>
-				<th>\(x_1\)</th>
-				<th>\(x_2\)</th>
-				<th>\(x_3\)</th>
-			</tr>
-			<tr>
-				<td>\(x^f\)</td>
-				<td id="ex6_fx1">0</td>
-				<td id="ex6_fx2">0</td>
-				<td id="ex6_fx3">10</td>
-			</tr>
-			<tr>
-				<td>\(x^b\)</td>
-				<td id="ex6_bx1">10</td>
-				<td id="ex6_bx2">10</td>
-				<td id="ex6_bx3">0</td>
-			</tr>
-			<tr id="ex6_h">
-				<td>\(h\)</td>
-				<td id="ex6_h1"></td>
-				<td id="ex6_h2"></td>
-				<td id="ex6_h3"></td>
-			</tr>
-			</table>
-		</div>
+          <table align=center style="border:none;">
+            <col width="20px"/>
+            <col width="80px"/>
+            <col width="20px"/>
+            <col width="80px"/>
+            <col width="20px"/>
+            <col width="80px"/>
+            <tr>
+              <td align=center colspan="6">Attribution Values</td>
+            </tr>
+            <tr>
+              <td id="ex6_phi1">\(\phi_1\)</td>
+              <td align=center id="ex6_phi1_val"></td>
+              <td id="ex6_phi2">\(\phi_2\)</td>
+              <td align=center id="ex6_phi2_val"></td>
+              <td id="ex6_phi3">\(\phi_3\)</td>
+              <td align=center id="ex6_phi3_val"></td>
+            </tr>
+          </table>
+        </div>
 
-    	<div class="first" style="width:250px;height:220px">
-	    	<p style="margin: 0px 0px 0px 30px;"><strong>Algorithm state</strong></p>
-			<table cellpadding="10" style="margin: 10px 0px 0px 80px">
-				<col width="40px"/>
-				<col width="80px"/>
-				<tr>
-					<td>\(S_C\)</td>
-					<td id="ex6_sc"></td>
-				</tr>
-				<tr>
-					<td>\(N_C\)</td>
-					<td id="ex6_nc"></td>
-				</tr>
-			</table>
-    	</div>
+        <div class="second" style="width:600px;height:620px;margin-top:20px">
+            <dt-code id="dynamiccode_1" class="indent0" block="" language="python">
+            def ite_dynamic(array xf, array xb, tree T):
+            </dt-code>
+            <dt-code id="dynamiccode_2" class="indent1" block="" language="python">
+              phi = [0]*len(xf)
+            </dt-code>
+            <dt-code id="dynamiccode_3" class="indent1" block="" language="python">
+              def recurse(node n, int nc, int sc, array fseen, array bseen):
+            </dt-code>
+            <dt-code id="dynamiccode_4" class="indent2" block="" language="python">
+                // Case 1: Leaf
+            </dt-code>
+            <dt-code id="dynamiccode_5" class="indent2" block="" language="python">
+                if n.is_leaf:
+            </dt-code>
+            <dt-code id="dynamiccode_6" class="indent3" block="" language="python">
+                  if sc == 0: return((0,0))
+            </dt-code>
+            <dt-code id="dynamiccode_7" class="indent3" block="" language="python">
+                  else: return((n.value*W(sc,nc-1),-n.value*W(sc,nc)))
+            </dt-code>
 
+            <dt-code id="dynamiccode_8" class="indent2" block="" language="python">
+                // Find children associated with xf and xb
+            </dt-code>
+            <dt-code id="dynamiccode_9" class="indent2" block="" language="python">
+                xf_child = n.left if xf[n.feat] < n.thres else n.right
+            </dt-code>
+            <dt-code id="dynamiccode_10" class="indent2" block="" language="python">
+                xb_child = n.left if xb[n.feat] < n.thres else n.right
+            </dt-code>
+            <dt-code id="dynamiccode_11" class="indent2" block="" language="python">
+                // Case 2: Feature encountered before
+            </dt-code>
+            <dt-code id="dynamiccode_12" class="indent2" block="" language="python">
+                if fseen[n.feat] > 0:
+            </dt-code>
+            <dt-code id="dynamiccode_13" class="indent3" block="" language="python">
+                  return(recurse(xf_child,nc,sc,fseen,bseen))
+            </dt-code>
+            <dt-code id="dynamiccode_14" class="indent2" block="" language="python">
+                if bseen[n.feat] > 0:
+            </dt-code>
+            <dt-code id="dynamiccode_15" class="indent3" block="" language="python">
+                  return(recurse(xb_child,nc,sc,fseen,bseen))
+            </dt-code>
 
-    	<div class="first" style="width:210px;height:220px">
-	    	<p style="margin: 0px 0px 0px 10px;"><strong>Attribution Values</strong></p>
+            <dt-code id="dynamiccode_16" class="indent2" block="" language="python">
+                // Case 3: xf and xb go the same way
+            </dt-code>
+            <dt-code id="dynamiccode_17" class="indent2" block="" language="python">
+                if xf_child == xb_child:
+            </dt-code>
+            <dt-code id="dynamiccode_18" class="indent3" block="" language="python">
+                  return(recurse(xb_child,nc,sc,fseen,bseen))
+            </dt-code>
+            <dt-code id="dynamiccode_19" class="indent2" block="" language="python">
+                // Case 4: xf and xb don't go the same way
+            </dt-code>
+            <dt-code id="dynamiccode_20" class="indent2" block="" language="python">
+                fseen2 = copy(fseen); fseen2[n.feat] += 1
+            </dt-code>
+            <dt-code id="dynamiccode_21" class="indent2" block="" language="python">
+                bseen2 = copy(bseen); bseen2[n.feat] += 1
+            </dt-code>
+            <dt-code id="dynamiccode_22" class="indent2" block="" language="python">
+                if xf_child != xb_child:
+            </dt-code>
+            <dt-code id="dynamiccode_23" class="indent3" block="" language="python">
+                  posf,negf = recurse(xb_child,nc+1,sc+1,fseen2,bseen)
+            </dt-code>
+            <dt-code id="dynamiccode_24" class="indent3" block="" language="python">
+                  posb,negb = recurse(xb_child,nc+1,sc  ,fseen ,bseen2)
+            </dt-code>
+            <dt-code id="dynamiccode_25" class="indent3" block="" language="python">
+                  phi[n.feat] += posf+negb
+            </dt-code>
+            <dt-code id="dynamiccode_26" class="indent3" block="" language="python">
+                  return((posf+posb,negf+negb))
+            </dt-code>
+            <dt-code id="dynamiccode_27" class="indent1" block="" language="python">
+              recurse(n=T.root,0,0,[0]*len(xf),[0]*len(xf))
+            </dt-code>
+        </div>
 
-			<table cellpadding="10" style="margin: 10px 0px 0px 10px">
-		      <col width="60px"/>
-		      <col width="80px"/>
-				<thead>
-				<!-- <tr style="background-color:#8BC34A;"> -->
-				<tr id="ex6_phi1">
-					<td>\(\phi_1(f,x^f,x^b)\)</td>
-					<td id="ex6_phi1_val"></td>
-				</tr>
-				<tr id="ex6_phi2">
-					<td>\(\phi_2(f,x^f,x^b)\)</td>
-					<td id="ex6_phi2_val"></td>
-				</tr>
-				<tr id="ex6_phi3">
-					<td>\(\phi_3(f,x^f,x^b)\)</td>
-					<td id="ex6_phi3_val"></td>
-				</tr>
-			</thead>
-			</table>
-    	</div>
+  	    <div class="clear"></div>
+  		</div>
 
-	    <div class="clear"></div>
-		</div>
-
-
+    <div align=center>
     	<input type="button" class="w3-button w3-green" value="<<" onclick="ex6_reset()">
     	<input type="button" class="w3-button w3-green" value=">" onclick="dynamicStep()">
     	<input type="button" class="w3-button w3-green" value=">>" onclick="dynamicRunAll()">
+    </div>
 
-    	<br><br>
+  </figure>
 
-		<p style="margin: 0px 0px 20px 0px;" id="ex6_dynamic_step">Dynamic algorithm</p>
+  <figure>
 
-	</div>
+    <figcaption>
+      <a href="#dynamic_ex" class="figure-number">10</a>: Dynamic programming algorithm for the tree and samples specified in <a href="#define_tree_samples" class="figure-number">5</a>.
+    </figcaption>
+
+  </figure>
 
 
 	<!-- Pseudocode -->
-	<div style="background-color:#e6ffee;">
+<!-- 	<div>
+		<p><a onclick="hideshow('pseudocode_dynamic')"><strong>+ Pseudocode</strong></a></a></p>
 
-		<div style="padding-left:10px;padding-right:10px">
+		<div id="pseudocode_dynamic" style="display:none">
+      <dt-code block language="python">
+        def ite_dynamic(array xf, array xb, tree T):
+          phi = [0]*len(xf)
+          def recurse(node n, int nc, int sc, array fseen, array bseen):
+            // Case 1: Leaf
+            if n.is_leaf:
+              if sc == 0: return((0,0))
+              else: return((n.value*W(sc,nc-1),-n.value*W(sc,nc)))
 
-			<p><a onclick="hideshow('pseudocode_dynamic')"><strong>DP Pseudocode (Click)</strong></a></a></p>
+            // Find children associated with xf and xb
+            xf_child = n.left if xf[n.feat] < n.thres else n.right
+            xb_child = n.left if xb[n.feat] < n.thres else n.right
 
-			<!-- <div id="pseudocode_dynamic", style="display:none"> -->
-			<div id="pseudocode_dynamic" style="display:none">
-			<p class="no-margin">
-				ITE_D(tree \(t\), array \(x^f\), array \(x^b\)):
-			</p>
-			<ul class="no-margin">
-				\(\phi=\) [0]*\(len(x)\) <br>
+            // Case 2: Feature encountered before
+            if fseen[n.feat] > 0:
+              return(recurse(xf_child,nc,sc,fseen,bseen))
+            if bseen[n.feat] > 0:
+              return(recurse(xb_child,nc,sc,fseen,bseen))
 
-				RECURSE(node \(n\), int \(S^c\), int \(N^c\), array \(x^f_a\), array \(x^b_a\)):
-				<ul style="font-family:courier;font-size:16px">
-					<font color="#8E44AD">// Case 1: At a leaf</font><br>
-					if \(n\) is a leaf:
-					<ul style="font-family:courier;font-size:16px">
-						if \(U==0\): return (0,0)<br>
-						else: return (\(W(S^c,N-1)\times n_{value}\),\(-W(S^c,N^c)\times n_{value}\))
-					</ul>
-					<font color="#8E44AD">// Find children associated with \(x^f\) and \(x^b\)</font><br>
-					\(x^f_{child} =\) \(n_{leftchild}\) if \(x[n_{feature}] < n_{threshold}\) else \(x^f_{child}\) = \(n_{rightchild}\) <br>
-					\(x^b_{child} =\) \(n_{leftchild}\) if \(x^b[n_{feature}] < n_{threshold}\) else \(x^b_{child}\) = \(n_{rightchild}\) <br>
-					<font color="#8E44AD">// Case 2: Feature was encountered previously</font><br>
-					if \(x_a[n_{feature}]>0\):
-					<ul style="font-size:16px">
-						return RECURSE(\(x^f_{child}\),\(S^c\),\(N^c\),\(x^f_a\),\(x^b_a\))
-					</ul>
-					if \(x^b_a[n_{feature}]>0\):
-					<ul style="font-size:16px">
-						return RECURSE(\(x^b_{child}\),\(S^c\),\(N^c\),\(x^f_a\),\(x^b_a\))
-					</ul>
+            // Case 3: xf and xb go the same way
+            if xf_child == xb_child:
+              return(recurse(xb_child,nc,sc,fseen,bseen))
 
-					<font color="#8E44AD">// Case 3: \(x^f\) and \(x^b\) go to same children</font><br>
-					if \(x^f_{child}==x^b_{child}\):
-					<ul style="font-size:16px">
-						return RECURSE(\(x^f_{child}\),\(S^c\),\(N^c\),\(x^f\),\(x^b\))
-					</ul>
-					<font color="#8E44AD">// Case 4: \(x^f\) and \(x^b\) go to different children</font><br>
-					\(X_a =\) copy(\(x^f_a\)); \(X_a[n_{feature}]=X_a[n_{feature}]+1\)<br>
-					\(x^b_a =\) copy(\(x^b_a\)); \(x^b_a[n_{feature}]=x^b_a[n_{feature}]+1\)<br>
-					if not \(x^f_{child}==x^b_{child}\):
-					<ul style="font-size:16px">
-						\(pos_x,neg_x=\) RECURSE(\(x^f_{child}\),\(S^c+1\),\(N^c+1\),\(x^f_a\),\(x^b_a\))<br>
-						\(pos_{x^b},neg_{x^b}=\) RECURSE(\(x^b_{child}\),\(S^c\),\(N^c+1\),\(x^f_a\),\(x^b_a\))<br>
-						\(\phi[n_{feature}]=\phi[n_{feature}]+pos_{x}+neg_{x^b}\)<br>
-						return (\(pox_{x}+pox_{x^b}\),\(neg_{x}+neg_{x^b}\))
-					</ul>
-				</ul>
-				return RECURSE(tree.root, 0, 0, [0]*\(len(x)\), [0]*\(len(x)\))
-			</ul> 
-			</div>
-		</div>
+            // Case 4: xf and xb don't go the same way
+            fseen2 = copy(fseen); fseen2[n.feat] += 1
+            bseen2 = copy(bseen); bseen2[n.feat] += 1
+            if xf_child != xb_child:
+              posf,negf = recurse(xb_child,nc+1,sc+1,fseen2,bseen)
+              posb,negb = recurse(xb_child,nc+1,sc  ,fseen ,bseen2)
+              phi[n.feat] += posf+negb
+              return((posf+posb,negf+negb))
+
+          return(recurse(n=T.root,0,0,[0]*len(xf),[0]*len(xf)))
+      </dt-code>
+    </div>
 	</div>
-
+ -->
     <p>
-		The computational complexity to compute \(\phi_i(f,x,x^b)\) using the dynamic programming algorithm for all features is now just \(O(T_{numnodes})\) where \(T_{numnodes}\) is the number of nodes in the tree.  In <a href="#example6">Example 6</a> it is easy to see that each node now only requires a constant amount of work.  
+		The computational complexity to compute \(\phi_i(f,x^f,x^b)\) using the dynamic programming algorithm for all features is now just \(O(T_{numnodes})\) where \(T_{numnodes}\) is the number of nodes in the tree.  In <a href="#dynamic_ex" class="figure-number">10</a> it is easy to see that each node now only requires a constant amount of work.  
 	</p>
 
     <p>
-		Finally, our original goal was to compute \(\phi_i(f,x)\).  We simply need to compute \(\phi_i(f,x,x^b)\) for many references, resulting in a run time of \(O(|D|T_{numnodes})\) where \(|D|\) is the number of samples in the background distribution.  In practice, using a fixed number of about 100 to 1000 references works well.
+		Finally, our original goal was to compute \(\phi_i(f,x^f)\).  We simply need to compute \(\phi_i(f,x^f,x^b)\) for many references \(x^b\), resulting in a run time of \(O(|D|T_{numnodes})\) where \(|D|\) is the number of samples in the background distribution.  In practice, using a fixed number of about 100 to 1000 references works well.
 	</p>
 
 
-  <hr>
+  	<hr>
 
     <h2 id="comparison_of_methods">Comparison of SHAP Methods</h3>
 
@@ -2254,23 +2644,23 @@ svg .rect {
 
     <p>
     	<ul>
-    		<li>Path Dependent Tree Explainer (PDTE): </li>
+    		<li class="no-space">Path Dependent Tree Explainer (PDTE): </li>
     		<ul>
-    			<li>Like ITE, PDTE is also meant to obtain SHAP values for tree models.</li> 
-				<li>PDTE approximates the interventional conditional expectation based on how many training samples went down paths in the tree, whereas ITE computes it exactly.</li>
-				<li>The computational complexity is \(O(T_{numleaves}T_{depth}^2)\).  In practice, PDTE can be faster than ITE, although it may depend on the number of references or the tree depth.</li>
+    			<li class="no-space">Like ITE, PDTE is also meant to obtain SHAP values for tree models.</li> 
+				<li class="no-space">PDTE approximates the interventional conditional expectation based on how many training samples went down paths in the tree, whereas ITE computes it exactly.</li>
+				<li class="no-space">The computational complexity is \(O(T_{numleaves}T_{depth}^2)\).  In practice, PDTE can be faster than ITE, although it may depend on the number of references or the tree depth.</li>
     		</ul>
-    		<li>Sampling Explainer:</li>
+    		<li class="no-space">Sampling Explainer:</li>
     		<ul>
-    			<li>A model agnostic approach to obtain SHAP values.</li>
-    			<li>An extension of Interactions-based Method for Explanation (IME) <d-cite bibtex-key="kononenko2010efficient"></d-cite>.</li> 
-    			<li>This approach is sampling based and converges to the SHAP values ITE obtains, but in practice is much slower than ITE.</li>
+    			<li class="no-space">A model agnostic approach to obtain SHAP values.</li>
+    			<li class="no-space">An extension of Interactions-based Method for Explanation (IME) <d-cite bibtex-key="kononenko2010efficient"></d-cite>.</li> 
+    			<li class="no-space">This approach is sampling based and converges to the SHAP values ITE obtains, but in practice is much slower than ITE.</li>
     		</ul>    		
-    		<li>Kernel Explainer <d-cite bibtex-key="lundberg2017unified"></d-cite>:</li>
+    		<li class="no-space">Kernel Explainer <d-cite bibtex-key="lundberg2017unified"></d-cite>:</li>
     		<ul>
-    			<li>A model agnostic approach to obtain SHAP values.</li>
-    			<li>An extension of Local Interpretable Model-agnostic Explanations (LIME) <d-cite bibtex-key="ribeiro2016should"></d-cite>.</li> 
-    			<li>This approach is sampling based and converges to the SHAP values ITE obtains, but in practice is much slower than ITE.</li>
+    			<li class="no-space">A model agnostic approach to obtain SHAP values.</li>
+    			<li class="no-space">An extension of Local Interpretable Model-agnostic Explanations (LIME) <d-cite bibtex-key="ribeiro2016should"></d-cite>.</li> 
+    			<li class="no-space">This approach is sampling based and converges to the SHAP values ITE obtains, but in practice is much slower than ITE.</li>
     		</ul>
     	</ul>
 	</p>
@@ -2291,28 +2681,28 @@ svg .rect {
 
 
 <!-- Figure 1 - Kaggle methods d3 bar plot -->
-<script src="kaggleMethods.js"></script>
+<script src="js/kaggleMethods.js"></script>
 
 <!-- Example 1 - Computing Shapley values -->
-<script src="shapleyValues.js"></script>
+<script src="js/shapleyValues.js"></script>
 
 <!-- Example 2 - Computing Shapley values CES vs RBS -->
-<script src="linearModelCESvsRBS.js"></script>
+<script src="js/linearModelCESvsRBS.js"></script>
 
 <!-- Example 3 - Initial tree parameters -->
-<script src="treeData0.js"></script>
+<script src="js/treeData0.js"></script>
 
 <!-- Example 3 - Creating tree and samples -->
-<script src="createTreeSamples.js"></script>
+<script src="js/createTreeSamples.js"></script>
 
 <!-- Example 4 - Brute force algorithm -->
-<script src="brute_force_ex.js"></script>
+<script src="js/brute_force_ex.js"></script>
 
 <!-- Example 5 - Naive tree algorithm -->
-<script src="naive_ex.js"></script>
+<script src="js/naive_ex.js"></script>
 
 <!-- Example 6 - DP tree algorithm -->
-<script src="dp_ex.js"></script>
+<script src="js/dp_ex.js"></script>
 
 <script>
 function hideshow(type) {
@@ -2332,8 +2722,84 @@ function hideshow(type) {
 
 <d-bibliography src="bibliography.bib"></d-bibliography>
 
-
 <script src="https://distill.pub/template.v2.js"></script>
+
+<script>
+  window.onload = function() {
+    // Set indentations for code
+    for (var i=0; i < 10; i++) {
+      var a = document.getElementById("bf_"+(i+1));
+      var b = a.getElementsByTagName("pre")[0];
+      b.style.marginTop = "0px";
+      b.style.marginBottom = "0px";
+      b.style.paddingTop = "0px";
+      b.style.paddingBottom = "0px";
+      b.style.fontSize = "14px";
+      b.style.background = "#ffffff";
+      if (i > 0) {
+        b.style.textIndent = "18px";
+      }
+      if (i > 2) {
+        b.style.textIndent = "36px";
+      }
+      if (i > 3) {
+        b.style.textIndent = "54px";
+      } 
+    }
+
+    // Set indentations for code
+    for (var i=0; i < 27; i++) {
+      var a = document.getElementById("naivecode_"+(i+1));
+      var b = a.getElementsByTagName("pre")[0];
+      b.style.marginTop = "0px";
+      b.style.marginBottom = "0px";
+      b.style.paddingTop = "0px";
+      b.style.paddingBottom = "0px";
+      b.style.fontSize = "14px";
+      b.style.background = "#ffffff";
+      if (a.classList[0] == "indent0") {
+        b.style.textIndent = "0px";
+      } else if (a.classList[0] == "indent1") {
+        b.style.textIndent = "18px";
+      } else if (a.classList[0] == "indent2") {
+        b.style.textIndent = "36px";
+      } else if (a.classList[0] == "indent3") {
+        b.style.textIndent = "54px";
+      } else if (a.classList[0] == "indent4") {
+        b.style.textIndent = "72px";
+      } else if (a.classList[0] == "indent5") {
+        b.style.textIndent = "90px";
+      }
+    }
+
+    // Set indentations for code
+    for (var i=0; i < 27; i++) {
+      var a = document.getElementById("dynamiccode_"+(i+1));
+      var b = a.getElementsByTagName("pre")[0];
+      b.style.marginTop = "0px";
+      b.style.marginBottom = "0px";
+      b.style.paddingTop = "0px";
+      b.style.paddingBottom = "0px";
+      b.style.fontSize = "14px";
+      b.style.background = "#ffffff";
+      if (a.classList[0] == "indent0") {
+        b.style.textIndent = "0px";
+      } else if (a.classList[0] == "indent1") {
+        b.style.textIndent = "18px";
+      } else if (a.classList[0] == "indent2") {
+        b.style.textIndent = "36px";
+      } else if (a.classList[0] == "indent3") {
+        b.style.textIndent = "54px";
+      } else if (a.classList[0] == "indent4") {
+        b.style.textIndent = "72px";
+      } else if (a.classList[0] == "indent5") {
+        b.style.textIndent = "90px";
+      }
+    }
+
+  };
+</script>
+
 
 </body>
 </html>

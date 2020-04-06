@@ -99,12 +99,20 @@ bars.append("rect")
     })
     .attr("height", y.bandwidth())
     .attr("x", 0)
-    .attr("fill-opacity", .6)
+    .attr("fill-opacity", function (d) {
+        let tree_methods = ["Decision Tree", "Random Forest", "Ensemble Method", "GBM"];
+        if (tree_methods.includes(d.method)) {
+            return(.7);
+        } else {
+            return(.6);
+        }
+    })
     .attr("width", function (d) {
         return x(d.count);
     });
 
-//add a frequency label to the right of each bar
+
+//add a count label to the right of each bar
 bars.append("text")
     .attr("class", "label")
     .attr("y", function (d) {

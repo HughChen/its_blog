@@ -2,8 +2,8 @@
 ////// Example 6 Tree Diagram ///////
 /////////////////////////////////////
 var margin6 = {top: 0, right: 0, bottom: 0, left: 0},
-	width6 = 700 - margin6.right - margin6.left,
-	height6 = 350 - margin6.top - margin6.bottom;
+	width6 = 370 - margin6.right - margin6.left,
+	height6 = 220 - margin6.top - margin6.bottom;
 
 var tree6 = d3.layout.tree()
 	.size([height6, width6]);
@@ -20,61 +20,62 @@ var svg6 = d3.select("#ex6_divtree").append("svg")
 update6(treeData[0]);
 
 function update6(source) {
-/* @desc Update tree SVG (doesn't seem to update text for some reason) */
+	/* @desc Update tree SVG (doesn't seem to update text for some reason) */
 
-// Compute the new tree layout.
-var nodes = tree6.nodes(source).reverse(),
-links = tree6.links(nodes);
+	// Compute the new tree layout.
+	var nodes = tree6.nodes(source).reverse(),
+	links = tree6.links(nodes);
 
-// Normalize for fixed-depth.
-nodes.forEach(function(d) { d.y = d.depth * 80 + 30; });
-nodes.forEach(function(d) { d.x = d.x * 1.95; });
+	// Normalize for fixed-depth.
+	nodes.forEach(function(d) { d.y = d.depth * 50 + 20; });
+	nodes.forEach(function(d) { d.x = (d.x+10) * 1.5; });
 
-// Declare the nodes…
-var node = svg6.selectAll("g.node")
-	.data(nodes, function(d) { return d.id || (d.id = ++i); });
+	// Declare the nodes…
+	var node = svg6.selectAll("g.node")
+		.data(nodes, function(d) { return d.id || (d.id = ++i); });
 
-// Enter the nodes.
-var nodeEnter = node.enter().append("g")
-	.attr("class", "node")
-	.attr("transform", function(d) { 
-	  return "translate(" + d.x + "," + d.y + ")"; })
+	// Enter the nodes.
+	var nodeEnter = node.enter().append("g")
+		.attr("class", "node")
+		.attr("transform", function(d) { 
+		  return "translate(" + d.x + "," + d.y + ")"; })
 
-nodeEnter.append("circle")
-	.attr("r", 10)
-	.style("fill", "#fff")
+	nodeEnter.append("circle")
+		.attr("r", 10)
+		.style("fill", "#fff")
+		.style("stroke", "#e8e8e8")
 
-nodeEnter.append("text")
-	.attr("y", function(d) { 
-	  return d.children || d._children ? 0 : 20; })
-	.attr("x", function(d) { 
-	  return d.children || d._children ? 15 : 0; })
-	.attr("dy", ".35em")
-	.attr("text-anchor", function(d) {
-		if (d.name.startsWith("Leaf")) {
-			return "middle"
-		}
-	})
-	.text(function(d) { 
-		if (d.name.startsWith("Leaf")) {
-			return d.value;
-		} else {
-			return d.variable + ">" + d.threshold;   
-		}
-	})
-	.style("font-family", "courier")
-	.style("font-size", "16px")
-	.style("fill-opacity", 1);
+	nodeEnter.append("text")
+		.attr("y", function(d) { 
+		  return d.children || d._children ? 0 : 20; })
+		.attr("x", function(d) { 
+		  return d.children || d._children ? 15 : 0; })
+		.attr("dy", ".35em")
+		.attr("text-anchor", function(d) {
+			if (d.name.startsWith("Leaf")) {
+				return "middle"
+			}
+		})
+		.text(function(d) { 
+			if (d.name.startsWith("Leaf")) {
+				return d.value;
+			} else {
+				return d.variable + ">" + d.threshold;   
+			}
+		})
+		.style("font-family", "courier")
+		.style("font-size", "14px")
+		.style("fill-opacity", 1);
 
-// Declare the links…
-var link = svg6.selectAll("path.link")
-	.data(links, function(d) { return d.target.id; });
+	// Declare the links…
+	var link = svg6.selectAll("path.link")
+		.data(links, function(d) { return d.target.id; });
 
-// Enter the links.
-link.enter().insert("path", "g")
-	.attr("class", "link")
-	.attr("d", diagonal);
-	}
+	// Enter the links.
+	link.enter().insert("path", "g")
+		.attr("class", "link")
+		.attr("d", diagonal);
+}
 
 /////////////////////////////////////////
 ////// Example 6 dynamic tree algo //////
@@ -86,34 +87,34 @@ function add_pn_text(n_name,txt,is_pos) {
 		.attr("y", function(d) { 
 			if (d.name.includes("Leaf")) {
 				if (is_pos) {
-					return(-10);
+					return(-6);
 				} else {
-					return(10);
+					return(6);
 				}
 			} else {
 				if (is_pos) {
-					return(-10);
+					return(-6);
 				} else {
-					return(10);
+					return(6);
 				}
 			}})
 		.attr("x", function(d) { 
 			if (d.name.includes("Leaf")) {
 				if ([1,3,5,7].includes(Number(d.name[4]))) {
-					return(-18);
-				} else {
-					return(18);
+					return(2);
+				} else { // Left leaves
+					return(2);
 				}
 			} else {
-				return(-18);
+				return(2);
 			}})
 		.attr("dy", ".35em")
 		.attr("text-anchor", function(d) {
 			if (d.name.startsWith("Leaf")) {
 				if ([1,3,5,7].includes(Number(d.name[4]))) {
 					return "end"
-				} else {
-					return "start"
+				} else { // Right leaves
+					return "end"
 				}
 			} else {
 				return "end"
@@ -125,7 +126,7 @@ function add_pn_text(n_name,txt,is_pos) {
 			}
 		})
 		.style("font-family", "courier")
-		.style("font-size", "16px")
+		.style("font-size", "12px")
 		.style("fill", function(d) {
 			if (is_pos) {
 				return("green");
@@ -219,7 +220,7 @@ function ex6_change_node_color(node_name) {
 }
 
 function ex6_update_str(str) {
-	document.getElementById("ex6_dynamic_step").innerHTML = str;
+	// document.getElementById("ex6_dynamic_step").innerHTML = str;
 }
 
 function ex6_update_nc_sc() {
@@ -263,6 +264,23 @@ var den = fact6(n_len);
 return(num/den);
 }
 
+function ex6_code_reset() {
+    for (var i=0; i < 27; i++) {
+		var a = document.getElementById("dynamiccode_"+(i+1));
+		var b = a.getElementsByTagName("pre")[0];
+		b.style.background = "#ffffff";
+    }
+}
+
+function ex6_code_color(lines) {
+    for (var i=0; i < lines.length; i++) {
+    	line = lines[i];
+		var a = document.getElementById("dynamiccode_"+(line+1));
+		var b = a.getElementsByTagName("pre")[0];
+		b.style.background = "#f5f2f0";
+    }
+}
+
 function ex6_reset() {
 	// Reset variables
 	ex6_is_initialize = true;
@@ -292,6 +310,7 @@ function ex6_reset() {
 	ex6_update_nc_sc();
 	ex6_update_phi();
 	ex6_update_h();
+	ex6_code_reset();
 
 	// Reset tree
 	ex6_reset_all_node_colors();
@@ -338,6 +357,7 @@ function dynamicRunAll() {
 function dynamicStep() {
 
 	if (nextnodes6.length == 0) {
+		ex6_reset_all_node_colors();
 		return(1);
 	}
 
@@ -357,6 +377,8 @@ function dynamicStep() {
 
 	// Case 1: at a leaf
 	if (currnode6["name"].includes("Leaf")) {
+		ex6_code_reset();
+		ex6_code_color([3,4,5,6]);
 		var value = currnode6["value"];
 		if (sp_lst6.length == 0) {
 			pos_dict6[nodename] = 0;
@@ -409,10 +431,13 @@ function dynamicStep() {
 
 	if (np_lst6.includes(currnode6.variable)) {
 		ex6_update_str('<strong>Case 2</strong>: Previously seen feature');
+		ex6_code_reset();
 		if (sp_lst6.includes(n_var)) {
 			s_t_pairs.push([currnode6,fchild]);
 			colors.push("#b3de69");
 			if (!nodesseen6.includes(currnode6)) {
+				ex6_code_color([7,8,9]);
+				ex6_code_color([10,11,12]);
 				nextnodes6.push(currnode6);
 				nextnodes6.push(fchild);
 				np_dict6[bchild.name] = np_lst6;
@@ -421,6 +446,7 @@ function dynamicStep() {
 			}
 			// Update pos/neg
 			if ((fchild.name in pos_dict6) & (fchild.name in neg_dict6)) {
+				ex6_code_color([12]);
 				pos_dict6[nodename] = pos_dict6[fchild.name];
 				neg_dict6[nodename] = neg_dict6[fchild.name];
 				add_pn_text(nodename,pos_dict6[nodename],true);
@@ -430,6 +456,8 @@ function dynamicStep() {
 			s_t_pairs.push([currnode6,bchild]);
 			colors.push("#fb8072");
 			if (!nodesseen6.includes(currnode6)) {
+				ex6_code_color([7,8,9]);
+				ex6_code_color([10,13,14]);
 				nextnodes6.push(currnode6);
 				nextnodes6.push(bchild);
 				np_dict6[bchild.name] = np_lst6;
@@ -438,6 +466,7 @@ function dynamicStep() {
 			}
 			// Update pos/neg
 			if ((bchild.name in pos_dict6) & (bchild.name in neg_dict6)) {
+				ex6_code_color([14]);
 				pos_dict6[nodename] = pos_dict6[bchild.name];
 				neg_dict6[nodename] = neg_dict6[bchild.name];
 				add_pn_text(nodename,pos_dict6[nodename],true);
@@ -446,10 +475,13 @@ function dynamicStep() {
 		}
 	} else if (fchild == bchild) {
 		ex6_update_str('<strong>Case 3</strong>: Foreground and background match');
+		ex6_code_reset();
 		s_t_pairs.push([currnode6,fchild]);
 		colors.push("#80b1d3");
 		// Update np/sp
 		if (!nodesseen6.includes(currnode6)) {
+			ex6_code_color([7,8,9]);
+			ex6_code_color([15,16,17]);
 			np_dict6[bchild.name] = np_lst6;
 			sp_dict6[bchild.name] = sp_lst6;
 			h_dict6[bchild.name]  = h6;
@@ -458,6 +490,7 @@ function dynamicStep() {
 		}
 		// Update pos/neg
 		if ((bchild.name in pos_dict6) & (bchild.name in neg_dict6)) {
+			ex6_code_color([17]);
 			pos_dict6[nodename] = pos_dict6[bchild.name];
 			neg_dict6[nodename] = neg_dict6[bchild.name];
 			add_pn_text(nodename,pos_dict6[nodename],true);
@@ -465,6 +498,10 @@ function dynamicStep() {
 		}
 	} else {
 		ex6_update_str('<strong>Case 4</strong>: Foreground and background differ');
+		ex6_code_reset();
+		ex6_code_color([7,8,9]);
+		ex6_code_color([18,19,20,21,22,23]);
+
 		s_t_pairs.push([currnode6,fchild]);
 		colors.push("#b3de69");
 
@@ -494,6 +531,8 @@ function dynamicStep() {
 		// Update phi
 		if ((lchild.name in pos_dict6) & (lchild.name in neg_dict6) &
 			(rchild.name in pos_dict6) & (rchild.name in neg_dict6)) {
+			ex6_code_reset();
+			ex6_code_color([24,25]);
 			ex6_phi[n_var] = ex6_phi[n_var] + pos_dict6[fchild.name] + neg_dict6[bchild.name];
 			pos_dict6[nodename] = pos_dict6[lchild.name] + pos_dict6[rchild.name];
 			neg_dict6[nodename] = neg_dict6[lchild.name] + neg_dict6[rchild.name];

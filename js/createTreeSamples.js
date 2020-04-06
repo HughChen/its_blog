@@ -230,7 +230,8 @@ function update(source) {
 
   nodeEnter.append("circle")
     .attr("r", 12)
-    .style("fill", "#fff");
+    .style("fill", "#fff")
+    .style("stroke", "#e8e8e8");
 
   nodeEnter.append("text")
     .attr("y", function(d) { 

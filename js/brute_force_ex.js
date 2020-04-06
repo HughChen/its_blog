@@ -3,7 +3,7 @@
 /////////////////////////////////////
 var margin4 = {top: 0, right: 0, bottom: 0, left: 0},
   width4 = 370 - margin4.right - margin4.left,
-  height4 = 260 - margin4.top - margin4.bottom;
+  height4 = 220 - margin4.top - margin4.bottom;
 
 var tree4 = d3.layout.tree()
   .size([height4, width4]);
@@ -27,8 +27,8 @@ function update4(source) {
 	links = tree4.links(nodes);
 
 	// Normalize for fixed-depth.
-	nodes.forEach(function(d) { d.y = d.depth * 60 + 20; });
-	nodes.forEach(function(d) { d.x = (d.x - 10) * 1.3; });
+	nodes.forEach(function(d) { d.y = d.depth * 50 + 20; });
+	nodes.forEach(function(d) { d.x = (d.x - 10) * 1.5; });
 
 	// Declare the nodes…
 	var node = svg4.selectAll("g.node")
@@ -42,7 +42,9 @@ function update4(source) {
 
 	nodeEnter.append("circle")
 		.attr("r", 10)
-		.style("fill", "#fff");
+		.style("fill", "#fff")
+		.style("stroke", "#e8e8e8");
+
 
 	nodeEnter.append("text")
 		.attr("y", function(d) { 
@@ -233,7 +235,7 @@ function reset_tree() {
 
 function reset_phi_values() {
 	for (var i = 0; i < feats.length; i++) {
-		document.getElementById("ex4_phi"+(i+1)+"_val").innerHTML = 0;
+		document.getElementById("ex4_phi"+(i+1)+"_val").innerHTML = "";
 	}
 }
 
@@ -255,6 +257,34 @@ function reset_colors() {
 	}
 }
 
+function reset_sets() {
+	sn_names = ["s1", "s2", "s3", "s4"];
+	for (var i = 0; i < sn_names.length; i++) {
+		sn = sn_names[i];
+		var s_ele  = document.getElementById(sn);
+		var si_ele = document.getElementById(sn+"i");
+		s_ele.innerHTML  = "";
+		si_ele.innerHTML = "";
+	}
+}
+
+function ex4_code_reset() {
+    for (var i=0; i < 10; i++) {
+		var a = document.getElementById("bf_"+(i+1));
+		var b = a.getElementsByTagName("pre")[0];
+		b.style.background = "#ffffff";
+    }
+}
+
+function ex4_code_color(lines) {
+    for (var i=0; i < lines.length; i++) {
+    	line = lines[i];
+		var a = document.getElementById("bf_"+(line+1));
+		var b = a.getElementsByTagName("pre")[0];
+		b.style.background = "#f5f2f0";
+    }
+}
+
 function ex4_reset() {
 	// Reset visuals
 	reset_bf_values();
@@ -262,6 +292,8 @@ function ex4_reset() {
 	reset_tree();
 	reset_phi_values();
 	reset_colors();
+	reset_sets();
+	ex4_code_reset()
 
 	// Update text
 	svg4.selectAll("g.node").remove();
@@ -271,6 +303,7 @@ function ex4_reset() {
 	ex4_feat  = 1;
 	curr_step = -1;
 }
+
 
 var feats = [1,2,3];
 var phi = [0,0,0];
@@ -320,6 +353,8 @@ function bruteForceStep() {
 		currs_name = "s1";
 		currs  = s1;
 		currsi = s1i;
+		ex4_code_reset();
+		ex4_code_color([1,2]);
 	}
 
 	// Fill in the appropriate sets
@@ -328,6 +363,8 @@ function bruteForceStep() {
 		fill_sets(s2,s2i,"s2");
 		fill_sets(s3,s3i,"s3");
 		fill_sets(s4,s4i,"s4");
+		ex4_code_reset();
+		ex4_code_color([3]);
 	}
 
 	// Highlight the row being obtained
@@ -341,6 +378,8 @@ function bruteForceStep() {
 		document.getElementById("ex4_hSi").style.backgroundColor = "#ccebc5";
 		document.getElementById("ex4_fxS").style.backgroundColor = "#fbb4ae";
 		document.getElementById("ex4_fxSi").style.backgroundColor = "#ccebc5";
+		ex4_code_reset();
+		ex4_code_color([4,5]);
 	}
 
 	// Get the hybrid samples
@@ -360,6 +399,8 @@ function bruteForceStep() {
 		ex4valuei  = value[1];
 
 		color_tree(s_t_pairs, s_t_pairsi);
+		ex4_code_reset();
+		ex4_code_color([6,7]);
 	}
 
 	if (curr_step == 6) {
@@ -371,12 +412,16 @@ function bruteForceStep() {
 		var contribution = W_dict[currs_name]*(ex4valuei-ex4value);
 		phi[ex4_feat-1] = phi[ex4_feat-1] + contribution;
 		update_phi_ele(phi);
+		ex4_code_reset();
+		ex4_code_color([8,9]);
 	}
 
 	////// Complete update for s2 //////
 	if (curr_step == 8) {
 		document.getElementById("ex4_"+currs_name+"_row").style.backgroundColor = "";
 		ex4_update_step("s2", s2, s2i);
+		ex4_code_reset();
+		ex4_code_color([4,5,6,7,8,9]);
 	}
 
 	////// Complete update for s3 //////
@@ -414,11 +459,21 @@ function bruteForceStep() {
 		s3i = [rem_feats[1],ex4_feat].sort();
 		s4  = rem_feats.sort(); 
 		s4i = [rem_feats[0],rem_feats[1],ex4_feat].sort();
+
+		fill_sets(s1,s1i,"s1");
+		fill_sets(s2,s2i,"s2");
+		fill_sets(s3,s3i,"s3");
+		fill_sets(s4,s4i,"s4");
+
+		ex4_code_reset();
+		ex4_code_color([2]);
 	}
 
 	if (curr_step == 12) {
 		document.getElementById("ex4_"+currs_name+"_row").style.backgroundColor = "";
 		ex4_update_step("s1", s1, s1i);
+		ex4_code_reset();
+		ex4_code_color([4,5,6,7,8,9]);
 	}
 
 	if (curr_step == 13) {
@@ -458,12 +513,22 @@ function bruteForceStep() {
 		s3i = [rem_feats[1],ex4_feat].sort();
 		s4  = rem_feats.sort(); 
 		s4i = [rem_feats[0],rem_feats[1],ex4_feat].sort();
+
+		fill_sets(s1,s1i,"s1");
+		fill_sets(s2,s2i,"s2");
+		fill_sets(s3,s3i,"s3");
+		fill_sets(s4,s4i,"s4");
+
+		ex4_code_reset();
+		ex4_code_color([2]);
 	}
 
 
 	if (curr_step == 17) {
 		document.getElementById("ex4_"+currs_name+"_row").style.backgroundColor = "";
 		ex4_update_step("s1", s1, s1i);
+		ex4_code_reset();
+		ex4_code_color([4,5,6,7,8,9]);
 	}
 
 	if (curr_step == 18) {
