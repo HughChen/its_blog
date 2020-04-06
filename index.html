@@ -1087,17 +1087,18 @@ pre {
         <!-- <div><a href="#introduction">Introduction</a></div> -->
         <div><a href="#background">Defining the feature attribution problem</a></div>
         <ul>
-          <li><a href="#shapley_values">1: Back to basics with Shapley values</a></li>
-          <li><a href="#shap_values">2: Adapting Shapley values to explain machine learning models</a></li>
-          <li><a href="#masking_missing">3: Masking missing features</a></li>
-          <li><a href="#shap_conditional_distribution">4: Imputing missing features by conditioning</a></li>
-          <li><a href="#background_distribution">5: Single reference SHAP values</a></li>
+          <li><a href="#shapley_values">Back to basics with Shapley values</a></li>
+          <li><a href="#shap_values">Adapting Shapley values to explain machine learning models</a></li>
+          <li><a href="#masking_missing">Masking missing features</a></li>
+          <li><a href="#shap_conditional_distribution">Imputing missing features by conditioning</a></li>
+          <li><a href="#background_distribution">Single reference SHAP values</a></li>
         </ul>
         <div><a href="#algorithm">Explaining trees quickly and exactly</a></div>
         <ul>
-          <li><a href="#brute_force">1: The brute force algorithm</a></li>
-          <li><a href="#naive_implementation">2: The naive algorithm</a></li>
-          <li><a href="#dynamic_programming_implementation">3: The dynamic algorithm</a></li>
+          <li><a href="#define_tree_samples">Choose your own adventure</a></li>
+          <li><a href="#brute_force">The brute force algorithm</a></li>
+          <li><a href="#naive_implementation">The naive algorithm</a></li>
+          <li><a href="#dynamic_programming_implementation">The dynamic algorithm</a></li>
         </ul>
         <div><a href="#comparison_of_methods">A comparison of Shapley value attribution methods</a></div>
         <div><a href="#references">References</a></div>
@@ -1827,7 +1828,7 @@ pre {
     </div>
 
     <figcaption>
-      <a href="#define_tree_samples" class="figure-number">5</a>: Choose foreground sample \(x^f\), background sample \(x^b\), and tree parameters for the remainder of <a href="#algorithm">Section 2</a>.
+      <a href="#define_tree_samples" class="figure-number">5</a>: Choose foreground sample \(x^f\), background sample \(x^b\), and tree parameters for the remainder of <a href="#algorithm">Section 2</a>.  This is the tree, foreground sample, and background sample that will be explained in the following examples.
     </figcaption>
 
 	</figure>
@@ -2647,7 +2648,10 @@ pre {
 	</p>
 
     <p>
-		<strong>Ensembles of trees:</strong> Many tree based methods are ensembles (e.g., random forests, gradient boosting trees).  In order to compute that attributions for these types of models, we can simply leverage the additivity of SHAP values and explain each tree and sum the attributions for each tree.
+		<strong>Ensembles of trees:</strong> Many tree based methods are ensembles (e.g., random forests, gradient boosting trees).  In order to compute that attributions for these types of models, we can simply leverage the additivity of SHAP values and explain each tree and sum the attributions for each tree.  This means that to explain a gradient boosting tree model, the computational complexity is just:
+		$$
+		O((\text{\# tree}) \times |D|\times (\text{\# nodes}))
+		$$		
 	</p>
 
   	<hr>
