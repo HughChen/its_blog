@@ -1306,7 +1306,7 @@ pre {
     </p>
 
     <p>
-      This specific adaptation of Shapley values to machine learning models is called Baseline Shapley, and have been shown to be be a unique solution to attribution methods with a single baseline based on cost-sharing literature <d-cite bibtex-key="sundararajan2019many"></d-cite>.  However, the choice of the baseline is a complicated one, and many different baselines have been considered including an all-zeros baseline, an average across features, a uniformly distributed baseline, etc. (<d-cite bibtex-key="sundararajan2017axiomatic"></d-cite>, <d-cite bibtex-key="shrikumar2017learning"></d-cite>, <d-cite bibtex-key="sturmfels2020visualizing"></d-cite>) <d-footnote>For an in-depth discussion of this concept and a comparison of several baselines for Aumann-Shapley values applied to explaining images see <d-cite bibtex-key="sturmfels2020visualizing"></d-cite>.</d-footnote>.
+      This specific adaptation of Shapley values to machine learning models is called Baseline Shapley, and have been shown to be a unique solution to attribution methods with a single baseline based on cost-sharing literature <d-cite bibtex-key="sundararajan2019many"></d-cite>.  However, the choice of the baseline is a complicated one, and many different baselines have been considered including an all-zeros baseline, an average across features, a uniformly distributed baseline, and more. (<d-cite bibtex-key="sundararajan2017axiomatic"></d-cite>, <d-cite bibtex-key="shrikumar2017learning"></d-cite>, <d-cite bibtex-key="sturmfels2020visualizing"></d-cite>) <d-footnote>For an in-depth discussion of this concept and a comparison of several baselines for Aumann-Shapley values applied to explaining images see <d-cite bibtex-key="sturmfels2020visualizing"></d-cite>.</d-footnote>.
     </p>
 
 
@@ -1455,7 +1455,7 @@ pre {
     </p>
 
     <p>
-      Alternatively, we could use a mean-baseline as in <a href="#single_baselines_bad" class="figure-number">3c</a>.  Although the mean of a binary variable does not have a natural interpretation it fixes the Gender problem.  However, for Height and Weight, we can see that the all-mean baseline introduces bias and effectively forces zero attribution to individuals with average heights and weights.  This is undesirable because their height and weight are clearly influencing the model's prediction.
+      Alternatively, we could use a mean-baseline as in <a href="#single_baselines_bad" class="figure-number">3c</a>.  Although the mean of a binary variable does not have a natural interpretation it fixes the Gender problem.  However, for Height and Weight, we can see that the all-mean baseline introduces bias and effectively forces zero attribution to individuals with average heights and weights.  This is undesirable because their height and weight do indeed influence the model's prediction.
     </p>
 
     <p>
@@ -1472,7 +1472,7 @@ pre {
     </p>
 
     <p>
-    	One caveat is that getting this conditional expectation for actual data is very difficult.  Furthermore, even if you do manage to do so, the resulting explanations can end up having undesirable characteristics (more on this later).  Because our goal is to focus on explaining the model itself, an arguably more natural approach is to use causal inference's <i>interventional conditional expectation</i>:
+    	One caveat is that getting this conditional expectation for actual data is very difficult.  Furthermore, even if you do manage to do so, the resulting explanations can end up having undesirable characteristics (more on this later).  Because our goal is just explain the model itself, an arguably more natural approach is to use causal inference's <i>interventional conditional expectation</i>:
     	$$
     	v(S)=\mathbb{E}_D[f(x)|\text{do}(x_{S})]
     	$$
@@ -1640,7 +1640,7 @@ pre {
   </p>
 
   <p>
-    In <a href="#linear_shap_ex" class="figure-number">4</a> we highlight tradeoffs between the conditional expectation and the interventional conditional expectation for a linear model.  Comparing Preset A to Preset B, we can see that the correlation between variables will cause the CE SHAP values to be split between correlated variables.  Although this may be desirable at times<d-footnote>For example, if we are interested in detecting whether a model is secretly using a confounding variable, we may want CE SHAP values.</d-footnote>, it can feel somewhat unnatural as in Preset D, where feature \(x_4\) is as important as feature \(x_3\) despite not being used in the model.  Although both CE SHAP values and ICE SHAP values are meaningful, we focus on ICE SHAP values because they are tractable to compute and they explain what the model is doing, rather than on what relationships exist in the data itself.
+    In <a href="#linear_shap_ex" class="figure-number">4</a> we highlight tradeoffs between the conditional expectation and the interventional conditional expectation for a linear model.  Comparing Preset A to Preset B, we can see that the correlation between variables will cause the CE SHAP values to be split between correlated variables.  Although this may be desirable at times<d-footnote>For example, if we are interested in detecting whether a model is secretly using a confounding variable, we may want CE SHAP values.</d-footnote>, it can feel somewhat unnatural as in Preset D, where feature \(x_4\) is as important as feature \(x_3\) despite not being used in the model.  Although both CE SHAP values and ICE SHAP values are meaningful, we focus on ICE SHAP values because they are tractable to compute and they explain what the model is doing, rather than how features in the data relate to each other.
   </p>
 
 
@@ -1690,7 +1690,7 @@ pre {
 	</p>
 
 	<p>
-		One natural definition of the background distribution is a uniform distribution over a population sample.  For instance, in machine learning, you could assign equal probability to every sample in your training set.  With this background distribution, we can re-write the SHAP value as an average of <i>single reference SHAP values</i> <d-cite bibtex-key="chen2019explaining"></d-cite>:
+		One natural definition of the background distribution is a uniform distribution over a population sample.  For instance, in machine learning, you could assign equal probability to every sample in your training set.  With this background distribution, we can re-write the SHAP value as an average of <i>single reference SHAP values</i> (which are analogous to <a href="masking_missing">Section 1.3</a> where missing features are masked) <d-cite bibtex-key="chen2019explaining"></d-cite>:
 		$$
 		\phi_i(f,x^f)=\frac{1}{|D|}\sum_{x^b\in D}\phi_i(f,x^f,x^b)
 		$$
@@ -2626,13 +2626,29 @@ pre {
 	</div>
  -->
     <p>
-		The computational complexity to compute \(\phi_i(f,x^f,x^b)\) using the dynamic programming algorithm for all features is now just \(O(T_{numnodes})\) where \(T_{numnodes}\) is the number of nodes in the tree.  In <a href="#dynamic_ex" class="figure-number">10</a> it is easy to see that each node now only requires a constant amount of work.  
+		In <a href="#dynamic_ex" class="figure-number">10</a> each node now only requires a constant amount of work.  The computational complexity to compute \(\phi_i(f,x^f,x^b)\) for all features \(i\) with this algorithm is now just:
+		$$
+		O(\text{\# nodes})
+		$$
+	</p>
+
+	<h3>Final considerations:</h3>
+
+    <p>
+		<strong>Background distribution:</strong> Finally, our original goal was to compute \(\phi_i(f,x^f)\).  In order to do so, we compute \(\phi_i(f,x^f,x^b)\) for many references \(x^b\), resulting in a run time of:
+		$$
+		O(|D|\times (\text{\# nodes}))
+		$$
+		where \(|D|\) is the number of samples in the background distribution.  In practice, using a fixed number of about 100 to 1000 references works well.
 	</p>
 
     <p>
-		Finally, our original goal was to compute \(\phi_i(f,x^f)\).  We simply need to compute \(\phi_i(f,x^f,x^b)\) for many references \(x^b\), resulting in a run time of \(O(|D|T_{numnodes})\) where \(|D|\) is the number of samples in the background distribution.  In practice, using a fixed number of about 100 to 1000 references works well.
+		<strong>Further optimization:</strong> Explaining the tree for a specific foreground and background sample requires knowing where all hybrid samples go in the tree.  The means that the worst case complexity is at best \(O(\text{\# nodes})\).  Alternatively, one might be able to compute the attributions for many background samples simultaneously in sub-linear time.
 	</p>
 
+    <p>
+		<strong>Ensembles of trees:</strong> Many tree based methods are ensembles (e.g., random forests, gradient boosting trees).  In order to compute that attributions for these types of models, we can simply leverage the additivity of SHAP values and explain each tree and sum the attributions for each tree.
+	</p>
 
   	<hr>
 
@@ -2648,7 +2664,7 @@ pre {
     		<ul>
     			<li class="no-space">Like ITE, PDTE is also meant to obtain SHAP values for tree models.</li> 
 				<li class="no-space">PDTE approximates the interventional conditional expectation based on how many training samples went down paths in the tree, whereas ITE computes it exactly.</li>
-				<li class="no-space">The computational complexity is \(O(T_{numleaves}T_{depth}^2)\).  In practice, PDTE can be faster than ITE, although it may depend on the number of references or the tree depth.</li>
+				<li class="no-space">The computational complexity is \(O((\text{\# leaf nodes})\times (\text{tree depth})^2)\).  In practice, PDTE can be faster than ITE, although it may depend on the number of references or the tree depth.</li>
     		</ul>
     		<li class="no-space">Sampling Explainer:</li>
     		<ul>
