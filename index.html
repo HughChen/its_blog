@@ -2650,7 +2650,7 @@ pre {
     <p>
 		<strong>Ensembles of trees:</strong> Many tree based methods are ensembles (e.g., random forests, gradient boosting trees).  In order to compute that attributions for these types of models, we can simply leverage the additivity of SHAP values and explain each tree and sum the attributions for each tree.  This means that to explain a gradient boosting tree model, the computational complexity is just:
 		$$
-		O((\text{\# tree}) \times |D|\times (\text{\# nodes}))
+		O((\text{\# trees}) \times |D|\times (\text{\# nodes}))
 		$$		
 	</p>
 
