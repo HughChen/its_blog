@@ -1129,7 +1129,7 @@ pre {
     <i>What is the goal of this article?</i> 
 
     <p>
-    Given that there is a long history of model explanations going awry when users do not understand what an explanation means (e.g., p-values for linear models <d-cite bibtex-key="schervish1996p"></d-cite>), it is critical to have a broadly accessible explanation of SHAP values and how they are obtained for tree models to ensure that they are not misused.  To this end, we aim to provide an easy to understand answer to two questions: 1.) What are SHAP values?  2.) How can we obtain SHAP values for trees?  In particular, we focus on explaining an algorithm to explain trees that is widely used in the popular SHAP package <d-cite bibtex-key="lundberg2020local"></d-cite>.
+    Given that there is a long history of model explanations going awry when users do not understand what an explanation means (e.g., p-values for linear models <d-cite bibtex-key="schervish1996p"></d-cite>), it is critical to have a broadly accessible explanation of SHAP values and how they are obtained for tree models to ensure that they are not misused.  To this end, we aim to provide an easy to understand answer to two questions: 1.) What are SHAP values?  2.) How can we obtain SHAP values for trees?  In particular, we focus on explaining an algorithm to explain trees that is widely used in the popular SHAP package called Interventional Tree Explainer <d-cite bibtex-key="lundberg2020local"></d-cite>.
   </p>
   </div>
 
@@ -1140,7 +1140,7 @@ pre {
     <h2 id="background">1. Defining the feature attribution problem</h2>
     
     <p>
- 	   In this section, we describe Shapley values and a few versions that have been used to explain machine learning models.  Then, we use a linear model example to justify a specific extension of the Shapley values.  With this formulation, we show how obtaining the SHAP values reduces to an average over so-called single reference SHAP values that can be thought of as explanations with respect to a single foreground sample (explicand) and a single background sample (reference).
+ 	   In this section, we describe Shapley values and a few versions that have been used to explain machine learning models.  Then, we use an example with a linear model to justify a specific extension of the Shapley values.  With this formulation, we show how obtaining the SHAP values reduces to an average of "single reference SHAP values" that can be thought of as explanations with respect to a single foreground sample (explicand, or sample being explained) and a single background sample (baseline, or sample the explicand is compared to).
 	</p>
 
 
@@ -1286,7 +1286,7 @@ pre {
     </p>
 
     <p>
-      Well, a machine learning model with binary features \(x_i\in(0,1)\) <d-footnote>Where 1 indicates presence of a feature and 0 indicates absence of a feature.</d-footnote> would in fact be a coalitional game.  In this setting, the best way to assign credit to features is to just use the Shapley values where we define a new set function:
+      Well, a machine learning model with binary features \(x_i\in(0,1)\) <d-footnote>Where 1 indicates presence of a feature and 0 indicates absence of a feature.</d-footnote> would in fact be a coalitional game.  In this setting, the best way to assign credit to features is to just use the Shapley values where we define a new set function where features are 1 or 0 depending on if they are in the set:
         $$
         v(S):=f(z^S)\text{, where } z^S_i = 1\text{ if }i\in S\text{, }0\text{ otherwise}
         $$
@@ -1294,20 +1294,20 @@ pre {
     </p>
 
     <p>
-      First, to address the presence of a feature, our goal is to obtain <i>local feature attributions</i><d-footnote>As opposed to a <i>global feature attribution</i> that aims to assign per-feature importance for the model as a whole.</d-footnote>: a vector of importance for each feature of a model prediction for a specific sample \(x^f\) (explicand <d-footnote>The sample being explained.</d-footnote>).  Then, if feature \(i\) is present, we can simply set that feature to be from the explicand \(x_i^f\). The next step is to address the absence of a feature which can be done in many ways.
+      First, to address the presence of a feature, our goal is to obtain <i>local feature attributions</i><d-footnote>As opposed to a <i>global feature attributions</i> that aims to assign per-feature importance for the model as a whole.</d-footnote>: a vector of importance for each feature of a model prediction for a specific sample \(x^f\) (explicand <d-footnote>The sample being explained.</d-footnote>).  Then, if feature \(i\) is present, we can simply set that feature to be from the explicand \(x_i^f\). The next step is to address the absence of a feature which can be done in many ways.
     </p>
 
   <h3 id="masking_missing">1.3 Masking missing features</h3>
 
     <p>
-      One straightforward way to address the absence of a feature is to define a baseline \(x^b\).  In this case, if feature \(i\) is absent, we can simply set that feature to be \(x_i^b\).  Putting this all together, our new set function is simply:
+      One straightforward way to address the absence of a feature is to define a baseline \(x^b\).  In this case, if feature \(i\) is absent, we can simply set that feature to be \(x_i^b\).  Then the new set function is:
       $$
       v(S)=f(h^S)\text{, where } h^S_i = x^f_i\text{ if }i\in S\text{, }x^b_i\text{ otherwise}
       $$
     </p>
 
     <p>
-      This specific adaptation of Shapley values to machine learning models is called Baseline Shapley, and have been shown to be a unique solution to attribution methods with a single baseline based on cost-sharing literature <d-cite bibtex-key="sundararajan2019many"></d-cite>.  However, the choice of the baseline is a complicated one, and many different baselines have been considered including an all-zeros baseline, an average across features, a uniformly distributed baseline, and more. (<d-cite bibtex-key="sundararajan2017axiomatic"></d-cite>, <d-cite bibtex-key="shrikumar2017learning"></d-cite>, <d-cite bibtex-key="sturmfels2020visualizing"></d-cite>) <d-footnote>For an in-depth discussion of this concept and a comparison of several baselines for Aumann-Shapley values applied to explaining images see <d-cite bibtex-key="sturmfels2020visualizing"></d-cite>.</d-footnote>.
+      This specific adaptation of Shapley values to machine learning models is called Baseline Shapley, and were shown to be a unique solution to attribution methods with a single baseline based on cost-sharing literature <d-cite bibtex-key="sundararajan2019many"></d-cite>.  However, the choice of the baseline is a complicated one, and many different baselines have been considered including an all-zeros baseline, an average across features, a uniformly distributed baseline, and more. (<d-cite bibtex-key="sundararajan2017axiomatic"></d-cite>, <d-cite bibtex-key="shrikumar2017learning"></d-cite>, <d-cite bibtex-key="sturmfels2020visualizing"></d-cite>) <d-footnote>For an in-depth discussion of this concept and a comparison of several baselines for Aumann-Shapley values applied to explaining images see <d-cite bibtex-key="sturmfels2020visualizing"></d-cite>.</d-footnote>.
     </p>
 
 
@@ -1460,7 +1460,7 @@ pre {
     </p>
 
     <p>
-      Instead of using a single <i>background sample</i> (baseline), we can use many.  In the next section we will describe two approaches to incorporate <i>background distributions</i> to our set functions \(v(S)\) for a much better definition of missingness.
+      To avoid the bias of using a single <i>background sample</i> (baseline) we can instead use many different baselines.  In the next section we will describe two approaches to incorporate <i>background distributions</i> to our set functions \(v(S)\) for a much better definition of missingness.
     </p>
 
     <h3 id="shap_conditional_distribution">1.4 Imputing missing features by conditioning</h3>
@@ -1477,7 +1477,7 @@ pre {
     	$$
     	v(S)=\mathbb{E}_D[f(x)|\text{do}(x_{S})]
     	$$
-    	The <i>do</i> notation is causal inference's <i>do</i>-operator <d-cite bibtex-key="pearl2009causality"></d-cite>.  In words, we break the dependence between the features in \(S\) and the remaining features, which is analogous to <i>intervening</i> on the remaining features (more on this in <a href="#background_distribution">Section 1.5</a>).  The motivation behind this decision comes from <d-cite bibtex-key="janzing2019feature"></d-cite> which is also very close to Random Baseline Shapley in <d-cite bibtex-key="sundararajan2019many"></d-cite>.  Additionally, this is exactly the assumption made by <a href="https://shap.readthedocs.io/en/latest/#shap.KernelExplainer">Kernel Explainer</a> <d-cite bibtex-key="lundberg2017unified"></d-cite> and <a href="https://shap.readthedocs.io/en/latest/#shap.SamplingExplainer">Sampling Explainer</a> from the SHAP package.
+    	The <i>do</i> notation is causal inference's <i>do</i>-operator <d-cite bibtex-key="pearl2009causality"></d-cite>.  In words, we break the dependence between the features in \(S\) and the remaining features, which is analogous to <i>intervening</i> on the remaining features.  The motivation behind this decision comes from <d-cite bibtex-key="janzing2019feature"></d-cite> which is also very close to Random Baseline Shapley in <d-cite bibtex-key="sundararajan2019many"></d-cite>.  Additionally, this is exactly the assumption made by <a href="https://shap.readthedocs.io/en/latest/#shap.KernelExplainer">Kernel Explainer</a> <d-cite bibtex-key="lundberg2017unified"></d-cite> and <a href="https://shap.readthedocs.io/en/latest/#shap.SamplingExplainer">Sampling Explainer</a> from the SHAP package.
     </p>
 
     <!-- Figure 3 -->
@@ -1641,7 +1641,7 @@ pre {
   </p>
 
   <p>
-    In <a href="#linear_shap_ex" class="figure-number">4</a> we highlight tradeoffs between the conditional expectation and the interventional conditional expectation for a linear model.  Comparing Preset A to Preset B, we can see that the correlation between variables will cause the CE SHAP values to be split between correlated variables.  Although this may be desirable at times<d-footnote>For example, if we are interested in detecting whether a model is secretly using a confounding variable, we may want CE SHAP values.</d-footnote>, it can feel somewhat unnatural as in Preset D, where feature \(x_4\) is as important as feature \(x_3\) despite not being used in the model.  Although both CE SHAP values and ICE SHAP values are meaningful, we focus on ICE SHAP values because they are tractable to compute and they explain what the model is doing, rather than how features in the data relate to each other.
+    In <a href="#linear_shap_ex" class="figure-number">4</a> we highlight tradeoffs between the conditional expectation and the interventional conditional expectation for a linear model.  Comparing Preset A to Preset B, we can see that the correlation between variables will cause the CE SHAP values to be split between correlated variables.  Although this may be desirable at times<d-footnote>For example, if we are interested in detecting whether a model is secretly using a confounding variable, we may want CE SHAP values.</d-footnote>, it can feel somewhat unnatural as in Preset D, where feature \(x_4\) is as important as feature \(x_3\) despite not being used in the model.  Although both CE SHAP values and ICE SHAP values are meaningful, we focus on ICE SHAP values because they are tractable to compute and explain what the model is doing, rather than how features in the data relate to each other.
   </p>
 
 
@@ -1687,7 +1687,7 @@ pre {
     <h3 id="background_distribution">1.5 Single reference SHAP values</h3>
 
 	<p>
-		As we saw earlier, to compute \(\phi_i(f,x^f)\) we evaluate the interventional conditional expectation.  However, this depends on a <i>background distribution</i> \(D\) that the sample we are explaining, otherwise known as the foreground sample \(x^f\), will be compared to.  
+		As we saw earlier, to compute \(\phi_i(f,x^f)\) we evaluate the interventional conditional expectation.  However, this depends on a <i>background distribution</i> \(D\) that foreground sample will be compared to.  
 	</p>
 
 	<p>
@@ -1699,7 +1699,7 @@ pre {
 		$$
 		\mathbb{E}_{D_{x^b}}[f(x^f)|\text{do}(x_{S})]=h^S\text{, where } h^S_i = x^f_i\text{ if }i\in S\text{, }x^b_i\text{ otherwise}
 		$$
-		In words, the interventional conditional expectation of \(x^f\) given a set of features \(S\) and \(x^b\) is a hybrid sample where the features in \(S\) are from \(x^f\) and the remaining features are from \(x^b\).  This is as if <i>we intervene on features in the foreground sample with features from the background sample</i>.  This should look very familiar, as it is equivalent to obtaining the SHAP value by treating a sample in the background distribution as a baseline and masking (<a href="#masking_missing">Section 1.3</a>)
+		In words, the interventional conditional expectation for an explicand given a set of features \(S\) and a baseline is the model prediction for a hybrid sample where the features in \(S\) are from the explicand and the remaining features are from baseline.  This is as if <i>we intervene on features in the foreground sample with features from the background sample</i>.  This should look very familiar, as it is equivalent to obtaining the SHAP value by treating a sample in the background distribution as a baseline and masking (<a href="#masking_missing">Section 1.3</a>).
 	</p>  
 
 	<!-- Background Distribution Proof -->
@@ -1739,7 +1739,7 @@ pre {
     <h2 id="algorithm">2. An algorithm to explain trees quickly and exactly</h2>
     
     <p>
-    Now our goal is to tackle the simpler problem of obtaining single reference SHAP values \(\phi_i(f,x^f,x^b)\) that are attributions for a single foreground (sample being explained) and background sample (sample being compared to).  In this section, we consider a specific foreground sample, background sample, and tree as specified in <a href="#define_tree_samples" class="figure-number">5</a>.
+    Now our goal is to tackle the simpler problem of obtaining single reference SHAP values \(\phi_i(f,x^f,x^b)\) that are attributions for a single foreground sample and background sample.  The examples in this section are all for a specific foreground sample, background sample, and tree specified in <a href="#define_tree_samples" class="figure-number">5</a>.
 	</p>
 
 	<figure id="define_tree_samples">
@@ -2013,13 +2013,13 @@ pre {
   </figure>
 
     <p>
-    	If we assume the computational cost of computing the weight \(W\) is constant<d-footnote>In order to do so, we can simply memoize \(k!\) for \(k=1,\cdots,d\).</d-footnote>, then the complexity of the brute force method is the number of terms in the summation multiplied by the cost of making a prediction (on the order of the depth of the tree).  This gives \(O((\text{tree depth})\times 2^{d})\).
+    	If we assume the computational cost of computing the weight \(W\) is constant<d-footnote>Which it will be if we memoize \(k!\) for \(k=1,\cdots,d\).</d-footnote>, then the complexity of the brute force method is the number of terms in the summation multiplied by the cost of making a prediction (on the order of the depth of the tree).  This gives \(O((\text{tree depth})\times 2^{d})\).
     </p>
 
     <p>
     	Then, in order to compute \(\phi_i(f,x^f,x^b)\) for all features \(i\), we have to re-run the entire algorithm \(d\) times, giving us an overall complexity of
     	$$
-    	O((\text{tree depth})\times d\times  2^{d})
+    	O(d\times (\text{tree depth})\times 2^{d})
     	$$
 	</p>
 
@@ -2087,14 +2087,14 @@ pre {
 				<li class="no-space">Pass down \(N_P\) and \(S_P\) without modifications because we did not add a new feature</li>
 			</ul>
 
-			<li class="no-space">Case 3: Both \(x\) and \(x^b\) are on the same side of \(n\)'s split</li>
+			<li class="no-space">Case 3: Both \(x^f\) and \(x^b\) are on the same side of \(n\)'s split</li>
 			<ul class="no-space">
-				<li class="no-space">Pass down \(N_P\) and \(S_P\) without modifications because relative to \(x\) and \(x^b\) it's as if this node doesn't exist</li>
+				<li class="no-space">Pass down \(N_P\) and \(S_P\) without modifications because relative to \(x^f\) and \(x^b\) it's as if this node doesn't exist</li>
 			</ul>
 
-			<li class="no-space">Case 4: \(x\) and \(x^b\) go to different children</li>
+			<li class="no-space">Case 4: \(x^f\) and \(x^b\) go to different children</li>
 			<ul class="no-space">
-				<li class="no-space">Add \(n_{feature}\) to both \(N_P\) and \(S_P\) and pass both lists to the \(x\) child</li>
+				<li class="no-space">Add \(n_{feature}\) to both \(N_P\) and \(S_P\) and pass both lists to the \(x^f\) child</li>
 				<li class="no-space">Only add \(n_{feature}\) to \(N_P\) and pass both lists to the \(x^b\) child</li>
 			</ul>
 		</ul>
@@ -2353,7 +2353,7 @@ pre {
     </p>
 
     <p>
-    	The first observation is that we can actually get rid of the multiplicative \((\text{tree depth})\) factor by focusing on what the lists \(S_P\) and \(N_P\) are used for.  The first use is to check if a feature has been previously encountered.  By replacing the lists with boolean arrays, we can check if a given feature has been encountered by a constant time access into the arrays.  This means the internal nodes now incur a constant cost.  The second use of \(S_P\) and \(N_P\) is to calculate the sizes of \(|S|\) and \(|N|\) at the leaves.  By instead maintaining integers that keep track of these values, the leaves no longer have a multiplicative \((\text{tree depth})\) factor.  This means the new computational complexity is:
+    	The first observation is that we can actually get rid of the multiplicative \((\text{tree depth})\) factor by focusing on what the lists \(S_P\) and \(N_P\) are used for.  The first use is to check if a feature has been previously encountered.  By replacing the lists with boolean arrays, we can check if a given feature has been encountered by a constant time access into the arrays.  This means the internal nodes now incur a constant cost.  The second use of \(S_P\) and \(N_P\) is to calculate the sizes of \(|S|\) and \(|N|\) at the leaves.  By instead maintaining integers that keep track of these values, the leaves no longer have to iterate through lists.  This gets rid of the multiplicative \((\text{tree depth})\) factor.  Then, the new computational complexity is:
 		$$
 		O((\text{\# internal nodes}) + O((\text{\# leaf nodes}) \times d)
 		$$
@@ -2644,11 +2644,11 @@ pre {
 	</p>
 
     <p>
-		<strong>Further optimization:</strong> Explaining the tree for a specific foreground and background sample requires knowing where all hybrid samples go in the tree.  The means that the worst case complexity is at best \(O(\text{\# nodes})\).  Alternatively, one might be able to compute the attributions for many background samples simultaneously in sub-linear time.
+		<strong>Further optimization:</strong> Explaining the tree for a specific foreground and background sample requires knowing where all hybrid samples go in the tree.  Therefore we achieve the best possible complexity of \(O(\text{\# nodes})\).  However, it may be possible to compute the attributions for many background samples simultaneously in sub-linear time in order to reduce the \(O(|D|\times (\text{\# nodes}))\) cost.
 	</p>
 
     <p>
-		<strong>Ensembles of trees:</strong> Many tree based methods are ensembles (e.g., random forests, gradient boosting trees).  In order to compute that attributions for these types of models, we can simply leverage the additivity of SHAP values and explain each tree and sum the attributions for each tree.  This means that to explain a gradient boosting tree model, the computational complexity is just:
+		<strong>Ensembles of trees:</strong> Many tree based methods are ensembles (e.g., random forests, gradient boosting trees).  In order to compute that attributions for these types of models, we can simply leverage the additivity of SHAP values and explain each tree and sum the attributions for each tree.  This means that to explain a gradient boosting tree model, the computational complexity is:
 		$$
 		O((\text{\# trees}) \times |D|\times (\text{\# nodes}))
 		$$		
