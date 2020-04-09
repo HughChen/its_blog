@@ -2044,7 +2044,7 @@ pre {
   </p>
 
   <p>
-    For a given path \(P\), we define \(N_P\) to be the unique features encountered and \(S_P\) to be the unique features that came from \(x\).  Finally, define \(v\) to be the value of the path's leaf.  Then, the attribution of the path is:
+    For a given path \(P\), we define \(N_P\) to be the unique features encountered and \(S_P\) to be the unique features that came from \(x^f\).  Finally, define \(v\) to be the value of the path's leaf.  Then, the attribution of the path is:
 
   	$$
 		\phi_i^P(f,x^f,x^b)=
@@ -2060,7 +2060,7 @@ pre {
 	<p><a onclick="hideshow('naive_alg_proof')"><strong>+ Technical Details</strong></a></p>
 	<div id="naive_alg_proof", style="display:none">
 		<p>
-			<i>Sketch of proof</i>: If we treat each path in the tree from the root to the leaf as a separate model \(f'(x)\) that returns the value of the leaf if that path is traversed by \(x\) or zero otherwise, then we have \(L\) models that operate on disjoint parts of the input space.  Then, \(f(x)=\sum f'(x)\) and by the additivity of SHAP values, \(\phi_i(f,x^f,x^b)=\sum_f\phi_i(f',x^f,x^b)\).  Then, we can simply calculate \(\phi_i\) for each path model.  Since the path model is zero everywhere except for the associated path, we can arrive to the solution in Theorem 1.
+			<i>Sketch of proof</i>: If we treat each path in the tree from the root to the leaf as a separate model \(f'(x)\) that returns the value of the leaf if that path is traversed by \(x^f\) or zero otherwise, then we have \(L\) models that operate on disjoint parts of the input space.  Then, \(f(x)=\sum f'(x)\) and by the additivity of SHAP values, \(\phi_i(f,x^f,x^b)=\sum_f\phi_i(f',x^f,x^b)\).  Then, we can simply calculate \(\phi_i\) for each path model.  Since the path model is zero everywhere except for the associated path, we can arrive to the solution in Theorem 1.
 		</p>
 	</div>
 
