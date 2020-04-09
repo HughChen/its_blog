@@ -1100,7 +1100,7 @@ pre {
           <li><a href="#naive_implementation">The naive algorithm</a></li>
           <li><a href="#dynamic_programming_implementation">The dynamic algorithm</a></li>
         </ul>
-        <div><a href="#comparison_of_methods">A comparison of Shapley value attribution methods</a></div>
+        <div><a href="#related_work">Related Work</a></div>
         <div><a href="#references">References</a></div>
       </nav>
     </d-contents>
@@ -2044,7 +2044,7 @@ pre {
   </p>
 
   <p>
-    For a given path \(P\), we define \(N_P\) to be the "unique" features encountered and \(S_P\) to be the "unique" features that came from \(x\).  Finally, define \(v\) to be the value of the path's leaf.  Then, the attribution of the path is:
+    For a given path \(P\), we define \(N_P\) to be the unique features encountered and \(S_P\) to be the unique features that came from \(x\).  Finally, define \(v\) to be the value of the path's leaf.  Then, the attribution of the path is:
 
   	$$
 		\phi_i^P(f,x^f,x^b)=
@@ -2539,27 +2539,30 @@ pre {
                 // Case 4: xf and xb don't go the same way
             </dt-code>
             <dt-code id="dynamiccode_20" class="indent2" block="" language="python">
-                fseen2 = copy(fseen); fseen2[n.feat] += 1
-            </dt-code>
-            <dt-code id="dynamiccode_21" class="indent2" block="" language="python">
-                bseen2 = copy(bseen); bseen2[n.feat] += 1
-            </dt-code>
-            <dt-code id="dynamiccode_22" class="indent2" block="" language="python">
                 if xf_child != xb_child:
             </dt-code>
+            <dt-code id="dynamiccode_21" class="indent3" block="" language="python">
+				fseen[n.feat] += 1
+            </dt-code>
+            <dt-code id="dynamiccode_22" class="indent3" block="" language="python">
+                  posf,negf = recurse(xb_child,nc+1,sc+1,fseen,bseen)
+            </dt-code>
             <dt-code id="dynamiccode_23" class="indent3" block="" language="python">
-                  posf,negf = recurse(xb_child,nc+1,sc+1,fseen2,bseen)
+				fseen[n.feat] -= 1; bseen[n.feat] += 1
             </dt-code>
             <dt-code id="dynamiccode_24" class="indent3" block="" language="python">
-                  posb,negb = recurse(xb_child,nc+1,sc  ,fseen ,bseen2)
+                  posb,negb = recurse(xb_child,nc+1,sc  ,fseen,bseen)
             </dt-code>
             <dt-code id="dynamiccode_25" class="indent3" block="" language="python">
-                  phi[n.feat] += posf+negb
+				bseen[n.feat] -= 1
             </dt-code>
             <dt-code id="dynamiccode_26" class="indent3" block="" language="python">
+                  phi[n.feat] += posf+negb
+            </dt-code>
+            <dt-code id="dynamiccode_27" class="indent3" block="" language="python">
                   return((posf+posb,negf+negb))
             </dt-code>
-            <dt-code id="dynamiccode_27" class="indent1" block="" language="python">
+            <dt-code id="dynamiccode_28" class="indent1" block="" language="python">
               recurse(n=T.root,0,0,[0]*len(xf),[0]*len(xf))
             </dt-code>
         </div>
@@ -2584,48 +2587,6 @@ pre {
   </figure>
 
 
-	<!-- Pseudocode -->
-<!-- 	<div>
-		<p><a onclick="hideshow('pseudocode_dynamic')"><strong>+ Pseudocode</strong></a></a></p>
-
-		<div id="pseudocode_dynamic" style="display:none">
-      <dt-code block language="python">
-        def ite_dynamic(array xf, array xb, tree T):
-          phi = [0]*len(xf)
-          def recurse(node n, int nc, int sc, array fseen, array bseen):
-            // Case 1: Leaf
-            if n.is_leaf:
-              if sc == 0: return((0,0))
-              else: return((n.value*W(sc,nc-1),-n.value*W(sc,nc)))
-
-            // Find children associated with xf and xb
-            xf_child = n.left if xf[n.feat] < n.thres else n.right
-            xb_child = n.left if xb[n.feat] < n.thres else n.right
-
-            // Case 2: Feature encountered before
-            if fseen[n.feat] > 0:
-              return(recurse(xf_child,nc,sc,fseen,bseen))
-            if bseen[n.feat] > 0:
-              return(recurse(xb_child,nc,sc,fseen,bseen))
-
-            // Case 3: xf and xb go the same way
-            if xf_child == xb_child:
-              return(recurse(xb_child,nc,sc,fseen,bseen))
-
-            // Case 4: xf and xb don't go the same way
-            fseen2 = copy(fseen); fseen2[n.feat] += 1
-            bseen2 = copy(bseen); bseen2[n.feat] += 1
-            if xf_child != xb_child:
-              posf,negf = recurse(xb_child,nc+1,sc+1,fseen2,bseen)
-              posb,negb = recurse(xb_child,nc+1,sc  ,fseen ,bseen2)
-              phi[n.feat] += posf+negb
-              return((posf+posb,negf+negb))
-
-          return(recurse(n=T.root,0,0,[0]*len(xf),[0]*len(xf)))
-      </dt-code>
-    </div>
-	</div>
- -->
     <p>
 		In <a href="#dynamic_ex" class="figure-number">10</a> each node now only requires a constant amount of work.  The computational complexity to compute \(\phi_i(f,x^f,x^b)\) for all features \(i\) with this algorithm is now just:
 		$$
@@ -2656,7 +2617,7 @@ pre {
 
   	<hr>
 
-    <h2 id="comparison_of_methods">Comparison of SHAP Methods</h3>
+    <h2 id="related_work">Related Work</h3>
 
     <p>
     	It should be noted that there are a number of alternative methods that aim to approximate SHAP values: Path Dependent Tree Explainer, Kernel Explainer, and Sampling Explainer.  If you are explaining tree-based models, it may not be clear which one you should use.  In this article we briefly overview the methods and compare them to ITE:
@@ -2793,7 +2754,7 @@ function hideshow(type) {
     }
 
     // Set indentations for code
-    for (var i=0; i < 27; i++) {
+    for (var i=0; i < 28; i++) {
       var a = document.getElementById("dynamiccode_"+(i+1));
       var b = a.getElementsByTagName("pre")[0];
       b.style.marginTop = "0px";

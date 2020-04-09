@@ -265,7 +265,7 @@ return(num/den);
 }
 
 function ex6_code_reset() {
-    for (var i=0; i < 27; i++) {
+    for (var i=0; i < 28; i++) {
 		var a = document.getElementById("dynamiccode_"+(i+1));
 		var b = a.getElementsByTagName("pre")[0];
 		b.style.background = "#ffffff";
@@ -500,7 +500,7 @@ function dynamicStep() {
 		ex6_update_str('<strong>Case 4</strong>: Foreground and background differ');
 		ex6_code_reset();
 		ex6_code_color([7,8,9]);
-		ex6_code_color([18,19,20,21,22,23]);
+		ex6_code_color([18,19,20,21,22,23,24]);
 
 		s_t_pairs.push([currnode6,fchild]);
 		colors.push("#b3de69");
@@ -532,7 +532,7 @@ function dynamicStep() {
 		if ((lchild.name in pos_dict6) & (lchild.name in neg_dict6) &
 			(rchild.name in pos_dict6) & (rchild.name in neg_dict6)) {
 			ex6_code_reset();
-			ex6_code_color([24,25]);
+			ex6_code_color([25,26]);
 			ex6_phi[n_var] = ex6_phi[n_var] + pos_dict6[fchild.name] + neg_dict6[bchild.name];
 			pos_dict6[nodename] = pos_dict6[lchild.name] + pos_dict6[rchild.name];
 			neg_dict6[nodename] = neg_dict6[lchild.name] + neg_dict6[rchild.name];
