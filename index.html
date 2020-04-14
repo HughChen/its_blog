@@ -1704,7 +1704,7 @@ pre {
 		$$
 		\mathbb{E}_{D_{x^b}}[f(x^f)|\text{do}(x_{S})]=h^S\text{, where } h^S_i = x^f_i\text{ if }i\in S\text{, }x^b_i\text{ otherwise}
 		$$
-		In words, the interventional conditional expectation for an explicand given a set of features \(S\) and a baseline is the model prediction for a hybrid sample where the features in \(S\) are from the explicand and the remaining features are from baseline.  This is as if <i>we intervene on features in the foreground sample with features from the background sample</i>.  This should look very familiar, as it is equivalent to obtaining the SHAP value by treating a sample in the background distribution as a baseline and masking (<a href="#masking_missing">Section 1.3</a>).
+		In words, the interventional conditional expectation for a single baseline is the model prediction for a hybrid sample where the features in \(S\) are from the explicand and the remaining features are from baseline.  This is as if <i>we intervene on features in the foreground sample with features from the background sample</i>.  This should look very familiar, as it is equivalent to obtaining the SHAP value by treating a sample in the background distribution as a baseline and masking (<a href="#masking_missing">Section 1.3</a>).
 	</p>  
 
 	<!-- Background Distribution Proof -->
