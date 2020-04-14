@@ -1099,6 +1099,7 @@ pre {
           <li><a href="#brute_force">The brute force algorithm</a></li>
           <li><a href="#naive_implementation">The naive algorithm</a></li>
           <li><a href="#dynamic_programming_implementation">The dynamic algorithm</a></li>
+          <li><a href="#final_considerations">Final considerations</a></li>
         </ul>
         <div><a href="#related_work">Related Work</a></div>
         <div><a href="#references">References</a></div>
@@ -1109,7 +1110,7 @@ pre {
   <div style="max-width:800px" id="abstract">
     <!-- <h2 id="introduction">Introduction</h2> -->
     <p>
-      Nowadays, machine learning (ML) is widespread.  In this field, one of the most popular machine learning model type is tree-based models.  As evidence, a recent survey of data scientists and researchers found that tree models were both the second and third most popular class of method, beaten only by Logistic Regression (Figure 1).  Although small tree models can be interpretable <d-cite bibtex-key="rudin2019stop"></d-cite>, most tree models are generally large and hard for humans to interpret.  
+      Nowadays, machine learning (ML) is widespread.  In this field, one of the most popular machine learning model types is tree-based models.  As evidence, a recent survey of data scientists and researchers found that tree models were both the second and third most popular class of method, beaten only by Logistic Regression (Figure 1).  Although small tree models can be interpretable <d-cite bibtex-key="rudin2019stop"></d-cite>, most tree models are generally large and hard for humans to interpret.  
     </p>
 
   <!-- Figure 1 -->
@@ -1129,7 +1130,7 @@ pre {
     <i>What is the goal of this article?</i> 
 
     <p>
-    Given that there is a long history of model explanations going awry when users do not understand what an explanation means (e.g., p-values for linear models <d-cite bibtex-key="schervish1996p"></d-cite>), it is critical to have a broadly accessible explanation of SHAP values and how they are obtained for tree models to ensure that they are not misused.  To this end, we aim to provide an easy to understand answer to two questions: 1.) What are SHAP values?  2.) How can we obtain SHAP values for trees?  In particular, we focus on explaining an algorithm to explain trees that is widely used in the popular SHAP package called Interventional Tree Explainer <d-cite bibtex-key="lundberg2020local"></d-cite>.
+    Given that there is a long history of model explanations going awry when users do not understand what an explanation means (e.g., p-values for linear models <d-cite bibtex-key="schervish1996p"></d-cite>), it is critical to have a broadly accessible explanation of SHAP values and how they are obtained for tree models to ensure that they are not misused.  To this end, we aim to provide an easy to understand answer to two questions: 1.) What are SHAP values?  2.) How can we obtain SHAP values for trees?  In particular, we focus on explaining an algorithm to explain trees in the popular SHAP package called Interventional Tree Explainer (the algorithm was first described and empirically evaluated in <d-cite bibtex-key="lundberg2020local"></d-cite>).
   </p>
   </div>
 
@@ -1266,7 +1267,7 @@ pre {
           $$
             \sum_{i\in N} \phi_i(v)=v(N)-v(\{\})
           $$
-        <li>Consistency/Monotonicity: If an employee \(i\) always increases company \(v_1\)'s profit more than they would company \(v_2\) for all teams of other employees, then \(i\)'s attribution for \(v_1\) should be greater than or equal to their attribution in \(v_2\):</li>
+        <li>Consistency/Monotonicity: If an employee \(i\) always increases company \(v_1\)'s profit more than they would company \(v_2\) for all possible teams of employees, then \(i\)'s attribution for \(v_1\) should be greater than or equal to their attribution in \(v_2\):</li>
           $$
           v_1(S\cup {i})-v_1(S)\geq v_2(S\cup {i})-v_2(S) \forall S \implies \phi_i(v_1)\geq \phi_i(v_2)
           $$
@@ -1294,7 +1295,7 @@ pre {
     </p>
 
     <p>
-      First, to address the presence of a feature, our goal is to obtain <i>local feature attributions</i><d-footnote>As opposed to a <i>global feature attributions</i> that aims to assign per-feature importance for the model as a whole.</d-footnote>: a vector of importance for each feature of a model prediction for a specific sample \(x^f\) (explicand <d-footnote>The sample being explained.</d-footnote>).  Then, if feature \(i\) is present, we can simply set that feature to be from the explicand \(x_i^f\). The next step is to address the absence of a feature which can be done in many ways.
+      First, to address the presence of a feature, our goal is to obtain <i>local feature attributions</i><d-footnote>As opposed to a <i>global feature attribution</i> that aims to assign per-feature importance for the model as a whole.</d-footnote>: a vector of importance for each feature of a model prediction for a specific sample \(x^f\) (explicand <d-footnote>The sample being explained.</d-footnote>).  Then, if feature \(i\) is present, we can simply set that feature to be from the explicand \(x_i^f\). The next step is to address the absence of a feature which can be done in many ways.
     </p>
 
   <h3 id="masking_missing">1.3 Masking missing features</h3>
@@ -1307,7 +1308,7 @@ pre {
     </p>
 
     <p>
-      This specific adaptation of Shapley values to machine learning models is called Baseline Shapley, and were shown to be a unique solution to attribution methods with a single baseline based on cost-sharing literature <d-cite bibtex-key="sundararajan2019many"></d-cite>.  However, the choice of the baseline is a complicated one, and many different baselines have been considered including an all-zeros baseline, an average across features, a uniformly distributed baseline, and more. (<d-cite bibtex-key="sundararajan2017axiomatic"></d-cite>, <d-cite bibtex-key="shrikumar2017learning"></d-cite>, <d-cite bibtex-key="sturmfels2020visualizing"></d-cite>) <d-footnote>For an in-depth discussion of this concept and a comparison of several baselines for Aumann-Shapley values applied to explaining images see <d-cite bibtex-key="sturmfels2020visualizing"></d-cite>.</d-footnote>.
+      This specific adaptation of Shapley values to machine learning models is called Baseline Shapley, and were shown to be a unique solution to attribution methods with a single baseline based on cost-sharing literature <d-cite bibtex-key="sundararajan2019many"></d-cite>.  However, the choice of the baseline is a complicated one, and many different baselines have been considered including an all-zeros baseline, an average across features, a uniformly distributed baseline, and more (<d-cite bibtex-key="sundararajan2017axiomatic"></d-cite>, <d-cite bibtex-key="shrikumar2017learning"></d-cite>, <d-cite bibtex-key="fong2017interpretable"></d-cite>, <d-cite bibtex-key="sturmfels2020visualizing"></d-cite>) <d-footnote>For an in-depth discussion of this concept and a comparison of several baselines for Aumann-Shapley values applied to explaining images see <d-cite bibtex-key="sturmfels2020visualizing"></d-cite>.</d-footnote>.
     </p>
 
 
@@ -1448,11 +1449,11 @@ pre {
 
 
     <p>
-      One criticism of this method is that the choice of baseline is very influential to the resulting feature attributions.  In <a href="#single_baselines_bad" class="figure-number">3</a>, we can see that the choice of baseline heavily influences the resulting attribution value.
+      One criticism of Baseline Shapley is that the choice of baseline is very influential to the resulting feature attributions.  In <a href="#single_baselines_bad" class="figure-number">3</a>, we can see that the choice of baseline heavily influences the resulting attribution value.
     </p>
 
     <p>
-      <a href="#single_baselines_bad" class="figure-number">3b</a> is the all-zeros baseline.  In this case, it appears that height and weight are quite important, however being male is not important at all.  This is a bit counter-intuitive, because relative to being female, being male reduces the prediction for this individual.  Put another way, we can consider a new model where \(x_3\) is 0 for female, rather than 1 for female.  Then, an equivalent model would be \(y=2x_1-x_2-10x_3+10\).  In this case, using the same zero-baseline gives an attribution value of 10 instead of 0 for being male for the exact same model.  Since the meaning of zero is often arbitrary for different variables, selecting it as your baseline can result in misleading attributions.
+      <a href="#single_baselines_bad" class="figure-number">3b</a> is the all-zeros baseline.  In this case, it appears that height and weight are quite important, however being male is not important at all.  This is a bit counter-intuitive, because relative to being female, being male reduces the prediction for this individual.  Put another way, we can consider a new model where \(x_3\) is 0 for female, rather than 1 for female.  Then, an equivalent model would be \(y=2x_1-x_2-10x_3+10\).  In this case, using the same zero-baseline gives an attribution value of -10 instead of 0 for being male for the exact same model.  Since the meaning of zero is often arbitrary for different variables, selecting it as your baseline can result in misleading attributions.
     </p>
 
     <p>
@@ -1466,14 +1467,14 @@ pre {
     <h3 id="shap_conditional_distribution">1.4 Imputing missing features by conditioning</h3>
 
     <p>
-		The most natural approach to incorporate a background distribution is with conditional expectations.  Instead of simply replacing "missing" features with a fixed value, we condition on the set of features that are "present" as if we know them and use those to guess at the "missing" features.  If we define \(D\) to be the background (underlying) distribution our samples are drawn from, the value of the game is:
+		One natural approach to incorporate a background distribution to the set function is with a conditional expectation.  Instead of simply replacing "missing" features with a fixed value, we condition on the set of features that are "present" as if we know them and use those to guess at the "missing" features.  If we define \(D\) to be the background (underlying) distribution our samples are drawn from, the value of the game is:
     	$$
 		  v(S)=\mathbb{E}_D[f(x)|x_{S}]
     	$$
     </p>
 
     <p>
-    	One caveat is that getting this conditional expectation for actual data is very difficult.  Furthermore, even if you do manage to do so, the resulting explanations can end up having undesirable characteristics (more on this later).  Because our goal is just explain the model itself, an arguably more natural approach is to use causal inference's <i>interventional conditional expectation</i>:
+    	One caveat is that getting this conditional expectation for actual data is very difficult.  Furthermore, even if you do manage to do so, the resulting explanations can end up having undesirable characteristics (more on this later).  Because our goal is just to explain the model itself, an arguably more natural approach is to use causal inference's <i>interventional conditional expectation</i>:
     	$$
     	v(S)=\mathbb{E}_D[f(x)|\text{do}(x_{S})]
     	$$
@@ -1640,46 +1641,50 @@ pre {
     In general, computing the conditional expectation SHAP value is difficult; however, for a multivariate normal distribution the conditional expectation is easy to calculate.  In addition, for a linear function the conditional expectation of the function equals the function applied to the conditional expectation (\(E[f(x)|x_S]=f(E[x|x_S])\)<d-footnote>Note that this is not generally true.  Only for affine functions.</d-footnote>).  
   </p>
 
+  <!-- Proof -->
+  <div">
+    <p><a onclick="hideshow('proof_linearmodel')"><strong>+ Technical details</strong></a></p>
+
+    <div id="proof_linearmodel", style="display:none">
+      <p>
+        Computing SHAP values for a linear model is much easier than for other model classes <d-footnote>Note that we assume features have zero mean in the following calculations.</d-footnote>.  This is how we compute them for <a href="#linear_shap_ex" class="figure-number">4</a>.
+      </p>
+
+      <p>
+        First, to compute Interventional Conditional Expectation (ICE) SHAP values for a linear model, we can start with:
+        $$
+        \begin{aligned}
+        \phi_i(f,x)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(x)|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[f(x)|do(x_{S})])\\
+        &=\sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[\beta x|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[\beta x|do(x_{S})])\\
+        &=\sum_{S\in C } W(|S|,|N|) \beta (\mathbb{E}_{D}[x|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[x|do(x_{S})])\\
+        &=\sum_{S\in C } W(|S|,|N|) \beta_i x^f_i\\ 
+        &= \beta_i x^f_i\\ 
+        \end{aligned}
+          $$
+          Note that \(\sum_{S\in C } W(|S|,|N|)=1\).
+    </p>
+
+      <p>
+        Second, to compute Conditional Expectation (CE) SHAP values for a linear model, we assume the background distribution \(D\) is multivariate normal with zero mean and covariance \(C\), we can start with:
+        $$
+        \begin{aligned}
+        \phi_i(f,x)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(x)|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[f(x)|x_{S}])\\
+        &= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[\beta x|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[\beta x|x_{S}])\\
+        &= \sum_{S\in C } W(|S|,|N|)\beta (\mathbb{E}_{D}[x|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[x|x_{S}])\\
+        \end{aligned}
+        $$
+        Here, we know that \(\mathbb{E}_{D}[x|x_{S}])=C_{N\setminus S,S} C_{S,S}^{-1} x_{S}\).
+      </p>
+      <hr style="margin-top:0px;margin-bottom:20px;">
+    </div>
+
   <p>
-    In <a href="#linear_shap_ex" class="figure-number">4</a> we highlight tradeoffs between the conditional expectation and the interventional conditional expectation for a linear model.  Comparing Preset A to Preset B, we can see that the correlation between variables will cause the CE SHAP values to be split between correlated variables.  Although this may be desirable at times<d-footnote>For example, if we are interested in detecting whether a model is secretly using a confounding variable, we may want CE SHAP values.</d-footnote>, it can feel somewhat unnatural as in Preset D, where feature \(x_4\) is as important as feature \(x_3\) despite not being used in the model.  Although both CE SHAP values and ICE SHAP values are meaningful, we focus on ICE SHAP values because they are tractable to compute and explain what the model is doing, rather than how features in the data relate to each other.
+    In <a href="#linear_shap_ex" class="figure-number">4</a> we highlight tradeoffs between the conditional expectation and the interventional conditional expectation for a linear model.  Comparing A to B, we can see that the correlation between variables will cause the CE SHAP values to be split between correlated variables.  Although this may be desirable at times<d-footnote>For example, if we are interested in detecting whether a model is secretly using a confounding variable, we may want CE SHAP values.</d-footnote>, it can feel somewhat unnatural as in D, where feature \(x_4\) is as important as feature \(x_3\) despite not being used in the model.
   </p>
 
-
-	<!-- Proof -->
-	<div">
-		<p><a onclick="hideshow('proof_linearmodel')"><strong>+ Technical details</strong></a></p>
-
-		<div id="proof_linearmodel", style="display:none">
-	    <p>
-	    	Computing SHAP values for a linear model is much easier than for other model classes <d-footnote>Note that we assume features have zero mean in the following calculations.</d-footnote>.  This is how we compute them for <a href="#linear_shap_ex" class="figure-number">4</a>.
-	    </p>
-
-	    <p>
-	    	First, to compute Interventional Conditional Expectation (ICE) SHAP values for a linear model, we can start with:
-  			$$
-  			\begin{aligned}
-  			\phi_i(f,x)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(x)|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[f(x)|do(x_{S})])\\
-  			&=\sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[\beta x|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[\beta x|do(x_{S})])\\
-  			&=\sum_{S\in C } W(|S|,|N|) \beta (\mathbb{E}_{D}[x|do(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[x|do(x_{S})])\\
-  			&=\sum_{S\in C } W(|S|,|N|) \beta_i x^f_i\\ 
-  			&= \beta_i x^f_i\\ 
-  			\end{aligned}
-        	$$
-        	Note that \(\sum_{S\in C } W(|S|,|N|)=1\).
-		</p>
-
-	    <p>
-	    	Second, to compute Conditional Expectation (CE) SHAP values for a linear model, we assume the background distribution \(D\) is multivariate normal with zero mean and covariance \(C\), we can start with:
-  			$$
-  			\begin{aligned}
-  			\phi_i(f,x)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(x)|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[f(x)|x_{S}])\\
-  			&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[\beta x|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[\beta x|x_{S}])\\
-  			&= \sum_{S\in C } W(|S|,|N|)\beta (\mathbb{E}_{D}[x|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[x|x_{S}])\\
-  			\end{aligned}
-  			$$
-  			Here, we know that \(\mathbb{E}_{D}[x|x_{S}])=C_{N\setminus S,S} C_{S,S}^{-1} x_{S}\).
-		  </p>
-    </div>
+    <p>
+      Although both CE SHAP values and ICE SHAP values are meaningful, we will focus on ICE SHAP values moving forward because they are tractable to compute and explain what the model is doing, rather than how features in the data relate to each other.
+    </p>
 
 	</div>
 
@@ -1687,11 +1692,11 @@ pre {
     <h3 id="background_distribution">1.5 Single reference SHAP values</h3>
 
 	<p>
-		As we saw earlier, to compute \(\phi_i(f,x^f)\) we evaluate the interventional conditional expectation.  However, this depends on a <i>background distribution</i> \(D\) that foreground sample will be compared to.  
+		To compute \(\phi_i(f,x^f)\) we evaluate the interventional conditional expectation.  However, this depends on a <i>background distribution</i> \(D\) that the foreground sample will be compared to.  
 	</p>
 
 	<p>
-		One natural definition of the background distribution is a uniform distribution over a population sample.  For instance, in machine learning, you could assign equal probability to every sample in your training set.  With this background distribution, we can re-write the SHAP value as an average of <i>single reference SHAP values</i> (which are analogous to <a href="masking_missing">Section 1.3</a> where missing features are masked) <d-cite bibtex-key="chen2019explaining"></d-cite>:
+		One natural definition of the background distribution is a uniform distribution over a population sample.  For instance, in machine learning, you could assign equal probability to every sample in your training set.  With this background distribution, we can re-write the SHAP value as an average of <i>single reference SHAP values</i> (which are analogous to <a href="#masking_missing">masking missing features</a>) <d-cite bibtex-key="chen2019explaining"></d-cite>:
 		$$
 		\phi_i(f,x^f)=\frac{1}{|D|}\sum_{x^b\in D}\phi_i(f,x^f,x^b)
 		$$
@@ -1721,8 +1726,8 @@ pre {
 				\end{aligned}
 				$$
 			</p>
-
 		</div>
+    <hr style="margin-top:0px;margin-bottom:20px;">
 	</div>
 
 	<p>
@@ -1843,7 +1848,7 @@ pre {
     	\phi_i(f,x^f,x^b)=\sum_{S\subseteq N\setminus\{i\}} \underbrace{W(|S|,|N|)}_{W}\underbrace{f(h^{S\cup \{i\}})}_{\text{\textcolor{green}{Pos} term}} {-} \underbrace{f(h^S)}_{\text{\textcolor{red}{Neg} term}})
     	$$
 
-    	The pseudocode and the computation for a specific example is then:
+    	The algorithm is then fairly straightforward:
     </p>
 
   <figure id="brute_force_ex" style="margin-bottom: 0px">
@@ -2044,7 +2049,7 @@ pre {
   </p>
 
   <p>
-    For a given path \(P\), we define \(N_P\) to be the unique features encountered and \(S_P\) to be the unique features that came from \(x^f\).  Finally, define \(v\) to be the value of the path's leaf.  Then, the attribution of the path is:
+    For a given path \(P\), we define \(N_P\) to be the unique features in the path and \(S_P\) to be the unique features in the path that came from \(x^f\).  Finally, define \(v\) to be the value of the path's leaf.  Then, the attribution of the path is:
 
   	$$
 		\phi_i^P(f,x^f,x^b)=
@@ -2060,8 +2065,13 @@ pre {
 	<p><a onclick="hideshow('naive_alg_proof')"><strong>+ Technical Details</strong></a></p>
 	<div id="naive_alg_proof", style="display:none">
 		<p>
-			<i>Sketch of proof</i>: If we treat each path in the tree from the root to the leaf as a separate model \(f'(x)\) that returns the value of the leaf if that path is traversed by \(x^f\) or zero otherwise, then we have \(L\) models that operate on disjoint parts of the input space.  Then, \(f(x)=\sum f'(x)\) and by the additivity of SHAP values, \(\phi_i(f,x^f,x^b)=\sum_f\phi_i(f',x^f,x^b)\).  Then, we can simply calculate \(\phi_i\) for each path model.  Since the path model is zero everywhere except for the associated path, we can arrive to the solution in Theorem 1.
+			<i>Sketch of proof</i>: Treat each path \(P\) in the tree from the root to each leaf as a separate model \(f^P(x)\) that returns the value of the leaf if that path is traversed by \(x\) or zero otherwise.  This results in (\(\text{\# leaf nodes}\)) models that operate on disjoint parts of the input space, implying that our original model is equal to the summation of all of these path models:
+      $$f(x)=\sum_P f^P(x)$$ 
+      By the additivity of SHAP values, 
+      $$\phi_i(f,x^f,x^b)=\sum_P\phi_i(f^P,x^f,x^b)$$  
+      Then, we can simply calculate \(\phi_i\) for each path model.  Since the path model is zero everywhere except for the associated path, we arrive to the solution in Theorem 1.
 		</p>
+    <hr style="margin-top:0px;margin-bottom:20px;">
 	</div>
 
 	<p>
@@ -2594,7 +2604,7 @@ pre {
 		$$
 	</p>
 
-	<h3>Final considerations:</h3>
+	<h3 id="final_considerations">2.4 Final considerations</h3>
 
     <p>
 		<strong>Background distribution:</strong> Finally, our original goal was to compute \(\phi_i(f,x^f)\).  In order to do so, we compute \(\phi_i(f,x^f,x^b)\) for many references \(x^b\), resulting in a run time of:
@@ -2617,37 +2627,32 @@ pre {
 
   	<hr>
 
-    <h2 id="related_work">Related Work</h3>
+    <h2 id="related_work">Related Work</h2>
+
+    <h3 id="related_work">Methods in the SHAP package</h3>
 
     <p>
-    	It should be noted that there are a number of alternative methods that aim to approximate SHAP values: Path Dependent Tree Explainer, Kernel Explainer, and Sampling Explainer.  If you are explaining tree-based models, it may not be clear which one you should use.  In this article we briefly overview the methods and compare them to ITE:
+    	It should be noted that there are a number of alternative methods that aim to approximate SHAP values.  A few of these methods include: <i>Sampling Explainer</i>, <i>Kernel Explainer</i>, and <i>Path Dependent Tree Explainer</i>.  If you are explaining tree-based models, it may not be clear which one you should use.  In this article we briefly overview a few of these the methods and compare them to ITE.
 	</p>
 
     <p>
-    	<ul>
-    		<li class="no-space">Path Dependent Tree Explainer (PDTE): </li>
-    		<ul>
-    			<li class="no-space">Like ITE, PDTE is also meant to obtain SHAP values for tree models.</li> 
-				<li class="no-space">PDTE approximates the interventional conditional expectation based on how many training samples went down paths in the tree, whereas ITE computes it exactly.</li>
-				<li class="no-space">The computational complexity is \(O((\text{\# leaf nodes})\times (\text{tree depth})^2)\).  In practice, PDTE can be faster than ITE, although it may depend on the number of references or the tree depth.</li>
-    		</ul>
-    		<li class="no-space">Sampling Explainer:</li>
-    		<ul>
-    			<li class="no-space">A model agnostic approach to obtain SHAP values.</li>
-    			<li class="no-space">An extension of Interactions-based Method for Explanation (IME) <d-cite bibtex-key="kononenko2010efficient"></d-cite>.</li> 
-    			<li class="no-space">This approach is sampling based and converges to the SHAP values ITE obtains, but in practice is much slower than ITE.</li>
-    		</ul>    		
-    		<li class="no-space">Kernel Explainer <d-cite bibtex-key="lundberg2017unified"></d-cite>:</li>
-    		<ul>
-    			<li class="no-space">A model agnostic approach to obtain SHAP values.</li>
-    			<li class="no-space">An extension of Local Interpretable Model-agnostic Explanations (LIME) <d-cite bibtex-key="ribeiro2016should"></d-cite>.</li> 
-    			<li class="no-space">This approach is sampling based and converges to the SHAP values ITE obtains, but in practice is much slower than ITE.</li>
-    		</ul>
-    	</ul>
-	</p>
+      First, there are two model agnostic explanation methods in the SHAP package.  The first is <i>Sampling Explainer</i> which is an implementation of Interactions-based Method for Explanation (IME) <d-cite bibtex-key="kononenko2010efficient"></d-cite>.  This approach is based on sampling from all possible sets in order to estimate ICE SHAP values.  The second is <i>Kernel Explainer</i> which is an extension of Local Interpretable Model-agnostic Explanations (LIME) <d-cite bibtex-key="ribeiro2016should"></d-cite> to estimate ICE SHAP values.  Both <i>Sampling Explainer</i> and <i>Kernel Explainer</i> are sampling based approaches that will converge to the same SHAP values ITE obtains.  However, ITE is much faster in practice because it leverages the structure of the tree.
+    </p>
 
     <p>
-		For an in-depth empirical comparison of some of these methods, please refer to <d-cite bibtex-key="lundberg2020local"></d-cite>.
+      Second, in the SHAP package there is a method named <i>Path Dependent Tree Explainer (PDTE)</i> that is meant to obtain SHAP values for tree models specifically.  <i>PDTE</i> approximates the interventional conditional expectation based on how many training samples went down paths in the tree, whereas ITE computes it exactly.  The computational complexity of <i>PDTE</i> is \(O((\text{\# leaf nodes})\times (\text{tree depth})^2)\).  In practice, <i>PDTE</i> can be faster than ITE, although it may depend on the number of references or the tree depth.  The tradeoff is that the attribution values estimated by <i>PDTE</i> are biased and do not give the ICE SHAP values.
+	</p>
+
+  <h3>A few other methods to explain trees</h3>
+
+  <p>
+    Two pre-existing methods to explain trees include <i>Gain (Gini Importance)</i> <d-cite bibtex-key="breiman_1984"></d-cite> and <i>Saabas</i> <d-cite bibtex-key="andosa_2019"></d-cite>.  Both methods consider a single ordering of the features (as opposed to all possible orderings) specified by the tree they are explaining.  Note that for an infinite ensemble of fully developed totally randomized trees <d-footnote>Where a fully developed totally randomized tree is a decision tree where each node \(n\) is partitioned using a variable \(x_i\) picked uniformly at random among those not yet used upstream of \(n\), each node \(n\) has one child for each possible value of \(x_i\), and the construction of these trees is complete only when all variables have been used.</d-footnote> and an infinitely large training sample, <i>Gain</i> is the mutual information between covariates and the outcome <d-cite bibtex-key="louppe2014understanding"></d-cite> and Saabas gives the SHAP values <d-cite bibtex-key="lundberg2020local"></d-cite>.  However, in practice trees are constructed greedily and both methods fail to satisfy the consistency axiom because they only consider a single ordering of the features.
+  </p>
+
+  <h3>Empirical evaluation</h3>
+
+  <p>
+		In this article we do not empirically evaluate these methods, because evaluating interpretability methods is a subjective problem.  Instead, we identify a way of assigning credit that comes equipped with a set of desirable properties (i.e., Shapley values) and show how to compute them exactly for trees with a tractable algorithm.  This means that the credit allocation we obtain comes built in with many of the desirable properties that ablation tests aim to measure (e.g., consistency).  That being said, <d-cite bibtex-key="lundberg2020local"></d-cite> provides an in-depth empirical comparison of many of these methods using a variety of ablation tests.
 	</p>	
 
     <h2 id="references">Acknowledgements</h2>
