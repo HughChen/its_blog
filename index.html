@@ -1673,7 +1673,7 @@ pre {
         &= \sum_{S\in C } W(|S|,|N|)\beta (\mathbb{E}_{D}[x|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[x|x_{S}])\\
         \end{aligned}
         $$
-        Here, we know that \(\mathbb{E}_{D}[x|x_{S}])=C_{N\setminus S,S} C_{S,S}^{-1} x_{S}\).
+        Here, we know that \(\mathbb{E}_{D}[x|x_{S}]=C_{N\setminus S,S} C_{S,S}^{-1} x_{S}\).
       </p>
       <hr style="margin-top:0px;margin-bottom:20px;">
     </div>
@@ -1985,22 +1985,22 @@ pre {
             for each set S in powerset(setminus(N,i)):
       </dt-code>
       <dt-code id="bf_5" block="" language="python">
-              hs  = [xf[j] for j in N if j in S else xb[j]] // Hybrid samples
+              hs  = [xf[j] for j in N if j in S else xb[j]] # Hybrid samples
       </dt-code>
       <dt-code id="bf_6" block="" language="python">
               hsi = [xf[j] for j in N if j in union(S,i) else xb[j]]
       </dt-code>
       <dt-code id="bf_7" block="" language="python">
-              fxs  = T.predict(hs) // Predictions
+              fxs  = T.predict(hs) # Predictions
       </dt-code>
       <dt-code id="bf_8" block="" language="python">
               fxsi = T.predict(hsi)
       </dt-code>
       <dt-code id="bf_9" block="" language="python">
-              W = (len(S)!*(len(N)-len(S)-1)!)/(len(N)!) // Weight
+              W = (len(S)!*(len(N)-len(S)-1)!)/(len(N)!) # Weight
       </dt-code>
       <dt-code id="bf_10" block="" language="python">
-              phi[i] += W*(fxsi-fxs) // Calculate phi contribution
+              phi[i] += W*(fxsi-fxs) # Calculate phi contribution
       </dt-code>
     </div>
 
@@ -2197,7 +2197,7 @@ pre {
           def recurse(node n, list np, list sp):
         </dt-code>
         <dt-code id="naivecode_4" class="indent2" block="" language="python">
-            // Case 1: Leaf
+            # Case 1: Leaf
         </dt-code>
         <dt-code id="naivecode_5" class="indent2" block="" language="python">
             if n.is_leaf: [Theorem 1]
@@ -2218,7 +2218,7 @@ pre {
                   phi[i] -= W(len(sp),len(np)) 
         </dt-code>
         <dt-code id="naivecode_11" class="indent2" block="" language="python">
-            // Find children associated with xf and xb
+            # Find children associated with xf and xb
         </dt-code>
         <dt-code id="naivecode_12" class="indent2" block="" language="python">
             xf_child = n.left if xf[n.feat] < n.thres else n.right
@@ -2228,7 +2228,7 @@ pre {
 
         </dt-code>
         <dt-code id="naivecode_14" class="indent2" block="" language="python">
-            // Case 2: Feature encountered before
+            # Case 2: Feature encountered before
         </dt-code>
         <dt-code id="naivecode_15" class="indent2" block="" language="python">
             if n.feat in np:
@@ -2247,7 +2247,7 @@ pre {
 
         </dt-code>
         <dt-code id="naivecode_20" class="indent2" block="" language="python">
-            // Case 3: xf and xb go the same way
+            # Case 3: xf and xb go the same way
         </dt-code>
         <dt-code id="naivecode_21" class="indent2" block="" language="python">
             if xf_child == xb_child:
@@ -2257,7 +2257,7 @@ pre {
 
         </dt-code>
         <dt-code id="naivecode_23" class="indent2" block="" language="python">
-            // Case 4: xf and xb don't go the same way
+            # Case 4: xf and xb don't go the same way
         </dt-code>
         <dt-code id="naivecode_24" class="indent2" block="" language="python">
             if not xf_child != xb_child:
@@ -2389,7 +2389,7 @@ pre {
 			</tr>
 		</table>
 
-    <figcaption><a href="#collapsibility_fig" class="figure-number">10</a> Example to illustrate collapsibility for features.  Green paths are associated with \(\textcolor{green}{x}\) and red paths are \(\textcolor{red}{x^b}\)</figcaption>
+    <figcaption><a href="#collapsibility_fig" class="figure-number">10</a> Example to illustrate collapsibility for features.  Green paths are associated with \(\textcolor{green}{x^f}\) and red paths are \(\textcolor{red}{x^b}\)</figcaption>
 	</figure>
 
 
@@ -2499,7 +2499,7 @@ pre {
               def recurse(node n, int nc, int sc, array fseen, array bseen):
             </dt-code>
             <dt-code id="dynamiccode_4" class="indent2" block="" language="python">
-                // Case 1: Leaf
+                # Case 1: Leaf
             </dt-code>
             <dt-code id="dynamiccode_5" class="indent2" block="" language="python">
                 if n.is_leaf:
@@ -2512,7 +2512,7 @@ pre {
             </dt-code>
 
             <dt-code id="dynamiccode_8" class="indent2" block="" language="python">
-                // Find children associated with xf and xb
+                # Find children associated with xf and xb
             </dt-code>
             <dt-code id="dynamiccode_9" class="indent2" block="" language="python">
                 xf_child = n.left if xf[n.feat] < n.thres else n.right
@@ -2521,7 +2521,7 @@ pre {
                 xb_child = n.left if xb[n.feat] < n.thres else n.right
             </dt-code>
             <dt-code id="dynamiccode_11" class="indent2" block="" language="python">
-                // Case 2: Feature encountered before
+                # Case 2: Feature encountered before
             </dt-code>
             <dt-code id="dynamiccode_12" class="indent2" block="" language="python">
                 if fseen[n.feat] > 0:
@@ -2537,7 +2537,7 @@ pre {
             </dt-code>
 
             <dt-code id="dynamiccode_16" class="indent2" block="" language="python">
-                // Case 3: xf and xb go the same way
+                # Case 3: xf and xb go the same way
             </dt-code>
             <dt-code id="dynamiccode_17" class="indent2" block="" language="python">
                 if xf_child == xb_child:
@@ -2546,7 +2546,7 @@ pre {
                   return(recurse(xb_child,nc,sc,fseen,bseen))
             </dt-code>
             <dt-code id="dynamiccode_19" class="indent2" block="" language="python">
-                // Case 4: xf and xb don't go the same way
+                # Case 4: xf and xb don't go the same way
             </dt-code>
             <dt-code id="dynamiccode_20" class="indent2" block="" language="python">
                 if xf_child != xb_child:
