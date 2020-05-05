@@ -1702,7 +1702,7 @@ pre {
 		$$
 		This is in part because the interventional conditional expectation has a very natural definition when the background distribution is a single sample \(x^b\) (\(D_{x^b}\)):
 		$$
-		\mathbb{E}_{D_{x^b}}[f(x^f)|\text{do}(x_{S})]=h^S\text{, where } h^S_i = x^f_i\text{ if }i\in S\text{, }x^b_i\text{ otherwise}
+		\mathbb{E}_{D_{x^b}}[f(x^f)|\text{do}(x_{S})]=f(h^S)\text{, where } h^S_i = x^f_i\text{ if }i\in S\text{, }x^b_i\text{ otherwise}
 		$$
 		In words, the interventional conditional expectation for a single baseline is the model prediction for a hybrid sample where the features in \(S\) are from the explicand and the remaining features are from baseline.  This is as if <i>we intervene on features in the foreground sample with features from the background sample</i>.  This should look very familiar, as it is equivalent to obtaining the SHAP value by treating a sample in the background distribution as a baseline and masking (<a href="#masking_missing">Section 1.3</a>).
 	</p>  
@@ -1845,7 +1845,7 @@ pre {
     	Based on the proof in <a href="#background_distribution">Section 1.5</a>, the brute force approach would be to compute the following:
 
     	$$
-    	\phi_i(f,x^f,x^b)=\sum_{S\subseteq N\setminus\{i\}} \underbrace{W(|S|,|N|)}_{W}\underbrace{f(h^{S\cup \{i\}})}_{\text{\textcolor{green}{Pos} term}} {-} \underbrace{f(h^S)}_{\text{\textcolor{red}{Neg} term}})
+    	\phi_i(f,x^f,x^b)=\sum_{S\subseteq N\setminus\{i\}} \underbrace{W(|S|,|N|)}_{W}(\underbrace{f(h^{S\cup \{i\}})}_{\text{\textcolor{green}{Pos} term}} {-} \underbrace{f(h^S)}_{\text{\textcolor{red}{Neg} term}})
     	$$
 
     	The algorithm is then fairly straightforward:
@@ -2209,13 +2209,13 @@ pre {
                 if i in sp:
         </dt-code>
         <dt-code id="naivecode_8" class="indent5" block="" language="python">
-                  phi[i] += W(len(sp)-1,len(np)) 
+                  phi[i] += W(len(sp)-1,len(np))*n.value
         </dt-code>
         <dt-code id="naivecode_9" class="indent4" block="" language="python">
                 elif:
         </dt-code>
         <dt-code id="naivecode_10" class="indent5" block="" language="python">
-                  phi[i] -= W(len(sp),len(np)) 
+                  phi[i] -= W(len(sp),len(np))*n.value
         </dt-code>
         <dt-code id="naivecode_11" class="indent2" block="" language="python">
             # Find children associated with xf and xb
