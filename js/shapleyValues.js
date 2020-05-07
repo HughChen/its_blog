@@ -46,22 +46,6 @@ function ex1_presetB() {
 
 function ex1_presetC() {
 	ex1_set_preset("ex1_preset","C");
-	for (var i = 0; i < slider_elements.length; i++) {
-		var s = document.getElementById(slider_elements[i])
-		if (i == 0) {
-			s.value = 0;
-		} else {
-			s.value = i-1;
-		}
-		s.oninput();
-		s.onchange();
-		var text = document.getElementById("ex1_preset_text");
-		text.innerHTML = 'Increasing set function.';
-	}
-}
-
-function ex1_presetD() {
-	ex1_set_preset("ex1_preset","D");
 	values = [0,5,1,1,6,6,2,7];
 	for (var i = 0; i < slider_elements.length; i++) {
 		var s = document.getElementById(slider_elements[i])
@@ -70,6 +54,19 @@ function ex1_presetD() {
 		s.onchange();
 		var text = document.getElementById("ex1_preset_text");
 		text.innerHTML = 'Ava the superstar.';
+	}
+}
+
+function ex1_presetD() {
+	ex1_set_preset("ex1_preset","D");
+	values = [0,0,1,1,1,1,2,2];
+	for (var i = 0; i < slider_elements.length; i++) {
+		var s = document.getElementById(slider_elements[i])
+		s.value = values[i];
+		s.oninput();
+		s.onchange();
+		var text = document.getElementById("ex1_preset_text");
+		text.innerHTML = 'Ava the small potato.';
 	}
 }
 
