@@ -1073,9 +1073,7 @@ pre {
   <d-title>
     <h1 id="top">Understanding Shapley value explanation algorithms for trees</h1>
       <p style="font-size: 150%;">Game theoretic Shapley values have recently become a popular way to explain the predictions of tree-based machine learning models. This rise in popularity was made possible by new efficient algorithms. Here we examine how these algorithms work, and how they solve what is in general an NP-hard problem in linear time for trees.</p>
-      <img
-        src="./images/trees.jpg"
-        style='grid-column: text; width: 100%; padding-top: 20px; padding-bottom:20px;' />
+      <img src="./images/trees.jpg" alt="trees" style='grid-column: text; width: 100%; padding-top: 20px; padding-bottom:20px;'/>
   </d-title>
   <d-byline></d-byline>
 
@@ -1295,22 +1293,24 @@ pre {
     <p>
       Shapley values are an excellent way to give credit to individuals in a coalitional game.  In fact, they are known to be a unique solution to spreading credit as defined by the following three desirable properties <d-cite bibtex-key="young1985monotonic"></d-cite> (all of which hold for any coalitional game, as can be seen in <a href="#shapley_value_ex" class="figure-number">2</a>):
       <ul>
-        <li>Local Accuracy/Efficiency<d-footnote>This property suggests that the units associated with the Shapley values are in terms of the coalitional game.  For instance, when we adapt them to explain machine learning models, the explanation will be in units that correspond to the model's output (e.g., probability space, etc.) </d-footnote>: The sum of Shapley values for all employees adds up to the profit with all employees minus the profit with no employees (<a href="#shapley_value_ex" class="figure-number">2A-2D</a>):</li>
+        <li>Local Accuracy/Efficiency<d-footnote>This property suggests that the units associated with the Shapley values are in terms of the coalitional game.  For instance, when we adapt them to explain machine learning models, the explanation will be in units that correspond to the model's output (e.g., probability space, etc.) </d-footnote>: The sum of Shapley values for all employees adds up to the profit with all employees minus the profit with no employees (<a href="#shapley_value_ex" class="figure-number">2A-2D</a>):
           $$
             \sum_{i\in N} \phi_i(v)=v(N)-v(\{\})
           $$
-        <li>Consistency/Monotonicity<d-footnote>This property is particularly important and implies that the Shapley values for features are ordered appropriately.</d-footnote>: If an employee \(i\) always increases company \(v_1\)'s profit more than they would company \(v_2\) for all possible teams of employees, then \(i\)'s attribution for \(v_1\) should be greater than or equal to their attribution in \(v_2\) (<a href="#shapley_value_ex" class="figure-number">2C</a> vs. <a href="#shapley_value_ex" class="figure-number">2B</a>):</li>
+        </li>
+        <li>Consistency/Monotonicity<d-footnote>This property is particularly important and implies that the Shapley values for features are ordered appropriately.</d-footnote>: If an employee \(i\) always increases company \(v_1\)'s profit more than they would company \(v_2\) for all possible teams of employees, then \(i\)'s attribution for \(v_1\) should be greater than or equal to their attribution in \(v_2\) (<a href="#shapley_value_ex" class="figure-number">2C</a> vs. <a href="#shapley_value_ex" class="figure-number">2B</a>):
           $$
           v_1(S\cup {i})-v_1(S)\geq v_2(S\cup {i})-v_2(S) \forall S \implies \phi_i(v_1)\geq \phi_i(v_2)
           $$
-        <li>Missingness: Employees \(i\) that don't help or hurt the company's profit must have no attribution (<a href="#shapley_value_ex" class="figure-number">2D</a>):</li>
+        </li>
+        <li>Missingness: Employees \(i\) that don't help or hurt the company's profit must have no attribution (<a href="#shapley_value_ex" class="figure-number">2D</a>):
           $$
           v(S\cup {i})=v(S)\forall S\implies \phi_i(v)=0
           $$
+        </li>
       </ul>
     </p>
 
-    <!-- What are SHAP Values? -->
     <h3 id="shap_values">1.3 Adapting Shapley values to explain machine learning models</h3>
 
 
@@ -1789,7 +1789,7 @@ pre {
 
 	<figure id="define_tree_samples">
 		<p style="text-align:center;font-size:15px;">
-			Tree Parameters <d-footnote>Green links indicate the foreground sample goes down a particular split, red indicates the background sample does, and blue indicates both samples do.</d-footnote> (Click nodes)</strong> <br>
+			Tree Parameters <d-footnote>Green links indicate the foreground sample goes down a particular split, red indicates the background sample does, and blue indicates both samples do.</d-footnote> (Click nodes)<br>
 		</p>
 
     <div style="max-width:800px;height:320px;text-align:center">
@@ -2009,7 +2009,6 @@ pre {
 	  </div>
 
       <div class="clear"></div>
-    </div>
 
     <div align=center style="margin-bottom: 20px">
       <dt-code id="bf_1" block="" language="python">
@@ -2393,10 +2392,10 @@ pre {
 
 	<figure id="collapsibility_fig">
 		<figure align=center style="margin-bottom: 10px">
-			<img align=center src="images/tree_example4.png" alt="Tree Example 3" style="width: 250px;">
+			<img src="images/tree_example4.png" alt="Tree Example 3" style="width: 250px;">
 		</figure>
 
-		<table cellpadding="10" align="center" style="border:none;">
+		<table cellpadding="10" style="border:none;margin-left:auto;margin-right:auto;">
 			<tr>
 				<td style="text-align:left;">\(\phi_1(f,x^f,x^b)\)</td>
 				<td style="text-align:left;">\(\textcolor{green}{\text{Pos}_{R\to L1}}+\textcolor{green}{\text{Pos}_{R\to L2}}+\textcolor{red}{\text{Neg}_{R\to L1}}+\textcolor{red}{\text{Neg}_{R\to L4}}\)</td>
@@ -2421,7 +2420,7 @@ pre {
 	<p>
 		<strong>Observation:</strong> We only add to the attribution for Case 4 nodes.  For a specific Case 4 node \(n\), one child is associated with \(x^f\) and one child is associated with \(x^b\).  If \(\phi_i(f,x^f,x^b)\) is initialized to zeros for all features, then, for each Case 4 node:
 		$$
-		\phi_{n_{feat}}(f,x^f,x^b)\mathrel{{+}{=}}\sum_{L\in \text{leaves}(x^f\text{ child})}\textcolor{green}{\text{Pos}_{R \to L}} + \sum_{L\in \text{leaves}(x^b\text{ child})}\textcolor{red}{\text{Neg}_{R \to L}}
+		\phi_{n_{feature}}(f,x^f,x^b)\mathrel{{+}{=}}\sum_{L\in \text{leaves}(x^f\text{ child})}\textcolor{green}{\text{Pos}_{R \to L}} + \sum_{L\in \text{leaves}(x^b\text{ child})}\textcolor{red}{\text{Neg}_{R \to L}}
 		$$
     In words, we only consider \(\textcolor{green}{\text{Pos}}\) terms from all paths under the \(x^f\) child and \(\textcolor{red}{\text{Neg}}\) terms from all paths under the \(x^b\) child.
 	</p>
