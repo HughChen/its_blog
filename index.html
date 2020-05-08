@@ -1087,10 +1087,11 @@ pre {
         <!-- <div><a href="#introduction">Introduction</a></div> -->
         <div><a href="#background">Defining the feature attribution problem</a></div>
         <ul>
+          <li><a href="#goal_feat_attr">The high level goal of feature attribution</a></li>
           <li><a href="#shapley_values">Back to basics with Shapley values</a></li>
           <li><a href="#shap_values">Adapting Shapley values to explain machine learning models</a></li>
-          <li><a href="#masking_missing">Masking missing features</a></li>
-          <li><a href="#shap_conditional_distribution">Imputing missing features by conditioning</a></li>
+          <li><a href="#masking_missing">Absence of a feature (masking)</a></li>
+          <li><a href="#shap_conditional_distribution">Absence of a feature (conditioning)</a></li>
           <li><a href="#background_distribution">Baseline Shapley values</a></li>
         </ul>
         <div><a href="#algorithm">Explaining trees quickly and exactly</a></div>
@@ -1145,18 +1146,18 @@ pre {
 	</p>
 
 
-  <h3 id="masking_missing">1.1 The high level goal of feature attribution</h3>
+  <h3 id="goal_feat_attr">1.1 The high level goal of feature attribution</h3>
 
     <p>
       The goal of feature attribution methods is to explain a model by assigning an importance value for each feature the model uses. In order to discuss the goal of feature attribution, it is useful to think about a linear model:
       $$
       f(x)=\beta_0 + \beta_1 x_1 + \cdots + \beta_d x_d
       $$
-      Linear models are considered inherently interpretable because they summarize the importance for each feature with a scalar value where the importance (\(\phi\)) of a given feature (\(i\)) for a linear model \(f\) is:
+      Linear models are considered inherently interpretable because they summarize the importance for each feature with a scalar value where the importance (\(\phi\)) of a given feature (\(i\)) for a linear model (\(f\)) is:
       $$
       \phi_i(f)=\beta_i
       $$
-      The attribution \(\phi_i(f)\) is known as a <i>global feature attribution</i> that explains the model as a whole.  This is possible because features in a linear model are constrained to have a linear relationship with the model prediction, so a sufficient statistic to describe the relationship between any feature and the output of the model is the slope associated with that feature.
+      The attribution \(\phi_i(f)\) is known as a <i>global feature attribution</i> that explains the model as a whole.  This is possible because features in a linear model are constrained to have a linear relationship with the model prediction, so a sufficient statistic to describe the relationship between any feature and the output of the model is the slope of that feature.
     </p>
 
     <p>
@@ -1168,7 +1169,7 @@ pre {
     </p>
 
     <p>
-      However, many easily interpretable models require making unrealistic assumptions (e.g., linear relationships in linear models, strictly marginal or pairwise effects in generalized additive models).  Instead, if we use non-linear models that allow for complex interaction effects between variables, we can much better capture relationships in our data.  For these models, summarizing non-linear effects with a single number (a global feature attribution \(\phi_i(f)\)) may not make sense, because we no longer have a slope.  Instead, we can aim for local feature attributions (\(\phi_i(f,x^f)\)) that will explain the model's prediction for a specific individual.  In order to do so in a non-heuristic manner, we can turn to the Shapley values.
+      However, many easily interpretable models require making unrealistic assumptions (e.g., linear relationships in linear models, strictly marginal or pairwise effects in generalized additive models).  Instead, if we use non-linear models that allow for complex interaction effects between variables, we can much better capture relationships in our data.  For these models, summarizing non-linear effects with a single number (a global feature attribution \(\phi_i(f)\)) may not make sense, because we no longer have a slope.  Instead, we can aim for local feature attributions (\(\phi_i(f,x^f)\)) that will explain the model's prediction for a specific individual.  In order to do so in a principled manner, we can turn to the Shapley values.
     </p>
 
 
@@ -1183,8 +1184,7 @@ pre {
     </p>
 
     <p>
-      To make these concepts more concrete, we can imagine a company that makes a profit \(v(S)\) that is determined by what combination of individuals they employ \(S\).  Furthermore, let's assume we know \(v(S)\) for all possible combinations of employees.  Then, the Shapley values assign credit to an individual \(i\) by taking a weighted average of how much the profit increases when \(i\) works with a group \(S\) versus when he does not work with \(S\).  Repeating this for all possible subsets \(S\) gives us the Shapley Values:
-    	<!-- (include a simple graphic here?) -->
+      To make these concepts more concrete, we can imagine a company that makes a profit \(v(S)\) that is determined by what combination of individuals they employ \(S\).  Furthermore, let's assume we know \(v(S)\) for all possible teams of employees.  Then, the Shapley values assign credit to an individual \(i\) by taking a weighted average of how much the profit increases when \(i\) works with a group \(S\) versus when he does not work with \(S\).  Repeating this for all possible teams \(S\) gives us Shapley values:
     	$$
       \overbrace{\phi_i(v)}^{\mathclap{\text{Shapley value of }i}}
       =
@@ -1295,11 +1295,11 @@ pre {
     <p>
       Shapley values are an excellent way to give credit to individuals in a coalitional game.  In fact, they are known to be a unique solution to spreading credit as defined by the following three desirable properties <d-cite bibtex-key="young1985monotonic"></d-cite> (all of which hold for any coalitional game, as can be seen in <a href="#shapley_value_ex" class="figure-number">2</a>):
       <ul>
-        <li>Local Accuracy/Efficiency: The sum of Shapley values for all employees adds up to the profit with all employees minus the profit with no employees (<a href="#shapley_value_ex" class="figure-number">2A-2D</a>):</li>
+        <li>Local Accuracy/Efficiency<d-footnote>This property suggests that the units associated with the Shapley values are in terms of the coalitional game.  For instance, when we adapt them to explain machine learning models, the explanation will be in units that correspond to the model's output (e.g., probability space, etc.) </d-footnote>: The sum of Shapley values for all employees adds up to the profit with all employees minus the profit with no employees (<a href="#shapley_value_ex" class="figure-number">2A-2D</a>):</li>
           $$
             \sum_{i\in N} \phi_i(v)=v(N)-v(\{\})
           $$
-        <li>Consistency/Monotonicity: If an employee \(i\) always increases company \(v_1\)'s profit more than they would company \(v_2\) for all possible teams of employees, then \(i\)'s attribution for \(v_1\) should be greater than or equal to their attribution in \(v_2\) (<a href="#shapley_value_ex" class="figure-number">2C</a> vs. <a href="#shapley_value_ex" class="figure-number">2B</a>):</li>
+        <li>Consistency/Monotonicity<d-footnote>This property is particularly important and implies that the Shapley values for features are ordered appropriately.</d-footnote>: If an employee \(i\) always increases company \(v_1\)'s profit more than they would company \(v_2\) for all possible teams of employees, then \(i\)'s attribution for \(v_1\) should be greater than or equal to their attribution in \(v_2\) (<a href="#shapley_value_ex" class="figure-number">2C</a> vs. <a href="#shapley_value_ex" class="figure-number">2B</a>):</li>
           $$
           v_1(S\cup {i})-v_1(S)\geq v_2(S\cup {i})-v_2(S) \forall S \implies \phi_i(v_1)\geq \phi_i(v_2)
           $$
@@ -1326,22 +1326,22 @@ pre {
     </p>
 
     <p>
-      As a first step, we can explore how coalitional games differ to machine learning models by looking at a model that is a coalitional game: a model with binary features \(x_i\in(0,1)\)<d-footnote>Where 1 indicates presence of a feature and 0 indicates absence of a feature.</d-footnote>.  For such a model, the most natural coalitional game is the function applied to a vector that is one if the feature is in the set and zero otherwise:
+      As a first step, we can explore how coalitional games differ to machine learning models by looking at a model that is a coalitional game: a model with binary features \(x_i\in(0,1)\)<d-footnote>Where 1 indicates presence of a feature and 0 indicates absence of a feature.</d-footnote>.  For such a model, the most natural coalitional game is the function applied to a vector that is one if the feature is in the set \(S\) and zero otherwise:
       $$
       v(S):=f(z^S)\text{, where } z^S_i = 1\text{ if }i\in S\text{, }0\text{ otherwise}
       $$
-      However, most machine learning models actually have continuous features. In order to explain a typical machine learning model, we have to define both the presence and absence of features<d-footnote>More precisely, we have to define a new set function \(v(S)\) related to the model's prediction \(f(x)\) where the features in \(S\) are present and the remaining features are absent.  This is analogous to the way players \(S\) in a game are considered present and the remaining players are considered absent.</d-footnote>.
+      However, most machine learning models actually have continuous features. In order to explain a typical machine learning model, we have to define both the presence and absence of features<d-footnote>More precisely, we have to define a new coalitional game \(v(S)\) related to the model's prediction \(f(x)\) where the features in \(S\) are present and the remaining features are absent.  This is analogous to the way players \(S\) in a game are considered present and the remaining players are considered absent.</d-footnote>.
     </p>
 
     <p>
-      First, to address the presence of a feature: since our goal is to obtain <i>local feature attributions</i><d-footnote>As opposed to a <i>global feature attribution</i> that assign per-feature importance for the model as a whole.</d-footnote>, a vector of importance values for each feature of a model prediction for a specific sample \(x^f\).  This means that if feature \(i\) is present, we can simply set that feature to its value in the foreground sample \(x_i^f\). The next step is to address the absence of a feature, which can be done in many ways.
+      <strong>Presence of a feature:</strong> Our goal is to obtain <i>local feature attributions</i> (\(\phi_i(f,x^f)\)), a vector of importance values for each feature of a model prediction for a specific sample \(x^f\).  This means that if feature \(i\) is present, we can simply set that feature to its value in the foreground sample \(x_i^f\). The next step is to address the absence of a feature, which can be done in several ways.
     </p>
 
 
-  <h3 id="masking_missing">1.4 Masking missing features</h3>
+  <h3 id="masking_missing">1.4 Absence of a feature (Masking)</h3>
 
     <p>
-      One straightforward way to address the absence of a feature is to define a baseline \(x^b\) (i.e., the background sample).  In this case, if feature \(i\) is absent, we can simply set that feature to be \(x_i^b\).  Then the new set function is:
+      One straightforward way to address the absence of a feature is to define a baseline \(x^b\) (i.e., the background sample).  In this case, if feature \(i\) is absent, we can simply set that feature to be \(x_i^b\).  Then the new coalitional game is:
       $$
       v(S)=f(h^S)\text{, where } h^S_i = x^f_i\text{ if }i\in S\text{, }x^b_i\text{ otherwise}
       $$
@@ -1489,7 +1489,7 @@ pre {
 
 
     <p>
-      One criticism of Baseline Shapley is that the choice of baseline is very influential to the resulting feature attributions.  In <a href="#single_baselines_bad" class="figure-number">3</a>, we can see that the choice of baseline heavily influences the resulting attribution value.
+      One downside of Baseline Shapley is that the choice of baseline is very influential to the resulting feature attributions.  In <a href="#single_baselines_bad" class="figure-number">3</a>, we can see that the choice of baseline heavily influences the resulting attribution value.
     </p>
 
     <p>
@@ -1497,17 +1497,17 @@ pre {
     </p>
 
     <p>
-      Alternatively, we could use a mean baseline as in <a href="#single_baselines_bad" class="figure-number">3c</a>.  Although the mean of a binary variable does not have a natural interpretation, the mean baseline actually gives a reasonable attribution for linear models because .
+      Alternatively, we could use a mean baseline as in <a href="#single_baselines_bad" class="figure-number">3c</a>.  Although the mean of a binary variable does not have a natural interpretation, the mean baseline is actually a reasonable choice of baseline for linear models when we use the interventional conditional expectation to define our coalitional game (more details in <a href="shap_conditional_distribution">Section 1.5</a>).  For this baseline, we see that for an individual with average height and weight, the importance of their height and weight should be zero relative to an average individual.  Furthermore, in comparison to the zero baseline, the attribution for gender with a mean baseline will be consistent across different representations of gender.
     </p>
 
     <p>
-      For non-linear models, rather than use a single <i>background sample</i> (or baseline) we can instead use many background samples with a conditional expectation.  In the next section we will describe two approaches to incorporate <i>background distributions</i> to our set functions \(v(S)\) for a much better definition of missingness.
+      However, for non-linear models, selecting a single baseline can introduce undesirable biases into your explanations.  Rather than use a single <i>background sample</i> (or baseline) we can instead use many background samples by using a conditional expectation to handle missingness.  In the next section we will describe two approaches to incorporate <i>background distributions</i> to our coalitional game \(v(S)\) for a better definition of missingness.
     </p>
 
-    <h3 id="shap_conditional_distribution">1.5 Imputing missing features by conditioning</h3>
+    <h3 id="shap_conditional_distribution">1.5 Absence of a feature (conditioning)</h3>
 
     <p>
-		One natural approach to incorporate a background distribution to the set function is with a conditional expectation.  Instead of simply replacing "missing" features with a fixed value, we condition on the set of features that are "present" as if we know them and use those to guess at the "missing" features.  If we define \(D\) to be the background (underlying) distribution our samples are drawn from, the value of the game is:
+		Another natural approach to incorporate a background distribution to the coalitional game is with a conditional expectation.  Instead of simply replacing "missing" features with a fixed value, we condition on the set of features that are "present" as if we know them and use those to guess at the "missing" features.  If we define \(D\) to be the background (underlying) distribution our samples are drawn from, the value of the game is:
     	$$
 		  v(S)=\mathbb{E}_D[f(x)|x_{S}]
     	$$
@@ -1771,7 +1771,7 @@ pre {
 	</div>
 
 	<p>
-		In summary, we show that the problem of obtaining \(\phi_i(f,x^f)\) <d-footnote>With an interventional conditional expectation for the set function.</d-footnote> reduces to an average of simpler problems \(\phi_i(f,x^f,x^b)\) where our foreground sample \(x^f\) is compared to a distribution with only one background sample \(x^b\).  Obtaining \(\phi_i(f,x^f,x^b)\) will prove to be an easy problem to tackle for tree models.
+		In summary, we show that the problem of obtaining \(\phi_i(f,x^f)\) <d-footnote>With an interventional conditional expectation for the coalitional game.</d-footnote> reduces to an average of simpler problems \(\phi_i(f,x^f,x^b)\) where our foreground sample \(x^f\) is compared to a distribution with only one background sample \(x^b\).  Obtaining \(\phi_i(f,x^f,x^b)\) will prove to be an easy problem to tackle for tree models.
 	</p>
 
   </div>
@@ -2373,7 +2373,7 @@ pre {
     </p>
 
     <p>
-    	The first observation is that we can get rid of the multiplicative \((\text{tree depth})\) factor by focusing on what the lists \(S_P\) and \(N_P\) are used for.  The first use is to check if a feature has been previously encountered.  By replacing the lists with boolean arrays, we can check if a given feature has been encountered by a constant time access into the arrays.  This means the internal nodes now incur a constant cost.  The second use of \(S_P\) and \(N_P\) is to calculate the sizes of \(|S|\) and \(|N|\) at the leaves.  By maintaining integers that keep track of these values, the leaves no longer have to iterate through lists.  This gets rid of the multiplicative \((\text{tree depth})\) factor for leaf nodes.  These optimizations lead to a new computational complexity of:
+    	The first observation is that we can get rid of the multiplicative \((\text{tree depth})\) factor by focusing on what the lists \(S_P\) and \(N_P\) are used for.  The first use is to check if a feature has been previously encountered.  By replacing the lists with boolean arrays, we can check if a given feature has been encountered by a constant time access into the arrays.  This means the internal nodes now incur a constant cost.  The second use of \(S_P\) and \(N_P\) is to calculate \(|S|\) and \(|N|\) at the leaves.  By maintaining integers that keep track of these values, the leaves no longer have to iterate through lists.  This gets rid of the multiplicative \((\text{tree depth})\) factor for leaf nodes.  These optimizations lead to a new computational complexity of:
 		$$
 		O((\text{\# internal nodes}) + O((\text{\# leaf nodes}) \times d)
 		$$
@@ -2408,7 +2408,7 @@ pre {
 			</tr>
 		</table>
 
-    <figcaption><a href="#collapsibility_fig" class="figure-number">10</a> Example to illustrate collapsibility for features.  Green paths are associated with \(\textcolor{green}{x^f}\) and red paths are \(\textcolor{red}{x^b}\)</figcaption>
+    <figcaption><a href="#collapsibility_fig" class="figure-number">10</a> Example to illustrate collapsibility for features.  Green paths are associated with \(\textcolor{green}{x^f}\) and red paths are associated with \(\textcolor{red}{x^b}\).</figcaption>
 	</figure>
 
 
@@ -2420,9 +2420,9 @@ pre {
   <hr style="margin-top:0px;margin-bottom:10px;">
 
 	<p>
-		<strong>Observation:</strong> We only add to the attribution for Case 4 nodes.  For a specific Case 4 node \(n\), one child is associated with \(x^f\) and one child is associated with \(x^b\).  Then, for that node's feature:
+		<strong>Observation:</strong> We only add to the attribution for Case 4 nodes.  For a specific Case 4 node \(n\), one child is associated with \(x^f\) and one child is associated with \(x^b\).  If \(\phi_i(f,x^f,x^b)\) is initialized to zeros for all features, then, for each Case 4 node:
 		$$
-		\phi_{n_{feat}}\mathrel{{+}{=}}\sum_{L\in \text{leaves}(x^f\text{ child})}\textcolor{green}{\text{Pos}_{R \to L}} + \sum_{L\in \text{leaves}(x^b\text{ child})}\textcolor{red}{\text{Neg}_{R \to L}}
+		\phi_{n_{feat}}(f,x^f,x^b)\mathrel{{+}{=}}\sum_{L\in \text{leaves}(x^f\text{ child})}\textcolor{green}{\text{Pos}_{R \to L}} + \sum_{L\in \text{leaves}(x^b\text{ child})}\textcolor{red}{\text{Neg}_{R \to L}}
 		$$
     In words, we only consider \(\textcolor{green}{\text{Pos}}\) terms from all paths under the \(x^f\) child and \(\textcolor{red}{\text{Neg}}\) terms from all paths under the \(x^b\) child.
 	</p>
@@ -2650,7 +2650,7 @@ pre {
 	</p>
 
   <p>
-    <strong>Empirical evaluation:</strong> The goal of this article is understanding how these algorithms work, and not empirically evaluating them. For evaluation we refer readers to <d-cite bibtex-key="lundberg2020local"></d-cite>.  In this article, we identify a way of assigning credit that comes equipped with a set of desirable properties (i.e., Shapley values) and show how to compute them exactly for trees with a tractable algorithm.  This means that the credit allocation we obtain comes built in with many of the desirable properties that ablation tests aim to measure (e.g., consistency).
+    <strong>Empirical evaluation:</strong> The goal of this article is understanding how these algorithms work, and not empirically evaluating them. For evaluation we refer readers to <d-cite bibtex-key="lundberg2020local"></d-cite>.  In this article, we identify a way of assigning credit that comes equipped with a set of desirable properties (i.e., Shapley values) and show how to compute them exactly for trees with a tractable algorithm.  This means that the credit allocation we obtain comes built in with many of the properties that empirical evaluation (often in the form of ablation tests) aim to measure (e.g., consistency).
   </p>  
 
   	<hr>
