@@ -1078,8 +1078,8 @@ pre {
         style='grid-column: text; width: 100%; padding-top: 20px; padding-bottom:20px;' />
   </d-title>
   <d-byline></d-byline>
-  <d-article>
 
+  <d-article>
     <d-contents>
       <nav class="l-text toc figcaption">
         <a href="#top"><h3>Top</h3></a>
@@ -1255,7 +1255,7 @@ pre {
     </div>
 
     <div style="margin-bottom:0px">
-  	  <table align="center" style="border:none;">
+  	  <table style="border:none;margin-left:auto;margin-right:auto;">
 		  <col style="width:80px;"/>
     	<col style="width:80px;"/>
 		  <col style="width:80px;"/>
@@ -1469,10 +1469,10 @@ pre {
     </figure>
 
   <!-- Proof -->
-  <div">
+  <div>
     <p><a onclick="hideshow('proof_linearmodel_baseline')"><strong>+ Technical details</strong></a></p>
 
-    <div id="proof_linearmodel_baseline", style="display:none">
+    <div id="proof_linearmodel_baseline" style="display:none">
       <p>
         For masking, the SHAP values for a linear model are easy to compute:
         $$
@@ -1748,10 +1748,10 @@ pre {
 	</p>  
 
 	<!-- Background Distribution Proof -->
-	<div">
+	<div>
 		<p><a onclick="hideshow('proof_backgrounddist')"><strong>+ Technical details</strong></a></p>
 
-		<div id="proof_backgrounddist", style="display:none">
+		<div id="proof_backgrounddist" style="display:none">
 
 		    <p>
 			    Define \(C\) to be all combinations of the set \(N \setminus \{i\}\) and \(P\) to be all permutations of \(N \setminus \{i\}\).  Starting with the definition of SHAP values: 
@@ -1846,23 +1846,23 @@ pre {
         <tr>
           <td>\(x_1\)</td>
           <td><input type="range" min="-15" max="15" value="0" class="slider" id="fx1"></td>
-          <td align="left" id="fx1_out"></td>
+          <td style="text-align: left;" id="fx1_out"></td>
           <td><input type="range" min="-15" max="15" value="10" class="slider" id="bx1"></td>
-          <td align="left" id="bx1_out"></td>
+          <td style="text-align: left;" id="bx1_out"></td>
         </tr>
         <tr>
           <td>\(x_2\)</td>
           <td><input type="range" min="-15" max="15" value="0" class="slider" id="fx2"></td>
-          <td align="left" id="fx2_out"></td>
+          <td style="text-align: left;" id="fx2_out"></td>
           <td><input type="range" min="-15" max="15" value="10" class="slider" id="bx2"></td>
-          <td align="left" id="bx2_out"></td>
+          <td style="text-align: left;" id="bx2_out"></td>
         </tr>
         <tr>
           <td>\(x_3\)</td>
           <td><input type="range" min="-15" max="15" value="10" class="slider" id="fx3"></td>
-          <td align="left" id="fx3_out"></td>
+          <td style="text-align: left;" id="fx3_out"></td>
           <td><input type="range" min="-15" max="15" value="0" class="slider" id="bx3"></td>
-          <td align="left" id="bx3_out"></td>
+          <td style="text-align: left;" id="bx3_out"></td>
         </tr>
       </table>
     </div>
@@ -1898,7 +1898,7 @@ pre {
       	<p style="text-align:center;font-size:15px;margin-bottom:10px">Tree Parameters</p>
       	<div align=center id="ex4_divtree" style="margin-top:0px;margin-bottom:0px"></div>
 
-	    <table align=center style="border:none;">
+	    <table style="border:none;text-align:center;margin-left:auto;margin-right:auto;">
         <col style="width:20px;"/>
         <col style="width:80px;"/>
         <col style="width:20px;"/>
@@ -1910,24 +1910,24 @@ pre {
 	      </tr>
 	      <tr>
 	        <td id="ex4_phi1">\(\phi_1\)</td>
-	        <td align=center id="ex4_phi1_val"></td>
+	        <td style="text-align:center;" id="ex4_phi1_val"></td>
 	        <td id="ex4_phi2">\(\phi_2\)</td>
-	        <td align=center id="ex4_phi2_val"></td>
+	        <td style="text-align:center;" id="ex4_phi2_val"></td>
 	        <td id="ex4_phi3">\(\phi_3\)</td>
-	        <td align=center id="ex4_phi3_val"></td>
+	        <td style="text-align:center;" id="ex4_phi3_val"></td>
 	      </tr>
 	    </table>
       	</div>
       </div>
 
       <div class="second" style="width:350px;height:410px">
-        <table align=center style="border:none;margin-bottom:-5px">
+        <table style="border:none;margin-bottom:-5px;margin-left:auto;margin-right:auto;">
           <col style="width:60px;"/>
           <col style="width:90px;"/>
           <col style="width:90px;"/>
           <col style="width:90px;"/>
           <tr>
-            <td align=center colspan="4">Foreground & background sample</td>
+            <td style="text-align:center;" colspan="4">Foreground & background sample</td>
           </tr>
           <tr>
             <th></th>
@@ -1961,14 +1961,14 @@ pre {
           </tr>
         </table>
 
-        <table align=center style="border:none;margin-bottom:-5px">
+        <table style="border:none;margin-bottom:-5px;margin-left:auto;margin-right:auto;">
           <col style="width:50px;"/>
           <col style="width:67px;"/>
           <col style="width:67px;"/>
           <col style="width:67px;"/>
           <col style="width:67px;"/>
           <tr>
-            <td align=center colspan="5">Algorithm State</td>
+            <td style="text-align:center;" colspan="5">Algorithm State</td>
           </tr>
           <tr>
             <td>\(W\)</td>
@@ -2110,7 +2110,7 @@ pre {
 
 	<!-- Proof -->
 	<p><a onclick="hideshow('naive_alg_proof')"><strong>+ Technical Details</strong></a></p>
-	<div id="naive_alg_proof", style="display:none">
+	<div id="naive_alg_proof" style="display:none">
 		<p>
 			<i>Sketch of proof</i>: Treat each path \(P\) in the tree from the root to each leaf as a separate model \(f^P(x)\) that returns the value of the leaf if that path is traversed by \(x\) or zero otherwise.  This results in (\(\text{\# leaf nodes}\)) models that operate on disjoint parts of the input space, implying that our original model is equal to the summation of all of these path models:
       $$f(x)=\sum_P f^P(x)$$ 
@@ -2165,13 +2165,13 @@ pre {
         <p style="text-align:center;font-size:15px;margin-bottom:10px">Tree Parameters</p>
         <div id="ex5_divtree" style="margin-top:0px;margin-bottom:-5px;"></div>
             
-  			<table align=center style="border:none;">
+  			<table style="border:none;margin-left:auto;margin-right:auto;">
           <col style="width:60px;"/>
           <col style="width:90px;"/>
           <col style="width:90px;"/>
           <col style="width:90px;"/>
           <tr>
-            <td align=center colspan="4">Foreground & background sample</td>
+            <td style="text-align:center;" colspan="4">Foreground & background sample</td>
           </tr>
     			<tr>
     				<td></td>
@@ -2199,12 +2199,12 @@ pre {
     			</tr>
   			</table>
 
-        <table align=center style="border:none;">
+        <table style="border:none;margin-left:auto;margin-right:auto;">
           <col style="width:40px;"/>
           <col style="width:120px;"/>
           <col style="width:40px;"/>
           <col style="width:120px;"/>
-          <td align=center colspan="4">Algorithm State</td>
+          <td style="text-align:center;" colspan="4">Algorithm State</td>
           <tr>
             <td>\(S_P\)</td>
             <td id="ex5_sp"></td>
@@ -2213,7 +2213,7 @@ pre {
           </tr>
         </table>
 
-        <table align=center style="border:none;">
+        <table style="border:none;margin-left:auto;margin-right:auto;">
           <col style="width:20px;"/>
           <col style="width:80px;"/>
           <col style="width:20px;"/>
@@ -2221,15 +2221,15 @@ pre {
           <col style="width:20px;"/>
           <col style="width:80px;"/>
           <tr>
-            <td align=center colspan="6">Attribution Values</td>
+            <td style="text-align:center;" colspan="6">Attribution Values</td>
           </tr>
           <tr>
             <td id="ex5_phi1">\(\phi_1\)</td>
-            <td align=center id="ex5_phi1_val"></td>
+            <td style="text-align:center;" id="ex5_phi1_val"></td>
             <td id="ex5_phi2">\(\phi_2\)</td>
-            <td align=center id="ex5_phi2_val"></td>
+            <td style="text-align:center;" id="ex5_phi2_val"></td>
             <td id="ex5_phi3">\(\phi_3\)</td>
-            <td align=center id="ex5_phi3_val"></td>
+            <td style="text-align:center;" id="ex5_phi3_val"></td>
           </tr>
         </table>
       </div>
@@ -2398,12 +2398,12 @@ pre {
 
 		<table cellpadding="10" align="center" style="border:none;">
 			<tr>
-				<td align="left">\(\phi_1(f,x^f,x^b)\)</td>
-				<td align="left">\(\textcolor{green}{\text{Pos}_{R\to L1}}+\textcolor{green}{\text{Pos}_{R\to L2}}+\textcolor{red}{\text{Neg}_{R\to L1}}+\textcolor{red}{\text{Neg}_{R\to L4}}\)</td>
+				<td style="text-align:left;">\(\phi_1(f,x^f,x^b)\)</td>
+				<td style="text-align:left;">\(\textcolor{green}{\text{Pos}_{R\to L1}}+\textcolor{green}{\text{Pos}_{R\to L2}}+\textcolor{red}{\text{Neg}_{R\to L1}}+\textcolor{red}{\text{Neg}_{R\to L4}}\)</td>
 			</tr>
 			<tr>
-				<td align="left">\(\phi_2(f,x^f,x^b)\)</td>
-				<td align="left">\(\textcolor{red}{\text{Neg}_{R\to L1}}+\textcolor{green}{\text{Pos}_{R\to L2}}+\textcolor{green}{\text{Pos}_{R\to L3}}+\textcolor{red}{\text{Neg}_{R\to L4}}\)</td>
+				<td style="text-align:left;">\(\phi_2(f,x^f,x^b)\)</td>
+				<td style="text-align:left;">\(\textcolor{red}{\text{Neg}_{R\to L1}}+\textcolor{green}{\text{Pos}_{R\to L2}}+\textcolor{green}{\text{Pos}_{R\to L3}}+\textcolor{red}{\text{Neg}_{R\to L4}}\)</td>
 			</tr>
 		</table>
 
@@ -2442,13 +2442,13 @@ pre {
         	<p style="text-align:center;font-size:15px;margin-bottom:10px">Tree Parameters</p>
         	<div id="ex6_divtree" style="margin-top:0px;margin-bottom:-5px;"></div>
 
-          <table align=center style="border:none;">
+          <table style="border:none;margin-left:auto;margin-right:auto;">
             <col style="width:60px;"/>
             <col style="width:90px;"/>
             <col style="width:90px;"/>
             <col style="width:90px;"/>
             <tr>
-              <td align=center colspan="4">Foreground & background sample</td>
+              <td style="text-align:center;" colspan="4">Foreground & background sample</td>
             </tr>
       			<tr>
       				<th></th>
@@ -2476,12 +2476,12 @@ pre {
       			</tr>
     			</table>
 
-          <table align=center style="border:none;">
+          <table style="border:none;margin-left:auto;margin-right:auto;">
             <col style="width:40px;"/>
             <col style="width:120px;"/>
             <col style="width:40px;"/>
             <col style="width:120px;"/>
-            <td align=center colspan="4">Algorithm State</td>
+            <td style="text-align:center;" colspan="4">Algorithm State</td>
             <tr>
               <td>\(S_C\)</td>
               <td id="ex6_sc"></td>
@@ -2490,7 +2490,7 @@ pre {
             </tr>
           </table>
 
-          <table align=center style="border:none;">
+          <table style="border:none;margin-left:auto;margin-right:auto;">
             <col style="width:20px;"/>
             <col style="width:80px;"/>
             <col style="width:20px;"/>
@@ -2498,15 +2498,15 @@ pre {
             <col style="width:20px;"/>
             <col style="width:80px;"/>
             <tr>
-              <td align=center colspan="6">Attribution Values</td>
+              <td style="text-align:center;" colspan="6">Attribution Values</td>
             </tr>
             <tr>
               <td id="ex6_phi1">\(\phi_1\)</td>
-              <td align=center id="ex6_phi1_val"></td>
+              <td style="text-align:center;" id="ex6_phi1_val"></td>
               <td id="ex6_phi2">\(\phi_2\)</td>
-              <td align=center id="ex6_phi2_val"></td>
+              <td style="text-align:center;" id="ex6_phi2_val"></td>
               <td id="ex6_phi3">\(\phi_3\)</td>
-              <td align=center id="ex6_phi3_val"></td>
+              <td style="text-align:center;" id="ex6_phi3_val"></td>
             </tr>
           </table>
         </div>
@@ -2656,7 +2656,7 @@ pre {
 
     <h2 id="related_work">Related Work</h2>
 
-    <h3 id="related_work">Methods in the SHAP package</h3>
+    <h3>Methods in the SHAP package</h3>
 
     <p>
     	It should be noted that there are a number of alternative methods that aim to estimate interventional conditional expectation Shapley values.  A few of these methods include: <i>Sampling Explainer</i>, <i>Kernel Explainer</i>, and <i>Path Dependent Tree Explainer</i>.  If you are explaining tree-based models, it may not be clear which one you should use.  In this article we briefly overview a few of these the methods and compare them to Interventional Tree Explainer (ITE).
@@ -2685,7 +2685,9 @@ pre {
   </div>
 
 </div>
-
+</p>
+</div>
+</d-article>
 
 <!-- Figure 1 - Kaggle methods d3 bar plot -->
 <script src="js/kaggleMethods.js"></script>
