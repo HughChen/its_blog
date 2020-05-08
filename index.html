@@ -10,12 +10,12 @@
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
     onload="renderMathInElement(document.body);"></script>
 
-<script language="JavaScript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.2.1/math.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.2.1/math.js"></script>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>d3v4 = d3;</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
 <script src="https://distill.pub/template.v1.js"></script>
-<style id="distill-prerendered-styles" type="text/css">/*
+<style id="distill-prerendered-styles">/*
  * Copyright 2018 The Distill Template Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -165,7 +165,7 @@ figcaption a {
 }
 
 figcaption b,
-figcaption strong, {
+figcaption strong {
   font-weight: 600;
   color: rgba(0, 0, 0, 1.0);
 }
@@ -1266,12 +1266,12 @@ pre {
           <td style="border:none;" colspan="6">Shapley values</td>
         </tr>
     		<tr>
-    			<td align=center>\(\phi_{Ava}(v)\)</td>
-    			<td align=center id="phi_a">0</td>
-    			<td align=center>\(\phi_{Ben}(v)\)</td>
-    			<td align=center id="phi_b">0</td>
-    			<td align=center>\(\phi_{Cat}(v)\)</td>
-    			<td align=center id="phi_c">0</td>
+    			<td style="text-align:center;">\(\phi_{Ava}(v)\)</td>
+    			<td style="text-align:center;" id="phi_a">0</td>
+    			<td style="text-align:center;">\(\phi_{Ben}(v)\)</td>
+    			<td style="text-align:center;" id="phi_b">0</td>
+    			<td style="text-align:center;">\(\phi_{Cat}(v)\)</td>
+    			<td style="text-align:center;" id="phi_c">0</td>
     		</tr>
   	  </table>
     </div>
@@ -1283,7 +1283,7 @@ pre {
   	  <input type="button" value="Preset D" class="w3-button w3-green" id="ex1_presetD" onclick="ex1_presetD()"> 
     </div>
 
-	  <p align="center" style="font-size:13px" id="ex1_preset_text">No credit.</p>
+	  <p style="text-align:center;font-size:13px" id="ex1_preset_text">No credit.</p>
 
     <figcaption>
       <a href="#shapley_value_ex" class="figure-number">2</a>: Shapley values for a company that makes a profit \(v(S)\) based on it's three prospective employees \(Ava\), \(Ben\), and \(Cat\).
@@ -1354,7 +1354,7 @@ pre {
 
     <figure id="single_baselines_bad">
 
-      <p align=center style="font-size: 15px"></p>
+      <p style="font-size: 15px;text-align:center;"></p>
 
       <div align=center style="margin-bottom: -10px">
         <table style="border:none;">
@@ -1788,7 +1788,7 @@ pre {
 	</p>
 
 	<figure id="define_tree_samples">
-		<p align=center style="font-size:15px;">
+		<p style="text-align:center;font-size:15px;">
 			Tree Parameters <d-footnote>Green links indicate the foreground sample goes down a particular split, red indicates the background sample does, and blue indicates both samples do.</d-footnote> (Click nodes)</strong> <br>
 		</p>
 
@@ -1807,7 +1807,7 @@ pre {
 
         <!-- Select variable/threshold -->
         <div align=center style="margin-bottom: 20px">
-          <p id="ex3_var_label" align=center style="font-size: 15px">Node Variable:</p>
+          <p id="ex3_var_label" style="text-align:center;font-size: 15px">Node Variable:</p>
           <div align=center>
             <input type="button" value="x1" class="w3-button w3-teal" id="ex3_x1_select" onclick="ex3_select_feat1()" style="font-size: 15px">
             <input type="button" value="x2" class="w3-button w3-green" id="ex3_x2_select" onclick="ex3_select_feat2()" style="font-size: 15px">
@@ -1895,7 +1895,7 @@ pre {
     <div class="container" style="width:700px">
 
       <div class="first" style="width:350px;height:410px">
-      	<p align=center style="font-size:15px;margin-bottom:10px">Tree Parameters</p>
+      	<p style="text-align:center;font-size:15px;margin-bottom:10px">Tree Parameters</p>
       	<div align=center id="ex4_divtree" style="margin-top:0px;margin-bottom:0px"></div>
 
 	    <table align=center style="border:none;">
@@ -1906,7 +1906,7 @@ pre {
 	      <col width="20px"/>
 	      <col width="80px"/>
 	      <tr>
-	        <td align=center colspan="6">Attribution Values</td>
+	        <td style="text-align:center;" colspan="6">Attribution Values</td>
 	      </tr>
 	      <tr>
 	        <td id="ex4_phi1">\(\phi_1\)</td>
@@ -2162,7 +2162,7 @@ pre {
 
   	<div class="container" style="width:1000px">
     	<div class="first" style="width:400px;height:620px">
-        <p align=center style="font-size:15px;margin-bottom:10px">Tree Parameters</p>
+        <p style="text-align:center;font-size:15px;margin-bottom:10px">Tree Parameters</p>
         <div id="ex5_divtree" style="margin-top:0px;margin-bottom:-5px;"></div>
             
   			<table align=center style="border:none;">
@@ -2330,7 +2330,6 @@ pre {
     	<input type="button" class="w3-button w3-green" value=">>" onclick="naiveRunAll()">
     </div>
 
-    <!-- <p align=center id="ex5_naive_step">Naive algorithm</p> -->
   </figure>
 
   <figure>
@@ -2440,7 +2439,7 @@ pre {
     <figure id="dynamic_ex" class="l-middle" style="margin-bottom: -10px;">
       <div class="container" style="width:1000px">
         <div class="first" style="width:400px;height:620px">
-        	<p align=center style="font-size:15px;margin-bottom:10px">Tree Parameters</p>
+        	<p style="text-align:center;font-size:15px;margin-bottom:10px">Tree Parameters</p>
         	<div id="ex6_divtree" style="margin-top:0px;margin-bottom:-5px;"></div>
 
           <table align=center style="border:none;">
