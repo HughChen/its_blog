@@ -1,1 +1,3 @@
-# its_blog
+# Understanding Shapley value explanation algorithms for trees
+
+Interventional Tree Explainer is a popular method for explaining tree models, however the algorithm underlying it is often misunderstood.  This article aims to explain the algorithm from the ground up, highlighting two variants of Shapley values for machine learning along the way.  Using visualizations of the algorithms themselves we describe a brute force approach to obtain Shapley values for trees, a naive approach that leverages the tree structure, and a dynamic programming approach that obtains explanations in time linear in the number of nodes.
