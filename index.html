@@ -1338,7 +1338,7 @@ pre {
     </p>
 
 
-  <h3 id="masking_missing">1.4 Absence of a feature (Masking)</h3>
+  <h3 id="masking_missing">1.4 Absence of a feature (masking)</h3>
 
     <p>
       One straightforward way to address the absence of a feature is to define a baseline \(x^b\) (i.e., the background sample).  In this case, if feature \(i\) is absent, we can simply set that feature to be \(x_i^b\).  Then the new coalitional game is:
@@ -1474,7 +1474,7 @@ pre {
 
     <div id="proof_linearmodel_baseline" style="display:none">
       <p>
-        For masking, the SHAP values for a linear model are easy to compute:
+        For masking, the Shapley values for a linear model are easy to compute:
         $$
         \begin{aligned}
         \phi_i(f,x^f,x^b)&= \sum_{S\in C } W(|S|,|N|)(f(h^{S\cup i}) {-} f(h^{S}))\\
@@ -1501,7 +1501,7 @@ pre {
     </p>
 
     <p>
-      However, for non-linear models, selecting a single baseline can introduce undesirable biases into your explanations.  Rather than use a single <i>background sample</i> (or baseline) we can instead use many background samples by using a conditional expectation to handle missingness.  In the next section we will describe two approaches to incorporate <i>background distributions</i> to our coalitional game \(v(S)\) for a better definition of missingness.
+      For linear models comparing to an average individual baseline is equivalent to comparing to the average population<d-footnote>For an interventional conditional expectation</d-footnote>.  However, if the data has binary features the average individual can be confusing, because they would be half female and half male.  Comparing to the average individual is even more unappealing for non-linear models where comparing to an average individual is not equivalent to comparing to the average population.  Rather than use a single background sample (or baseline) we can instead use many background samples and handling missingness with a conditional expectation over an entire population. In the next section we will describe two approaches to incorporate background distributions to our coalitional game \(v(S)\) for a better definition of missingness.
     </p>
 
     <h3 id="shap_conditional_distribution">1.5 Absence of a feature (conditioning)</h3>
@@ -1641,14 +1641,14 @@ pre {
   	      	<td>\(\phi_4\)</td>
   	  	  </tr>
     		  <tr style="text-align:center;">
-    		    <td>SHAP Values (CE)</td>
+    		    <td>Shapley Values (CE)</td>
     		    <td id="ex2_CE_phi1">1</td>
     		    <td id="ex2_CE_phi2">2</td>
     		    <td id="ex2_CE_phi3">3</td>
     		    <td id="ex2_CE_phi4">4</td>
     		  </tr>
     		  <tr style="text-align:center;">
-    		  	<td>SHAP Values (ICE)</td>
+    		  	<td>Shapley Values (ICE)</td>
     		    <td id="ex2_ICE_phi1">1</td>
     		    <td id="ex2_ICE_phi2">2</td>
     		    <td id="ex2_ICE_phi3">3</td>
@@ -1667,7 +1667,7 @@ pre {
 	    <p id="ex2_preset_text" style="text-align:center;font-size:13px">Independent variables.</p>
 
       <figcaption>
-        <a href="#linear_shap_ex" class="figure-number">4</a>: Comparing two versions of SHAP values: conditional expectation (CE) and interventional conditional expectation (ICE).  We make two simplifying assumptions:
+        <a href="#linear_shap_ex" class="figure-number">4</a>: Comparing two versions of Shapley values: conditional expectation (CE) and interventional conditional expectation (ICE).  We make two simplifying assumptions:
 
         <ul>
           <li class="no-space">The function is linear (\(f=\beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \beta_4 x_4\))</li>
@@ -1678,7 +1678,7 @@ pre {
 
 
   <p>
-    In general, computing the conditional expectation SHAP value is difficult; however, for a multivariate normal distribution the conditional expectation is easy to calculate.  In addition, for a linear function the conditional expectation of the function equals the function applied to the conditional expectation (\(E[f(x)|x_S]=f(E[x|x_S])\)<d-footnote>Note that this is not generally true.  Only for affine functions.</d-footnote>).  
+    In general, computing the conditional expectation Shapley value is difficult; however, for a multivariate normal distribution the conditional expectation is easy to calculate.  In addition, for a linear function the conditional expectation of the function equals the function applied to the conditional expectation (\(E[f(x)|x_S]=f(E[x|x_S])\)<d-footnote>Note that this is not generally true.  Only for affine functions.</d-footnote>).  
   </p>
 
   <!-- Proof -->
@@ -1687,7 +1687,7 @@ pre {
 
     <div id="proof_linearmodel" style="display:none">
       <p>
-        Computing SHAP values for a linear model is much easier than for other model classes <d-footnote>Note that we assume features have zero mean in the following calculations.</d-footnote>.  This is how we compute them for <a href="#linear_shap_ex" class="figure-number">4</a>.
+        Computing Shapley values for a linear model is much easier than for other model classes <d-footnote>Note that we assume features have zero mean in the following calculations.</d-footnote>.  This is how we compute them for <a href="#linear_shap_ex" class="figure-number">4</a>.
       </p>
 
       <p>
@@ -1705,7 +1705,7 @@ pre {
     </p>
 
       <p>
-        Second, to compute Conditional Expectation (CE) SHAP values for a linear model, we assume the background distribution \(D\) is multivariate normal with zero mean and covariance \(C\), we can start with:
+        Second, to compute Conditional Expectation (CE) Shapley values for a linear model, we assume the background distribution \(D\) is multivariate normal with zero mean and covariance \(C\), we can start with:
         $$
         \begin{aligned}
         \phi_i(f,x)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(x)|x_{S\cup \{i\}}] {-} \mathbb{E}_{D}[f(x)|x_{S}])\\
@@ -1719,11 +1719,11 @@ pre {
     </div>
 
   <p>
-    In <a href="#linear_shap_ex" class="figure-number">4</a> we highlight tradeoffs between the conditional expectation and the interventional conditional expectation for a linear model.  Comparing <a href="#linear_shap_ex" class="figure-number">4A</a> to <a href="#linear_shap_ex" class="figure-number">4B</a>, we can see that the correlation between variables will cause the CE SHAP values to be split between correlated variables.  Although this may be desirable at times<d-footnote>For example, if we are interested in detecting whether a model is secretly using a confounding variable, we may want CE SHAP values.</d-footnote>, it can feel unnatural as in <a href="#linear_shap_ex" class="figure-number">4D</a>, where feature \(x_4\) is as important as feature \(x_3\) despite the fact the model explicitly does not use it.
+    In <a href="#linear_shap_ex" class="figure-number">4</a> we highlight tradeoffs between the conditional expectation and the interventional conditional expectation for a linear model.  Comparing <a href="#linear_shap_ex" class="figure-number">4A</a> to <a href="#linear_shap_ex" class="figure-number">4B</a>, we can see that the correlation between variables will cause the CE Shapley values to be split between correlated variables.  Although this may be desirable at times<d-footnote>For example, if we are interested in detecting whether a model is secretly using a confounding variable, we may want CE Shapley values.</d-footnote>, it can feel unnatural as in <a href="#linear_shap_ex" class="figure-number">4D</a>, where feature \(x_4\) is as important as feature \(x_3\) despite the fact the model explicitly does not use it.
   </p>
 
   <p>
-    Although both CE SHAP values and ICE SHAP values are meaningful, we will focus on ICE SHAP values moving forward for two reasons: 1.) ICE SHAP values are tractable to compute as opposed to CE SHAP values that require modelling many conditional expectations and 2.) ICE SHAP values more explicitly describe the model's behavior whereas CE SHAP values conflate the model's behavior with the correlation in the data.
+    Although both CE Shapley values and ICE Shapley values are meaningful, we will focus on ICE Shapley values moving forward for two reasons: 1.) ICE Shapley values are tractable to compute as opposed to CE Shapley values that require modelling many conditional expectations and 2.) ICE Shapley values more explicitly describe the model's behavior whereas CE Shapley values conflate the model's behavior with the correlation in the data.
   </p>
 
 	</div>
@@ -1736,7 +1736,7 @@ pre {
 	</p>
 
 	<p>
-		One natural definition of the background distribution is a uniform distribution over a population sample (e.g., equal probability for every sample in a data set).  With this background distribution, we can re-write the SHAP value as an average of <i>Baseline Shapley values</i> (which are analogous to <a href="#masking_missing">masking missing features</a>) <d-cite bibtex-key="sundararajan2019many"></d-cite> <d-cite bibtex-key="chen2019explaining"></d-cite>:
+		One natural definition of the background distribution is a uniform distribution over a population sample (e.g., equal probability for every sample in a data set).  With this background distribution, we can re-write the Shapley value as an average of <i>Baseline Shapley values</i> (which are analogous to <a href="#masking_missing">masking missing features</a>) <d-cite bibtex-key="sundararajan2019many"></d-cite> <d-cite bibtex-key="chen2019explaining"></d-cite>:
 		$$
 		\phi_i(f,x^f)=\frac{1}{|D|}\sum_{x^b\in D}\phi_i(f,x^f,x^b)
 		$$
@@ -1754,14 +1754,14 @@ pre {
 		<div id="proof_backgrounddist" style="display:none">
 
 		    <p>
-			    Define \(C\) to be all combinations of the set \(N \setminus \{i\}\) and \(P\) to be all permutations of \(N \setminus \{i\}\).  Starting with the definition of SHAP values: 
+			    Define \(C\) to be all combinations of the set \(N \setminus \{i\}\) and \(P\) to be all permutations of \(N \setminus \{i\}\).  Starting with the definition of Shapley values: 
 				$$
 				\begin{aligned}
 				\phi_i(f,x^f)&= \sum_{S\in C } W(|S|,|N|)(\mathbb{E}_{D}[f(x^f)|\text{do}(x_{S\cup \{i\}})] {-} \mathbb{E}_{D}[f(x^f)|\text{do}(x_{S})])\\
 				&=\frac{1}{|P|}\sum_{S\subseteq P} \mathbb{E}_D[f(x^f)|\text{do}(x_{S \cup \{i\}})] {-} \mathbb{E}_D[f(x^f)|\text{do}(x_{S})]\\
 				&= \frac{1}{|P|}\sum_{S\subseteq P}\frac{1}{|D|}\sum_{x^b\in D} f(h^{S\cup \{i\}}) {-} f(h^{S})\\
 				&= \frac{1}{|D|}\sum_{x^b\in D} \frac{1}{|P|}\sum_{S\subseteq P} f(h^{S\cup \{i\}}) {-} f(h^{S})\\
-				&= \frac{1}{|D|}\sum_{x^b\in D} \underbrace{\sum_{S\subseteq C} W(|S|,|N|)f(h^{S\cup \{i\}}) {-} f(h^{S})}_{\text{Single reference SHAP value}}\\
+				&= \frac{1}{|D|}\sum_{x^b\in D} \underbrace{\sum_{S\subseteq C} W(|S|,|N|)f(h^{S\cup \{i\}}) {-} f(h^{S})}_{\text{Baseline Shapley value}}\\
 				&=\frac{1}{|D|}\sum_{x^b\in D}\phi_i(f,x^f,x^b)
 				\end{aligned}
 				$$
@@ -2069,7 +2069,7 @@ pre {
 
 
 	<p>
-	    An exponential computational complexity is bad; however, if we <i>constrain \(f(x)\) to be a tree-based model</i> (e.g., XGBoost, decision trees, random forests, etc.), then we can come up with a polynomial time algorithm to compute \(\phi_i(f,x^f,x^b)\) exactly.  Why is this the case?  Well, looking at <a href="#brute_force_ex" class="figure-number">6</a>, we can see that even for explaining a single feature, the brute force algorithm may consider a particular path multiple times.  However, to compute the SHAP value for a single feature, it turns out that we only need to consider each path once.  This insight leads us to the naive algorithm in <a href="#naive_implementation">Section 2.2</a>.
+	    An exponential computational complexity is bad; however, if we <i>constrain \(f(x)\) to be a tree-based model</i> (e.g., XGBoost, decision trees, random forests, etc.), then we can come up with a polynomial time algorithm to compute \(\phi_i(f,x^f,x^b)\) exactly.  Why is this the case?  Well, looking at <a href="#brute_force_ex" class="figure-number">6</a>, we can see that even for explaining a single feature, the brute force algorithm may consider a particular path multiple times.  However, to compute the Baseline Shapley value for a single feature, it turns out that we only need to consider each path once.  This insight leads us to the naive algorithm in <a href="#naive_implementation">Section 2.2</a>.
 	</p>
 
 
@@ -2412,7 +2412,7 @@ pre {
 
 
 	<p>
-		In <a href="#collapsibility_fig" class="figure-number">10</a>, we can first observe that for each leaf, according to Theorem 1, there are only two possible values needed to compute the SHAP values (\(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\)).  Based on the attributions for \(x_1\) we see that these \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) terms can be grouped by the left and right subtrees below \(x_1\).  To generalize this example, we make the following observation:
+		In <a href="#collapsibility_fig" class="figure-number">10</a>, we can first observe that for each leaf, according to Theorem 1, there are only two possible values needed to compute the Baseline Shapley values (\(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\)).  Based on the attributions for \(x_1\) we see that these \(\textcolor{green}{\text{Pos}}\) and \(\textcolor{red}{\text{Neg}}\) terms can be grouped by the left and right subtrees below \(x_1\).  To generalize this example, we make the following observation:
 	</p>
 
   <hr style="margin-top:0px;margin-bottom:10px;">
@@ -2662,17 +2662,23 @@ pre {
 	</p>
 
     <p>
-      First, there are two model agnostic explanation methods in the SHAP package.  The first is <i>Sampling Explainer</i> which is an implementation of Interactions-based Method for Explanation (IME) <d-cite bibtex-key="kononenko2010efficient"></d-cite>.  This approach is based on sampling from all possible sets in order to estimate ICE SHAP values.  The second is <i>Kernel Explainer</i> which is an extension of Local Interpretable Model-agnostic Explanations (LIME) <d-cite bibtex-key="ribeiro2016should"></d-cite> to estimate ICE SHAP values.  Both <i>Sampling Explainer</i> and <i>Kernel Explainer</i> are sampling based approaches that will converge to the same SHAP values ITE obtains.  However, ITE is much faster in practice because it leverages the structure of the tree.
+      First, there are two model agnostic explanation methods in the SHAP package.  The first is <i>Sampling Explainer</i> which is an implementation of Interactions-based Method for Explanation (IME) <d-cite bibtex-key="kononenko2010efficient"></d-cite>.  This approach is based on sampling from all possible sets in order to estimate ICE Shapley values.  The second is <i>Kernel Explainer</i> which is an extension of Local Interpretable Model-agnostic Explanations (LIME) <d-cite bibtex-key="ribeiro2016should"></d-cite> to estimate ICE Shapley values.  Both <i>Sampling Explainer</i> and <i>Kernel Explainer</i> are sampling based approaches that will converge to the same Shapley values ITE obtains.  However, ITE is much faster in practice because it leverages the structure of the tree.
     </p>
 
     <p>
-      Second, in the SHAP package there is a method named <i>Path Dependent Tree Explainer (PDTE)</i> that is meant to obtain SHAP values for tree models specifically.  PDTE approximates the interventional conditional expectation based on how many training samples went down paths in the tree, whereas ITE computes it exactly.  The computational complexity of PDTE is \(O((\text{\# leaf nodes})\times (\text{tree depth})^2)\).  In practice, PDTE can be faster than ITE, although it may depend on the number of references or the tree depth.  The tradeoff is that the attribution values estimated by PDTE are biased away from interventional expectations by conditioning on parent nodes during the computation of the expected values.
+      Second, in the SHAP package there is a method named <i>Path Dependent Tree Explainer (PDTE)</i> that is meant to obtain Shapley values for tree models specifically.  PDTE approximates the interventional conditional expectation based on how many training samples went down paths in the tree, whereas ITE computes it exactly.  The computational complexity of PDTE is \(O((\text{\# leaf nodes})\times (\text{tree depth})^2)\).  In practice, PDTE can be faster than ITE, although it may depend on the number of references or the tree depth.  The tradeoff is that the attribution values estimated by PDTE are biased away from interventional expectations by conditioning on parent nodes during the computation of the expected values.
 	</p>
 
   <h3>Additional methods to explain trees</h3>
 
   <p>
-    Two pre-existing methods to explain trees include <i>Gain (Gini Importance)</i> <d-cite bibtex-key="breiman_1984"></d-cite> and <i>Saabas</i> <d-cite bibtex-key="andosa_2019"></d-cite>.  Both methods consider a single ordering of the features (as opposed to all possible orderings) specified by the tree they are explaining.  Note that for an infinite ensemble of fully developed totally randomized trees <d-footnote>Where a fully developed totally randomized tree is a decision tree where each node \(n\) is partitioned using a variable \(x_i\) picked uniformly at random among those not yet used upstream of \(n\), each node \(n\) has one child for each possible value of \(x_i\), and the construction of these trees is complete only when all variables have been used.</d-footnote> and an infinitely large training sample, <i>Gain</i> is the mutual information between covariates and the outcome <d-cite bibtex-key="louppe2014understanding"></d-cite> and Saabas gives the SHAP values <d-cite bibtex-key="lundberg2020local"></d-cite>.  However, in practice trees are constructed greedily and both methods fail to satisfy the consistency axiom because they only consider a single ordering of the features.
+    Two pre-existing methods to explain trees include <i>Gain (Gini Importance)</i> <d-cite bibtex-key="breiman_1984"></d-cite> and <i>Saabas</i> <d-cite bibtex-key="andosa_2019"></d-cite>.  Both methods consider a single ordering of the features (as opposed to all possible orderings) specified by the tree they are explaining.  Note that for an infinite ensemble of fully developed totally randomized trees <d-footnote>Where a fully developed totally randomized tree is a decision tree where each node \(n\) is partitioned using a variable \(x_i\) picked uniformly at random among those not yet used upstream of \(n\), each node \(n\) has one child for each possible value of \(x_i\), and the construction of these trees is complete only when all variables have been used.</d-footnote> and an infinitely large training sample, <i>Gain</i> is the mutual information between covariates and the outcome <d-cite bibtex-key="louppe2014understanding"></d-cite> and Saabas gives the Shapley values <d-cite bibtex-key="lundberg2020local"></d-cite>.  However, in practice trees are constructed greedily and both methods fail to satisfy the consistency axiom because they only consider a single ordering of the features.
+  </p>
+
+  <h3>Empirical Evaluation</h3>
+
+  <p>
+    In this article we do not empirically evaluate these methods, because evaluating interpretability methods can difficult due to the subjective nature of an explanation.  Instead, we identify a way of assigning credit that comes equipped with a set of desirable properties (i.e., Shapley values) and show how to compute them exactly for trees with a tractable algorithm.  This means that the credit allocation we obtain comes built in with many of the desirable properties that ablation tests aim to measure (e.g., consistency).  That being said, <d-cite bibtex-key="lundberg2020local"></d-cite> provides an in-depth empirical comparison of many of these methods using a variety of ablation tests.
   </p>
 
     <h2 id="references">Acknowledgements</h2>
