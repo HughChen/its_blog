@@ -4,6 +4,9 @@
 	(factory((global.dl = global.dl || {})));
 }(this, (function (exports) { 'use strict';
 
+  // Version 1 had not prior license
+  // Modified to remove the banner specifying it was a distill draft
+
 var html = function(dom) {
   if (!dom.querySelector("html").getAttribute("lang")) {
     dom.querySelector("html").setAttribute("lang", "en");
