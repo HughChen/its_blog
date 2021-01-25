@@ -6271,11 +6271,12 @@ var citation = function(dom, data) {
     }
   }
   function doi_string(ent, new_line){
-    if ("doi" in ent) {
-      return ((new_line?"<br>":"") + " <a href=\"https://doi.org/" + (ent.doi) + "\" style=\"text-decoration:inherit;\">DOI: " + (ent.doi) + "</a>");
-    } else {
-      return "";
-    }
+    // if ("doi" in ent) {
+    //   return ((new_line?"<br>":"") + " <a href=\"https://doi.org/" + (ent.doi) + "\" style=\"text-decoration:inherit;\">DOI: " + (ent.doi) + "</a>");
+    // } else {
+    //   return "";
+    // }
+    return "";
   }
 
   function bibliography_cite(ent, fancy){

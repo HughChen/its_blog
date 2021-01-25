@@ -454,7 +454,8 @@ d-byline .byline {
 
 @media(min-width: 768px) {
   d-byline .byline {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr; 
+    /*Modified to have two columns*/
   }
 }
 
@@ -1059,6 +1060,8 @@ pre {
 
 
 <body>
+
+
 
   <d-front-matter>
     <code style="display: none;" type="text/json"
@@ -2734,7 +2737,7 @@ function hideshow(type) {
 
 <d-bibliography src="bibliography.bib"></d-bibliography>
 
-<script src="https://distill.pub/template.v2.js"></script>
+<script src="local_template.v2.js"></script>
 
 <script>
   window.onload = function() {
