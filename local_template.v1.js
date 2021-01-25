@@ -4,7 +4,8 @@
 	(factory((global.dl = global.dl || {})));
 }(this, (function (exports) { 'use strict';
 
-  // Version 1 had not prior license
+  // Version 1 had no license
+  // Sourced from https://distill.pub/template.v1.js
   // Modified to remove the banner specifying it was a distill draft
 
 var html = function(dom) {
